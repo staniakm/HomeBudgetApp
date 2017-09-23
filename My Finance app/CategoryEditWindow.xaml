@@ -1,0 +1,31 @@
+﻿<Window x:Class="My_Finance_app.CategoryEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:My_Finance_app"
+        mc:Ignorable="d"
+        Title="CategoryEditWindow" Height="208" Width="316">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="6*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0">
+            <Label Content="ID aso" />
+            <Label Content="Nazwa"/>
+            <Label Content="ID kategoria"/>
+            <Label Content="Nazwa kat"/>
+            <Label Content="Nowa kategoria"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <Label x:Name="lb_id_aso" Height="25"/>
+            <TextBox x:Name="lb_nazwa_aso" Height="25"/>
+            <Label x:Name="lb_id_kat" Height="25"/>
+            <Label x:Name="lb_nazwa_kat" Height="25"/>
+            <ComboBox x:Name="cb_nowa_kat" Height="25" Margin="5" IsEditable="True" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
+            <Button x:Name="bt_zatwierdz" Height="25" Margin="5" Content="Zatwierdź" Click="bt_zatwierdz_Click"/>
+        </StackPanel>
+
+    </Grid>
+</Window>
