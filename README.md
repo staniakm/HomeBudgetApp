@@ -1,2 +1,2 @@
 # HomeBudgetApp
-Desktop app based on SQL servwer database
+Desktop app based on SQL server database

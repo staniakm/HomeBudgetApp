@@ -1,0 +1,22 @@
+﻿<Window x:Class="My_Finance_app.LoginForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:My_Finance_app"
+        mc:Ignorable="d"
+        Title="LoginForm" Height="152" Width="300" ResizeMode="NoResize">
+    <Grid>
+        <StackPanel>
+            <TabPanel Margin="5,5,5,5">
+                <Label Content="Login" Width="50"/>
+                <TextBox x:Name="login" Width="220"/>
+            </TabPanel>
+            <TabPanel Margin="5,5,5,5">
+                <Label Content="Hasło" Width="50"/>
+                <PasswordBox x:Name="pass" Width="220"/>
+            </TabPanel>
+            <Button x:Name="confirmLogin" Content="OK" Click="confirmLogin_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

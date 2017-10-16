@@ -46,7 +46,7 @@
     <Compile Include="Paragon.cs" />
     <Compile Include="ParagonSzczegoly.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sklepy.cs" />
+    <Compile Include="Shops.cs" />
     <Compile Include="SqlEngine.cs" />
     <Compile Include="stData.cs" />
   </ItemGroup>

@@ -14,12 +14,19 @@ namespace Engine
         private string Database;
         public string _spid { get; private set; }
         public string id;
+        public SqlEngine(string database, string login, string pass)
+        {
+            _con = new SqlConnection();
+            Database = database;
+            polacz_z_baza(login, pass);
+        }
+
         public SqlEngine(string database)
         {
             _con = new SqlConnection();
             Database = database;
-            polacz_z_baza();
         }
+
 
         public bool Con
         {
@@ -42,13 +49,13 @@ namespace Engine
             }
         }
 
-        public void polacz_z_baza()
+        public bool polacz_z_baza(string user, string pass)
         {
-
+            bool connected = false;
             string dbString = "";
             string strCon = "";
             //string user = "testowy";
-            string pass = "1234";
+            //string pass = "1234";
             Console.Write("Łączenie: ");
             Console.WriteLine(Con);
             if (Con)
@@ -65,7 +72,7 @@ namespace Engine
                 else { dbString = "MARIUSZ_DOMOWY"; }
                 if (Database == "Normalna")
                 {
-                    strCon = "Data Source=" + dbString + ";Initial Catalog=finanse;Integrated Security=false;Connection Timeout=10;user id=testowy;password=" + pass; //'NT Authentication
+                    strCon = "Data Source=" + dbString + ";Initial Catalog=finanse;Integrated Security=false;Connection Timeout=10;user id="+user+";password=" + pass; //'NT Authentication
                 }
                 else
                 {
@@ -78,18 +85,16 @@ namespace Engine
                     {
                         _con.Open();
                         _spid = SQLgetScalar("select @@SPID");
-                        //id = SQLgetScalar("exec  dbo.Sample_Procedure ");
-
+                        connected = true;
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine(ex.Message);
-                        throw;
+                        connected = false;
                     }
-                    Console.Write("Po próbie połączenia: ");
-                    Console.WriteLine(Con.ToString());
                 }
             }
+            return connected;
         }
 
         public int SQLexecuteNonQuerry(string querry)

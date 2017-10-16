@@ -28,11 +28,15 @@ namespace My_Finance_app
         int id_zest = 1;
         SqlEngine _sql;
         Paragon _paragon;
-        public MainWindow()
+        string login;
+        string password;
+        public MainWindow( string login, string password)
         {
             InitializeComponent();
             dp_data.SelectedDate = DateTime.Now;
             PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
+            this.login = login;
+            this.password = password;
         }
         private void ConnectDatabase(object sender, RoutedEventArgs e)
         {
@@ -40,7 +44,7 @@ namespace My_Finance_app
             {
                 if (cb_database.Text != "")
                 {
-                    _sql = new SqlEngine(cb_database.Text);
+                    _sql = new SqlEngine(cb_database.Text, login, password);
                     l_spid.Content = _sql._spid;
                     cb_database.IsEnabled = !_sql.Con;
                     button.Content = "Rozłącz";
