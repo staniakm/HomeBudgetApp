@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Engine
 {
@@ -54,8 +52,6 @@ namespace Engine
             bool connected = false;
             string dbString = "";
             string strCon = "";
-            //string user = "testowy";
-            //string pass = "1234";
             Console.Write("Łączenie: ");
             Console.WriteLine(Con);
             if (Con)
@@ -76,7 +72,7 @@ namespace Engine
                 }
                 else
                 {
-                    strCon = "Data Source=" + dbString + ";Initial Catalog=finanse_test;Integrated Security=SSPI;Connection Timeout=10;";// 'NT Authentication;
+                    strCon = "Data Source=" + dbString + ";Initial Catalog=finanse_test;Integrated Security=SSPI;Connection Timeout=10;user id=" + user + ";password=" + pass;// 'NT Authentication;
                 }
                 _con.ConnectionString = strCon;
                 if (Con == false)
@@ -86,6 +82,7 @@ namespace Engine
                         _con.Open();
                         _spid = SQLgetScalar("select @@SPID");
                         connected = true;
+                        Console.WriteLine("Connected to database");
                     }
                     catch (Exception ex)
                     {
@@ -289,6 +286,50 @@ namespace Engine
         public void Backup()
         {
             SQLexecuteNonQuerry("exec BackupDatabase");
+        }
+
+        /// <summary>
+        /// Zwracamy kolekcję kont. Można ustawiać bezpośrednio do datacontextu.
+        /// </summary>
+        /// <returns></returns>
+        public ObservableCollection<BankAccount> GetAccountColection()
+        {
+            ObservableCollection<BankAccount> konta = new ObservableCollection<BankAccount>();
+            DataTable dt = GetTable("konta");
+            foreach (DataRow item in dt.Rows)
+            {
+                konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"]));
+            }
+            return konta;
+        }
+        /// <summary>
+        /// Zwracamy kolekcję sklepów. Można bezpośrednio bindować do datacontext
+        /// </summary>
+        public ObservableCollection<Sklep> GetShopsCollection()
+        {
+            ObservableCollection<Sklep> sklepy = new ObservableCollection<Sklep>();
+
+            DataTable dt = GetTable("sklepy");
+            foreach (DataRow item in dt.Rows)
+            {
+                sklepy.Add(new Sklep((int)item["id"], (string)item["sklep"]));
+            }
+            return sklepy;
+        }
+        /// <summary>
+        /// Zwracamy kolekcję kategorii. Można bezpośrednio bindować do datacontext
+        /// </summary>
+        public ObservableCollection<Category> GetCategoryCollection()
+        {
+            ObservableCollection<Category> kategorie = new ObservableCollection<Category>();
+
+            DataTable dt = GetTable("kategorie");
+            foreach (DataRow item in dt.Rows)
+            {
+                Console.WriteLine(item["id"] + " " + item["nazwa"]);
+                kategorie.Add(new Category((int)item["id"], (string)item["nazwa"]));
+            }
+            return kategorie;
         }
     }
 

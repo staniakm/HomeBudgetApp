@@ -22,8 +22,8 @@
         </DockPanel>
         <Grid x:Name="grid_paragony" Visibility="Visible" Background="#FFB9B7B7" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -32,26 +32,29 @@
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal"></StackPanel>
             <Grid>
-                <ComboBox x:Name="cb_database" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" Margin="0,21,0,0" AutomationProperties.Name="db_database">
+                <!--<ComboBox x:Name="cb_database" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" Margin="0,21,0,0" AutomationProperties.Name="db_database">
                     <Label Content="Normalna"/>
                     <Label Content="Testowa"/>
                 </ComboBox>
-                <Button x:Name="button" Content="Połącz" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" Margin="0,51,0,0" Click="ConnectDatabase"/>
-                <Label x:Name="l_spid" Visibility="Hidden" Content="" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,81,0,0"/>
-                <Button x:Name="bt_ref" Content="Refresh" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="76" Click="RefreshDataGrid" IsEnabled="True" Height="22"/>
-
-            </Grid>
-
-            <Grid x:Name="gr_paragon" Grid.Column="1" IsEnabled="False">
+                <Button x:Name="button" Content="Połącz" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" Margin="0,51,0,0" Click="ConnectDatabase"/>-->
+                <!--<Label x:Name="l_spid" Visibility="Hidden" Content="" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,81,0,0"/>-->
+               
                 <DatePicker x:Name="dp_data" HorizontalAlignment="Left" Margin="64,21,0,0" VerticalAlignment="Top" Width="128" DisplayDate="2017-01-01" FirstDayOfWeek="Monday" Cursor="None"/>
                 <ComboBox x:Name="cb_sklep" HorizontalAlignment="Left" Margin="64,50,0,0" VerticalAlignment="Top" Width="128" IsEditable="True" TabIndex="1" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
                 <TextBox x:Name="tb_nr_paragonu" HorizontalAlignment="Left" Height="23" Margin="64,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" TabIndex="2"/>
                 <ComboBox x:Name="cb_konto" HorizontalAlignment="Left" Margin="64,105,0,0" VerticalAlignment="Top" Width="128" TabIndex="3" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
-                <Button x:Name="bt_dodajParagon" Content="Dodaj paragon" HorizontalAlignment="Left" Margin="68,141,0,0" VerticalAlignment="Top" Width="124" Click="NowyParagon" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="4"/>
+                <Button x:Name="bt_dodajParagon" Content="Dodaj paragon" HorizontalAlignment="Left" Margin="64,141,0,0" VerticalAlignment="Top" Width="128" Click="NowyParagon" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="4"/>
                 <Label x:Name="label" Content="Data" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy" Content="Sklep" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy1" Content="Paragon" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy2" Content="Konto" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
+
+
+
+            </Grid>
+
+            <Grid x:Name="gr_paragon" Grid.Column="1" IsEnabled="False">
+                <Button x:Name="bt_ref" Content="Refresh" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="76" Click="RefreshDataGrid" IsEnabled="True" Height="22"/>
             </Grid>
             <Grid x:Name="gr_produkty" IsEnabled="False" Grid.Column="2">
                 <ComboBox x:Name="cb_product" HorizontalAlignment="Left" Margin="82,21,0,0" VerticalAlignment="Top" Width="250" IsEditable="True" TabIndex="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID" SelectedValue="{Binding ID}" />

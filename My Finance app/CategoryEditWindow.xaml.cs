@@ -38,7 +38,7 @@ namespace My_Finance_app
 
         private void loadCategories()
         {
-            cb_nowa_kat.DataContext = mw.GetCategoryCollection();
+            cb_nowa_kat.DataContext = SQL.GetCategoryCollection();
         }
         private void bt_zatwierdz_Click(object sender, RoutedEventArgs e)
         {

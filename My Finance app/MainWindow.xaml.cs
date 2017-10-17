@@ -1,22 +1,14 @@
-﻿using System;
+﻿using Engine;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Engine;
-using System.Text.RegularExpressions;
-using System.Data;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
 
 namespace My_Finance_app
 {
@@ -28,62 +20,54 @@ namespace My_Finance_app
         int id_zest = 1;
         SqlEngine _sql;
         Paragon _paragon;
-        string login;
-        string password;
-        public MainWindow( string login, string password)
+        Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
+        public MainWindow(SqlEngine _sql)
         {
             InitializeComponent();
+            this._sql = _sql;
+            SetupAdditionalData();
+        }
+
+        private void SetupAdditionalData()
+        {
             dp_data.SelectedDate = DateTime.Now;
             PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
-            this.login = login;
-            this.password = password;
+            ConnectDatabase();
+
+            grids.Add("Paragony", grid_paragony);
+            grids.Add("Asortyment", grid_asortyment);
+            grids.Add("Podział na kategorie", grid_zestawienie);
+            grids.Add("Standardowe zestawienie", grid_zestawienie);
+
+
+
+        //    throw new NotImplementedException();
         }
-        private void ConnectDatabase(object sender, RoutedEventArgs e)
+
+        private void ConnectDatabase()
         {
-            if (_sql == null)
+            LoadDataToCombo();
+            UpdateControlsState(true);
+            LoadCategories();
+            try
             {
-                if (cb_database.Text != "")
-                {
-                    _sql = new SqlEngine(cb_database.Text, login, password);
-                    l_spid.Content = _sql._spid;
-                    cb_database.IsEnabled = !_sql.Con;
-                    button.Content = "Rozłącz";
-                    LoadDataToCombo();
-                   
-                    UpdateControlsState(true);
-                    LoadCategories();
-                    try
-                    {
-                        _sql.SQLexecuteNonQuerry("EXEC dodaj_rachunki");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, "Error");
-                    }
-
-                    try
-                    {
-                        Task t = Task.Run(() =>
-                        {
-                            _sql.Backup();
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, "Error");
-                    }
-                }
+                _sql.SQLexecuteNonQuerry("EXEC dodaj_rachunki");
             }
-            else
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.Message, "Error");
+            }
 
-                Console.WriteLine("");
-                _sql.Con = false;
-                cb_database.IsEnabled = !_sql.Con;
-                _sql = null;
-                _paragon = null;
-                button.Content = "Połącz";
-                UpdateControlsState(false);
+            try
+            {
+                Task t = Task.Run(() =>
+                {
+                    _sql.Backup();
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
             }
         }
 
@@ -91,8 +75,8 @@ namespace My_Finance_app
         private void LoadDataToCombo()
         {
 
-            cb_sklep.DataContext = GetShopsCollection();
-            cb_konto.DataContext = GetAccountColection();
+            cb_sklep.DataContext = _sql.GetShopsCollection();
+            cb_konto.DataContext = _sql.GetAccountColection();
         }
 
         /// <summary>
@@ -115,51 +99,7 @@ namespace My_Finance_app
             }
         }
 
-        /// <summary>
-        /// Zwracamy kolekcję kont. Można ustawiać bezpośrednio do datacontextu.
-        /// </summary>
-        /// <returns></returns>
-        private ObservableCollection<BankAccount> GetAccountColection()
-        {
-            ObservableCollection<BankAccount> konta = new ObservableCollection<BankAccount>();
-            DataTable dt = _sql.GetTable("konta");
-            foreach (DataRow item in dt.Rows)
-            {
-                konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"]));
-            }
-            return konta;
-        }
 
-        /// <summary>
-        /// Zwracamy kolekcję sklepów. Można bezpośrednio bindować do datacontext
-        /// </summary>
-        private ObservableCollection<Sklep> GetShopsCollection()
-        {
-            ObservableCollection<Sklep> sklepy = new ObservableCollection<Sklep>();
-
-            DataTable dt = _sql.GetTable("sklepy");
-            foreach (DataRow item in dt.Rows)
-            {
-                sklepy.Add(new Sklep((int)item["id"], (string)item["sklep"]));
-            }
-            return sklepy;
-        }
-
-        /// <summary>
-        /// Zwracamy kolekcję kategorii. Można bezpośrednio bindować do datacontext
-        /// </summary>
-        public ObservableCollection<Category> GetCategoryCollection()
-        {
-            ObservableCollection<Category> kategorie = new ObservableCollection<Category>();
-
-            DataTable dt = _sql.GetTable("kategorie");
-            foreach (DataRow item in dt.Rows)
-            {
-                Console.WriteLine(item["id"]+" "+ item["nazwa"]);
-                kategorie.Add(new Category((int)item["id"], (string)item["nazwa"]));
-            }
-            return kategorie;
-        }
 
         public ObservableCollection<Asortyment> GetProductInStoreCollection(string shop)
         {
@@ -178,7 +118,7 @@ namespace My_Finance_app
             string selectedCategory = cb_kategoria.Text.Length == 0 ? "wszystkie" : cb_kategoria.Text;
             try
             {
-                cb_kategoria.DataContext = GetCategoryCollection();// _sql.GetData("SELECT row_number() over (order by nazwa) [licznik], nazwa, id FROM kategoria union select 0, 'wszystkie',0 order by licznik;").DefaultView;
+                cb_kategoria.DataContext = _sql.GetCategoryCollection();// _sql.GetData("SELECT row_number() over (order by nazwa) [licznik], nazwa, id FROM kategoria union select 0, 'wszystkie',0 order by licznik;").DefaultView;
                 cb_kategoria.Text = selectedCategory;
             }
             catch (Exception ex)
@@ -187,7 +127,7 @@ namespace My_Finance_app
             }
         }
 
- 
+
         /// <summary>
         /// Ładowanie produktów do combo.
         /// Konieczne po dodaniu paragonu a także przy dodawaniu asortymentu do sklepu.
@@ -210,7 +150,7 @@ namespace My_Finance_app
                 if (_sql.ShopExists(cb_sklep.Text.ToString().ToUpper()) > 0)
                 {
                     string SelectedShop = cb_sklep.Text.ToString().ToUpper();
-                    cb_sklep.DataContext = GetShopsCollection();
+                    cb_sklep.DataContext = _sql.GetShopsCollection();
                     cb_sklep.Text = SelectedShop;
                 }
                 //ładujemy aso sklepu
@@ -306,7 +246,7 @@ namespace My_Finance_app
             _paragon.Sklep = cb_sklep.Text;
             try
             {
-                
+
                 string strCommand = String.Format("insert into paragony(nr_paragonu, data, sklep, konto, suma, opis) values ('{0}', '{1}','{2}',{3}, 0,'' )",
                                                       _paragon.NrParagonu.ToUpper(), _paragon.Data, _paragon.Sklep.ToUpper(), _paragon.Konto);
                 _sql.SQLexecuteNonQuerry(strCommand);
@@ -357,19 +297,11 @@ namespace My_Finance_app
                 case "Standardowe zestawienie":
                     id_zest = 1;
 
-                    grid_paragony.Visibility = Visibility.Hidden;
-                    grid_zestawienie.Visibility = Visibility.Visible;
-                    grid_asortyment.Visibility = Visibility.Hidden;
-
+                    showGrid(mi.Header.ToString());
                     dp_dataOd_zest.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
                     dp_dataDo_zest.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1);
-
-
-                    cb_kategoria_zestawienie.DataContext = GetCategoryCollection();
-
-                    cb_sklep_zestawienie.DataContext = GetShopsCollection();
-
-
+                    cb_kategoria_zestawienie.DataContext = _sql.GetCategoryCollection();
+                    cb_sklep_zestawienie.DataContext = _sql.GetShopsCollection();
                     if (mi.Header.ToString() == "Podział na kategorie")
                     {
                         id_zest = 2;
@@ -379,16 +311,22 @@ namespace My_Finance_app
 
 
                 case "Paragony":
-                    grid_paragony.Visibility = Visibility.Visible;
-                    grid_zestawienie.Visibility = Visibility.Hidden;
-                    grid_asortyment.Visibility = Visibility.Hidden;
+                    showGrid(mi.Header.ToString());
                     break;
                 case "Asortyment":
-                    grid_paragony.Visibility = Visibility.Hidden;
-                    grid_zestawienie.Visibility = Visibility.Hidden;
-                    grid_asortyment.Visibility = Visibility.Visible;
+                    showGrid(mi.Header.ToString());
                     break;
             }
+        }
+
+        private void showGrid(string v)
+        {
+
+            foreach (string s in grids.Keys)
+            {
+                    grids[s].Visibility = Visibility.Hidden;
+            }
+            grids[v].Visibility = Visibility.Visible;
         }
 
         private void PrintConsole(string s)

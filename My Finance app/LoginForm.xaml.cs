@@ -17,11 +17,15 @@ namespace My_Finance_app
             SqlEngine sql = new SqlEngine("Normalna");
             if (sql.polacz_z_baza(login.Text,pass.Password.ToString()))
             {
-                MainWindow mw = new MainWindow(login.Text, pass.Password.ToString());
+                MainWindow mw = new MainWindow(sql);
                 mw.Show();
                 this.Close();
-            }                                          else
+            } else
             {
+                if (sql.Con)
+                {
+                    sql.Con = false;
+                }
                 pass.Clear();
                 login.Clear();
 
