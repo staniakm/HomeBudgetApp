@@ -4,10 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:My_Finance_app"
+         xmlns:eng ="clr-namespace:Engine;assembly=Engine"
         mc:Ignorable="d"
         Title="MyFinancial app" Height="451" Width="804">
-
-    <Grid x:Name="grid_main" Margin="0,0,0,0">
+    <Window.Resources>
+        <eng:DataConverter x:Key="convert"/>
+    </Window.Resources>
+        <Grid x:Name="grid_main" Margin="0,0,0,0">
         <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" >
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_Zakładki" >
@@ -17,10 +20,11 @@
                         <MenuItem Header="Podział na kategorie" Click="MenuItem_Click"/>
                     </MenuItem>
                     <MenuItem x:Name="mi_Kategorie" Header="Asortyment" Click="MenuItem_Click" IsEnabled="False"/>
+                    <MenuItem x:Name="mi_Konta" Header="Konta" Click="MenuItem_Click" IsEnabled="False"/>
                 </MenuItem>
             </Menu>
         </DockPanel>
-        <Grid x:Name="grid_paragony" Visibility="Visible" Background="#FFB9B7B7" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid x:Name="grid_paragony" Visibility="Hidden" Background="#FFB9B7B7" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="1*"/>
@@ -125,6 +129,58 @@
                     <DataGridTextColumn Binding="{Binding Path=nazwa}" IsReadOnly="True" />
                 </DataGrid.Columns>-->
             </DataGrid>
+        </Grid>
+        <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Visible" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="12*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+            <Label Content="Edycja kont"/>
+                <ComboBox x:Name="konta_cb_konto" VerticalAlignment="Center" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID" HorizontalAlignment="Stretch" Margin="5"/>
+                <Button x:Name="br_zapisz_konto" Content="Zapisz" Margin="5" HorizontalAlignment="Stretch" Click="br_zapisz_konto_Click"/>
+                <Button x:Name="bt_nowe_konto" Content="Nowe" Margin="0,50,0,0" Click="bt_nowe_konto_Click"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+                <TabPanel Margin="5">
+                    <Label Width="100" Content="ID"/>
+                    <TextBox x:Name="konto_ID" Width="150" IsEnabled="False" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.ID, Mode=OneWay}" />
+                </TabPanel>
+                <TabPanel Margin="5">
+                    <Label Width="100" Content="Nazwa"/>
+                    <TextBox x:Name="konto_nazwa" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Name, Mode=OneWay}" />
+                </TabPanel>
+                <TabPanel Margin="5">
+                    <Label Content="Kwota" Width="100"/>
+                    <TextBox x:Name="konto_kwota" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Value, Mode=OneWay}"  PreviewTextInput="NumberValidation"/>
+                </TabPanel>
+                <TabPanel Margin="5" Height="60">
+                    <Label Content="Opis" Width="100"/>
+                    <TextBox x:Name="konto_opis" Height="60" TextWrapping="Wrap" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Opis, Mode=OneWay}" />
+                </TabPanel>
+                <TabPanel Margin="5">
+                    <Label Content="Właściciel" Width="100"/>
+                    <TextBox x:Name="konto_owner" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Owner, Mode=OneWay}" />
+                </TabPanel>
+                <TabPanel Margin="5">
+                    <Label Content="Oprocentowanie" Width="100"/>
+                    <TextBox x:Name="konto_procent" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Oprocentowanie, Mode=OneWay}"  PreviewTextInput="NumberValidation"/>
+                </TabPanel>
+            </StackPanel>
+            
+            <!--<Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100*"/>
+                <ColumnDefinition Width="600*"/>
+            </Grid.ColumnDefinitions>
+            <ComboBox x:Name="cb_konto" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10" IsEditable="True"/>
+            <Button x:Name="bt_zaladuj_produkty" Content="Załaduj" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,40,10,10" Click="LoadCategory"/>
+            <Button x:Name="bt_edit_category" Click="bt_edit_category_Click" Content="Edytuj" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,70,10,0"/>-->
+
+            <!--<DataGrid x:Name="dg_asortyment" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}" >
+                --><!--<DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Path=nazwa}" IsReadOnly="True" />
+                </DataGrid.Columns>--><!--
+            </DataGrid>-->
         </Grid>
     </Grid>
 

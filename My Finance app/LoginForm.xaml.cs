@@ -14,13 +14,19 @@ namespace My_Finance_app
 
         private void confirmLogin_Click(object sender, RoutedEventArgs e)
         {
-            SqlEngine sql = new SqlEngine("Normalna");
-            if (sql.polacz_z_baza(login.Text,pass.Password.ToString()))
+            //create instance to SqlEngine for production database
+            SqlEngine sql = new SqlEngine(cb_db_name.Text);
+            ////check if login data are correct
+            if (sql.Polacz_z_baza(login.Text, pass.Password.ToString()))
             {
+                //if login data are correctthen we can create main window.
+                //we can pass sql instance to main window so we don't have to create another instance in main window
+                //and we can use passed instance
                 MainWindow mw = new MainWindow(sql);
                 mw.Show();
                 this.Close();
-            } else
+            }
+            else
             {
                 if (sql.Con)
                 {

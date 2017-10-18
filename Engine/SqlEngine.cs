@@ -16,7 +16,7 @@ namespace Engine
         {
             _con = new SqlConnection();
             Database = database;
-            polacz_z_baza(login, pass);
+            Polacz_z_baza(login, pass);
         }
 
         public SqlEngine(string database)
@@ -47,13 +47,13 @@ namespace Engine
             }
         }
 
-        public bool polacz_z_baza(string user, string pass)
+        public bool Polacz_z_baza(string user, string pass)
         {
             bool connected = false;
             string dbString = "";
             string strCon = "";
-            Console.Write("Łączenie: ");
-            Console.WriteLine(Con);
+            //Console.Write("Łączenie: ");
+            //Console.WriteLine(Con);
             if (Con)
             {
                 Con = false;
@@ -66,14 +66,8 @@ namespace Engine
                     dbString = @"MARIUSZ_DOMOWY\SQLEXPRESS";
                 }
                 else { dbString = "MARIUSZ_DOMOWY"; }
-                if (Database == "Normalna")
-                {
-                    strCon = "Data Source=" + dbString + ";Initial Catalog=finanse;Integrated Security=false;Connection Timeout=10;user id="+user+";password=" + pass; //'NT Authentication
-                }
-                else
-                {
-                    strCon = "Data Source=" + dbString + ";Initial Catalog=finanse_test;Integrated Security=SSPI;Connection Timeout=10;user id=" + user + ";password=" + pass;// 'NT Authentication;
-                }
+                    strCon = "Data Source=" + dbString + ";Initial Catalog="+Database+";Integrated Security=false;Connection Timeout=10;user id="+user+";password=" + pass; //'NT Authentication
+
                 _con.ConnectionString = strCon;
                 if (Con == false)
                 {
@@ -100,11 +94,12 @@ namespace Engine
             SqlCommand sql = new SqlCommand(querry, _con);
             try
             {
+                Console.WriteLine(querry);
                 rowsAffected = sql.ExecuteNonQuery();
             }
-            catch (System.Exception)
+            catch (System.Exception e)
             {
-
+                Console.WriteLine(e.Message);
                 throw;
             }
             return rowsAffected;
@@ -112,20 +107,23 @@ namespace Engine
 
         public void AddAsoToStore(string produkt, string sklep)
         {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-
-            dic.Add("@produkt", produkt);
-            dic.Add("@sklep", sklep);
+            Dictionary<string, string> dic = new Dictionary<string, string>
+            {
+                { "@produkt", produkt },
+                { "@sklep", sklep }
+            };
 
             SQLexecuteNonQuerryProcedure("dbo.addAsoToStore", dic);
         }
 
-        private int SQLexecuteNonQuerryProcedure(string querry, Dictionary<string, string> paramet)
+        public int SQLexecuteNonQuerryProcedure(string querry, Dictionary<string, string> paramet)
         {
 
             int rowsAffected = 0;
-            SqlCommand command = new SqlCommand(querry, _con);
-            command.CommandType = CommandType.StoredProcedure;
+            SqlCommand command = new SqlCommand(querry, _con)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
 
 
             Console.WriteLine(querry);
@@ -170,10 +168,14 @@ namespace Engine
         public DataTable GetData(string sqlCommand)
         {
             SqlCommand command = new SqlCommand(sqlCommand, _con);
-            SqlDataAdapter adapter = new SqlDataAdapter();
-            adapter.SelectCommand = command;
-            DataTable table = new DataTable();
-            table.Locale = System.Globalization.CultureInfo.InvariantCulture;
+            SqlDataAdapter adapter = new SqlDataAdapter
+            {
+                SelectCommand = command
+            };
+            DataTable table = new DataTable
+            {
+                Locale = System.Globalization.CultureInfo.InvariantCulture
+            };
             adapter.Fill(table);
             return table;
         }
@@ -185,7 +187,7 @@ namespace Engine
             switch (name)
             {
                 case "konta":
-                    sqlCommand = "SELECT nazwa, id FROM konto order by id;";
+                    sqlCommand = "SELECT nazwa, id, kwota, opis, wlasciciel, oprocentowanie FROM konto order by id;";
                     break;
                 case "sklepy":
                     sqlCommand = "select '' sklep, -1 id union SELECT sklep,id FROM sklepy;";
@@ -199,16 +201,14 @@ namespace Engine
 
         public DataTable GetAsoList(string shop)
         {
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-            dict.Add("@sklep", shop);
+            Dictionary<string, string> dict = new Dictionary<string, string>
+            {
+                { "@sklep", shop }
+            };
 
             string querry = "select '' as NAZWA, 0 id union  select a.NAZWA, a.id from ASORTYMENT a join sklepy s on s.sklep = @sklep " +
            "join ASORTYMENT_SKLEP sk on sk.id_aso = a.id where a.del = 0 and  sk.del = 0 and sk.id_sklep = s.id";
-
-
             return GetData(querry, dict);
-                
-
         }
 
         public DataTable GetData(string sqlCommand, Dictionary<string, string> param)
@@ -224,10 +224,14 @@ namespace Engine
             }
             command.Parameters.Add(par);
 
-            SqlDataAdapter adapter = new SqlDataAdapter();
-            adapter.SelectCommand = command;
-            DataTable table = new DataTable();
-            table.Locale = System.Globalization.CultureInfo.InvariantCulture;
+            SqlDataAdapter adapter = new SqlDataAdapter
+            {
+                SelectCommand = command
+            };
+            DataTable table = new DataTable
+            {
+                Locale = System.Globalization.CultureInfo.InvariantCulture
+            };
             adapter.Fill(table);
             return table;
         }
@@ -298,7 +302,7 @@ namespace Engine
             DataTable dt = GetTable("konta");
             foreach (DataRow item in dt.Rows)
             {
-                konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"]));
+                konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"], (decimal) item["kwota"], (string)item["opis"],(string)item["wlasciciel"],(decimal)item["oprocentowanie"]));
             }
             return konta;
         }
@@ -326,7 +330,7 @@ namespace Engine
             DataTable dt = GetTable("kategorie");
             foreach (DataRow item in dt.Rows)
             {
-                Console.WriteLine(item["id"] + " " + item["nazwa"]);
+              //  Console.WriteLine(item["id"] + " " + item["nazwa"]);
                 kategorie.Add(new Category((int)item["id"], (string)item["nazwa"]));
             }
             return kategorie;

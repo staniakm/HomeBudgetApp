@@ -34,14 +34,14 @@ namespace My_Finance_app
             PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
             ConnectDatabase();
 
+            //puting grids to dictionary. This will allow us to switch between grids.
             grids.Add("Paragony", grid_paragony);
             grids.Add("Asortyment", grid_asortyment);
             grids.Add("Podział na kategorie", grid_zestawienie);
             grids.Add("Standardowe zestawienie", grid_zestawienie);
+            grids.Add("Konta", grid_konta);
 
-
-
-        //    throw new NotImplementedException();
+            showGrid("Paragony");
         }
 
         private void ConnectDatabase()
@@ -77,6 +77,7 @@ namespace My_Finance_app
 
             cb_sklep.DataContext = _sql.GetShopsCollection();
             cb_konto.DataContext = _sql.GetAccountColection();
+            grid_konta.DataContext = _sql.GetAccountColection();
         }
 
         /// <summary>
@@ -129,8 +130,8 @@ namespace My_Finance_app
 
 
         /// <summary>
-        /// Ładowanie produktów do combo.
-        /// Konieczne po dodaniu paragonu a także przy dodawaniu asortymentu do sklepu.
+        /// Loading products connected with selected store into combo 
+        /// Require during adding new bill and also when adding products into store.
         /// </summary>
         private void LoadProducts()
         {
@@ -138,10 +139,8 @@ namespace My_Finance_app
         }
 
         /// <summary>
-        /// Rozpoczynamy tworzenie nowego paragonu
+        /// Begining of creating new bill.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void NowyParagon(object sender, RoutedEventArgs e)
         {
             if (cb_sklep.Text != "" && cb_konto.Text != "")
@@ -167,7 +166,7 @@ namespace My_Finance_app
         /// <param name="state"> bool </param>
         private void UpdateControlsState(bool state)
         {
-            Console.WriteLine(state);
+            Console.WriteLine("status kontorlek: "+state);
             gr_paragon.IsEnabled = state;
             if (_sql != null)
             {
@@ -175,6 +174,7 @@ namespace My_Finance_app
                 mi_Zestawienia.IsEnabled = true;
                 mi_Kategorie.IsEnabled = true;
                 gr_paragon.IsEnabled = state;
+                mi_Konta.IsEnabled = true;
             }
             else
             {
@@ -289,15 +289,13 @@ namespace My_Finance_app
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem mi = e.Source as MenuItem;
-            //  Console.WriteLine(mi.Name);
-
+            showGrid(mi.Header.ToString());
             switch (mi.Header.ToString())
             {
                 case "Podział na kategorie":
                 case "Standardowe zestawienie":
                     id_zest = 1;
 
-                    showGrid(mi.Header.ToString());
                     dp_dataOd_zest.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
                     dp_dataDo_zest.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1);
                     cb_kategoria_zestawienie.DataContext = _sql.GetCategoryCollection();
@@ -308,20 +306,11 @@ namespace My_Finance_app
                     }
 
                     break;
-
-
-                case "Paragony":
-                    showGrid(mi.Header.ToString());
-                    break;
-                case "Asortyment":
-                    showGrid(mi.Header.ToString());
-                    break;
             }
         }
 
         private void showGrid(string v)
         {
-
             foreach (string s in grids.Keys)
             {
                     grids[s].Visibility = Visibility.Hidden;
@@ -334,25 +323,29 @@ namespace My_Finance_app
             Console.WriteLine(s);
         }
 
+        /// <summary>
+        /// After clicking button we are create session settings for specific report.
+        /// 
+        /// </summary>
         private void bt_generuj_Click(object sender, RoutedEventArgs e)
         {
 
-            //kasujemy wszystkie ustawienia dla sesji
+            //delete all setings for specific session
             _sql.SQLexecuteNonQuerry(string.Format("delete from rapOrg where sesja = {0}", _sql._spid));
 
+            //date settings parametr = 1
             if (dp_dataOd_zest.SelectedDate.ToString() != "" || dp_dataDo_zest.SelectedDate.ToString() != "")
             {
                 string dataod = dp_dataOd_zest.SelectedDate.ToString() != "" ? dp_dataOd_zest.SelectedDate.ToString() : "2000-01-01";
                 string datado = dp_dataDo_zest.SelectedDate.ToString() != "" ? dp_dataDo_zest.SelectedDate.ToString() : "2050-01-01";
-                //ustawiamy ograniczenia dla dat parametr = 1
                 _sql.SQLexecuteNonQuerry(string.Format("insert into rapOrg select '{0}', '{1}', 1 ,{2}", dataod, datado, _sql._spid));
             }
-            //kategoria parametr = 2
+            //category parametr = 2
             if ((int)cb_kategoria_zestawienie.SelectedIndex > 0)
             {
                 _sql.SQLexecuteNonQuerry(string.Format("insert into rapOrg select '{0}', '', 2 ,{1}", cb_kategoria_zestawienie.SelectedValue.ToString(), _sql._spid));
             }
-            //sklep parametr = 3
+            //shop parametr = 3
             if ((int)cb_sklep_zestawienie.SelectedIndex > 0)
             {
                 Console.WriteLine(cb_sklep_zestawienie.SelectedValue);
@@ -385,6 +378,32 @@ namespace My_Finance_app
             LoadCategoryData();
         }
 
+        private void br_zapisz_konto_Click(object sender, RoutedEventArgs e)
+        {
+            //Console.WriteLine(konta_cb_konto.SelectedValue);
+            Dictionary<string, string> tmpDic = new Dictionary<string, string>()
+            {
+               { "@nazwa", konto_nazwa.Text},
+                { "@kwota", konto_kwota.Text},
+                {"@opis", konto_opis.Text },
+                {"@owner", konto_owner.Text },
+                {"@oprocentowanie", konto_procent.Text},
+                {"@id", (konto_ID.Text.Equals("")?null:konto_ID.Text)}
+            };
 
+            _sql.SQLexecuteNonQuerryProcedure("dbo.bankAccountModification", tmpDic);
+            //_sql.SQLexecuteNonQuerry(String.Format("update konto set kwota = {1}, opis='{2}', wlasciciel='{3}', oprocentowanie = {4} where ID = {0}", konta_cb_konto.SelectedValue, konto_kwota.Text, konto_opis.Text,
+            //                                            konto_owner.Text, konto_procent.Text));
+        }
+
+        private void bt_nowe_konto_Click(object sender, RoutedEventArgs e)
+        {
+            konto_ID.Text = "";
+            konto_nazwa.Text = "";
+            konto_kwota.Text = "";
+            konto_opis.Text = "";
+            konto_owner.Text = "";
+            konto_procent.Text = "";
+        }
     }
 }//ostani

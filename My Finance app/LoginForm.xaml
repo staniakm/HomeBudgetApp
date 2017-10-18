@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:My_Finance_app"
         mc:Ignorable="d"
-        Title="LoginForm" Height="152" Width="300" ResizeMode="NoResize">
+        Title="LoginForm" Height="172" Width="300" ResizeMode="NoResize">
     <Grid>
         <StackPanel>
             <TabPanel Margin="5,5,5,5">
@@ -16,6 +16,11 @@
                 <Label Content="Hasło" Width="50"/>
                 <PasswordBox x:Name="pass" Width="220"/>
             </TabPanel>
+            <ComboBox x:Name="cb_db_name">
+                <ComboBoxItem IsSelected="True" >finanse</ComboBoxItem>
+                <ComboBoxItem >finanse_test</ComboBoxItem>
+                <ComboBoxItem >finanse_test_2</ComboBoxItem>
+            </ComboBox>
             <Button x:Name="confirmLogin" Content="OK" Click="confirmLogin_Click"/>
         </StackPanel>
     </Grid>
