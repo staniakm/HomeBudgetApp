@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace Engine
 {
-    
+
     [ValueConversion(typeof(int), typeof(string))]
     //konwersja defaultowej daty na pusty string
     public class DataConverter : IValueConverter
@@ -17,12 +13,9 @@ namespace Engine
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            // Console.WriteLine(value);
             DateTime original = (DateTime)value;
-            // Console.WriteLine(original.ToString("yyyy-MM-dd"));
             if (original.ToString("yyyy-MM-dd") == "0001-01-01")
             {
-                //   Console.WriteLine("podmiana");
                 return "";
             }
             return original.ToString("yyyy-MM-dd");

@@ -190,10 +190,10 @@ namespace Engine
                     sqlCommand = "SELECT nazwa, id, kwota, opis, wlasciciel, oprocentowanie FROM konto order by id;";
                     break;
                 case "sklepy":
-                    sqlCommand = "select '' sklep, -1 id union SELECT sklep,id FROM sklepy;";
+                    sqlCommand = "select '' sklep, -1 id union SELECT sklep,id FROM sklepy order by sklep;";
                     break;
                 case "kategorie":
-                    sqlCommand = "select '' nazwa, -1 id union SELECT nazwa,id FROM kategoria;";
+                    sqlCommand = "select '' nazwa, -1 id union SELECT nazwa,id FROM kategoria order by nazwa;";
                     break;
             }
             return GetData(sqlCommand);

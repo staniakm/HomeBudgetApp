@@ -10,18 +10,23 @@
         <StackPanel>
             <TabPanel Margin="5,5,5,5">
                 <Label Content="Login" Width="50"/>
+                <ComboBox x:Name="cb_db_name" Width="220">
+                    <ComboBoxItem IsSelected="True" >finanse</ComboBoxItem>
+                    <ComboBoxItem >finanse_test</ComboBoxItem>
+                    <ComboBoxItem >finanse_test_2</ComboBoxItem>
+                </ComboBox>
+            </TabPanel>
+            <TabPanel Margin="5,5,5,5">
+                <Label Content="Login" Width="50"/>
                 <TextBox x:Name="login" Width="220"/>
             </TabPanel>
             <TabPanel Margin="5,5,5,5">
                 <Label Content="Hasło" Width="50"/>
                 <PasswordBox x:Name="pass" Width="220"/>
             </TabPanel>
-            <ComboBox x:Name="cb_db_name">
-                <ComboBoxItem IsSelected="True" >finanse</ComboBoxItem>
-                <ComboBoxItem >finanse_test</ComboBoxItem>
-                <ComboBoxItem >finanse_test_2</ComboBoxItem>
-            </ComboBox>
-            <Button x:Name="confirmLogin" Content="OK" Click="confirmLogin_Click"/>
+            <TabPanel Margin="5,5,5,5">
+                <Button Margin="50,0,-50,0" x:Name="confirmLogin" Content="OK" Click="confirmLogin_Click" Width="200"/>
+            </TabPanel>
         </StackPanel>
     </Grid>
 </Window>

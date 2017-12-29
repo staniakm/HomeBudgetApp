@@ -13,9 +13,9 @@ namespace Engine
             ID = iD;
             Name = name;
             Value = value;
-            this.Opis = opis;
-            this.Owner = owner;
-            this.Oprocentowanie = oprocentowanie;
+            Opis = opis;
+            Owner = owner;
+            Oprocentowanie = oprocentowanie;
         }
 
         public int ID { get; private set; }
@@ -40,8 +40,8 @@ namespace Engine
             }
         }
 
-        public decimal Oprocentowanie { get => oprocentowanie; set => oprocentowanie = value; }
-        public string Owner { get => owner; set => owner = value; }
-        public string Opis { get => opis; set => opis = value; }
+        public decimal Oprocentowanie { get { return oprocentowanie; } set { oprocentowanie = value; } }
+        public string Owner { get { return owner; } set { owner = value; } }
+        public string Opis { get { return opis; } set { opis = value; } }
     }
 }
