@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace Engine
 {
@@ -18,7 +19,23 @@ namespace Engine
         {
             _con = new SqlConnection();
             this.database = database;
-            ConnectSQLDatabase(login, pass);
+            if (ConnectSQLDatabase(login, pass))
+            {
+                SQLexecuteNonQuerry("EXEC dodaj_rachunki");
+                try
+                {
+                    Task t = Task.Run(() =>
+                    {
+                        Backup();
+                    });
+                }
+                catch (Exception ex)
+                {
+                    //MessageBox.Show(ex.Message, "Error");
+                }
+            }
+                ;
+
         }
 
         public SqlEngine(string database)
@@ -86,6 +103,11 @@ namespace Engine
             return connected;
         }
 
+        public void UpdateAsoCategory(int idASO, string nowaKategoria, int idKAT, string nowaNazwa)
+        {
+            SQLexecuteNonQuerry(String.Format("exec dbo.updateAsoCategory {0}, '{1}', {2}, '{3}'", idASO, nowaKategoria, idKAT, nowaNazwa));
+        }
+
         public void UpdateBudget(int databaseBudgetRowID, string newValue)
         {
             try
@@ -101,7 +123,7 @@ namespace Engine
 
         }
 
-        public int SQLexecuteNonQuerry(string querry)
+        private int SQLexecuteNonQuerry(string querry)
         {
             Console.WriteLine( "query: "+querry);
             int rowsAffected = 0;
@@ -130,7 +152,7 @@ namespace Engine
             SQLexecuteNonQuerryProcedure("dbo.addAsoToStore", dic);
         }
 
-        public int SQLexecuteNonQuerryProcedure(string querry, Dictionary<string, string> paramet)
+        private int SQLexecuteNonQuerryProcedure(string querry, Dictionary<string, string> paramet)
         {
 
             int rowsAffected = 0;
@@ -364,6 +386,20 @@ namespace Engine
             int rowsNumb = 0;
             rowsNumb = SQLexecuteNonQuerry(string.Format("if not exists(select 1 from sklepy where sklep = '{0}') insert into sklepy(sklep) select '{0}'", sklep));
             return rowsNumb;
+        }
+
+        public void ReportSettings(Dictionary<int, Tuple<string, string>> dic)
+        {
+            string querry = string.Format("delete from rapOrg where sesja = {0};\n", _spid);
+
+            foreach (KeyValuePair<int, Tuple<string,string>> entry in dic)
+            {
+                querry += string.Format("insert into rapOrg select '{0}', '{1}', {2} ,{3};\n", entry.Value.Item1, entry.Value.Item2, entry.Key, _spid);
+            }
+
+            Console.WriteLine(querry);
+            SQLexecuteNonQuerry(querry);
+               
         }
 
         public void Backup()

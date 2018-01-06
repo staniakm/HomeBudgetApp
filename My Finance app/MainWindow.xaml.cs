@@ -50,26 +50,7 @@ namespace My_Finance_app
             LoadDataToCombo();
             UpdateControlsState(true);
             LoadCategories();
-            try
-            {
-                _sql.SQLexecuteNonQuerry("EXEC dodaj_rachunki");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error");
-            }
-
-            try
-            {
-                Task t = Task.Run(() =>
-                {
-                    _sql.Backup();
-                });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error");
-            }
+           
         }
 
         //ustawamy context na sklepy i konto dla 1 zakładki
@@ -344,28 +325,27 @@ namespace My_Finance_app
         /// </summary>
         private void bt_generuj_Click(object sender, RoutedEventArgs e)
         {
-
-            //delete all setings for specific session
-            _sql.SQLexecuteNonQuerry(string.Format("delete from rapOrg where sesja = {0}", _sql._spid));
-
+            var dic = new Dictionary<int, Tuple<string, string>>();
+            
             //date settings parametr = 1
             if (dp_dataOd_zest.SelectedDate.ToString() != "" || dp_dataDo_zest.SelectedDate.ToString() != "")
             {
                 string dataod = dp_dataOd_zest.SelectedDate.ToString() != "" ? dp_dataOd_zest.SelectedDate.ToString() : "2000-01-01";
                 string datado = dp_dataDo_zest.SelectedDate.ToString() != "" ? dp_dataDo_zest.SelectedDate.ToString() : "2050-01-01";
-                _sql.SQLexecuteNonQuerry(string.Format("insert into rapOrg select '{0}', '{1}', 1 ,{2}", dataod, datado, _sql._spid));
+                dic.Add(1, new Tuple<string, string>(dataod, datado));
             }
             //category parametr = 2
             if ((int)cb_kategoria_zestawienie.SelectedIndex > 0)
             {
-                _sql.SQLexecuteNonQuerry(string.Format("insert into rapOrg select '{0}', '', 2 ,{1}", cb_kategoria_zestawienie.SelectedValue.ToString(), _sql._spid));
+                dic.Add(2, new Tuple<string, string>(cb_kategoria_zestawienie.SelectedValue.ToString(), ""));
             }
             //shop parametr = 3
             if ((int)cb_sklep_zestawienie.SelectedIndex > 0)
             {
                 Console.WriteLine(cb_sklep_zestawienie.SelectedValue);
-                _sql.SQLexecuteNonQuerry(string.Format("insert into rapOrg select '{0}', '', 3 ,{1}", cb_sklep_zestawienie.SelectedValue.ToString(), _sql._spid));
+                dic.Add(3, new Tuple<string, string>(cb_sklep_zestawienie.SelectedValue.ToString(), ""));
             }
+            _sql.ReportSettings(dic);
             ZaladujZestawienie();
         }
 
