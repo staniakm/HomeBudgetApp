@@ -12,12 +12,7 @@ namespace Engine
         public int IDAso { get; set; }
         public string NazwaAso { get; set; }
         public decimal _cena;
-
-
-       
-
         public decimal Ilosc { get; set; }
-        //public decimal CenaCalosc { get { return Math.Round(Cena * Ilosc, 2); }; set; }
         public decimal CenaCalosc { get;  set; }
 
         public string Opis { get; set; }
