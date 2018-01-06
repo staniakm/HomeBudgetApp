@@ -13,6 +13,7 @@ namespace Engine
         public string NazwaAso { get; set; }
         public decimal _cena;
 
+
        
 
         public decimal Ilosc { get; set; }
@@ -27,12 +28,13 @@ namespace Engine
             Cena = cena;
             Ilosc = ilosc;
             Opis = opis;
+
             CenaCaloscSet();
         }
 
         public void CenaCaloscSet()
         {
-            CenaCalosc =Math.Round(Cena * Ilosc, 2); 
+            CenaCalosc = Math.Round(Cena * Ilosc, 2) ; 
         }
 
         public decimal Cena

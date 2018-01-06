@@ -25,18 +25,21 @@ namespace My_Finance_app
         public CategoryEditWindow(DataRowView id, SqlEngine _sql, MainWindow mw)
         {
             InitializeComponent();
+            this.Top = SystemParameters.PrimaryScreenHeight/2;
+            this.Left = SystemParameters.PrimaryScreenWidth/2;
+  
             lb_id_aso.Content = id[0];
             lb_nazwa_aso.Text= id["Nazwa"].ToString();
             lb_id_kat.Content = id["id_kat"];
             lb_nazwa_kat.Content = id["Nazwa kategorii"];
             SQL = _sql;
             this.mw = mw;
-            loadCategories();
+            LoadCategories();
             System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
 
         }
 
-        private void loadCategories()
+        private void LoadCategories()
         {
             cb_nowa_kat.DataContext = SQL.GetCategoryCollection();
         }

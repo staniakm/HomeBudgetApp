@@ -19,12 +19,13 @@
                         <MenuItem Header="Standardowe zestawienie" Click="MenuItem_Click" />
                         <MenuItem Header="Podział na kategorie" Click="MenuItem_Click"/>
                     </MenuItem>
+                    <MenuItem x:Name="mi_Budzet" Header="Budżet" Click="MenuItem_Click"/>
                     <MenuItem x:Name="mi_Kategorie" Header="Asortyment" Click="MenuItem_Click" IsEnabled="False"/>
                     <MenuItem x:Name="mi_Konta" Header="Konta" Click="MenuItem_Click" IsEnabled="False"/>
                 </MenuItem>
             </Menu>
         </DockPanel>
-        <Grid x:Name="grid_paragony" Visibility="Hidden" Background="#FFB9B7B7" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid x:Name="grid_paragony" Visibility="Visible" Background="#FFB9B7B7" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="1*"/>
@@ -43,11 +44,12 @@
                 <Button x:Name="button" Content="Połącz" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" Margin="0,51,0,0" Click="ConnectDatabase"/>-->
                 <!--<Label x:Name="l_spid" Visibility="Hidden" Content="" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,81,0,0"/>-->
                
-                <DatePicker x:Name="dp_data" HorizontalAlignment="Left" Margin="64,21,0,0" VerticalAlignment="Top" Width="128" DisplayDate="2017-01-01" FirstDayOfWeek="Monday" Cursor="None"/>
-                <ComboBox x:Name="cb_sklep" HorizontalAlignment="Left" Margin="64,50,0,0" VerticalAlignment="Top" Width="128" IsEditable="True" TabIndex="1" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
-                <TextBox x:Name="tb_nr_paragonu" HorizontalAlignment="Left" Height="23" Margin="64,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" TabIndex="2"/>
+                <DatePicker x:Name="dp_data" HorizontalAlignment="Left" Margin="64,21,0,0" VerticalAlignment="Top" Width="128" DisplayDate="2017-01-01" FirstDayOfWeek="Monday" Cursor="None" TabIndex="1"/>
+                <ComboBox x:Name="cb_sklep" HorizontalAlignment="Left" Margin="64,50,0,0" VerticalAlignment="Top" Width="128" IsEditable="True" TabIndex="2" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
+                <TextBox x:Name="tb_nr_paragonu" HorizontalAlignment="Left" Height="23" Margin="64,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" TabIndex="3"/>
                 <ComboBox x:Name="cb_konto" HorizontalAlignment="Left" Margin="64,105,0,0" VerticalAlignment="Top" Width="128" TabIndex="3" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
                 <Button x:Name="bt_dodajParagon" Content="Dodaj paragon" HorizontalAlignment="Left" Margin="64,141,0,0" VerticalAlignment="Top" Width="128" Click="NowyParagon" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="4"/>
+                <Button x:Name="bt_CancelBill" Content="Anuluj paragon" HorizontalAlignment="Left" Margin="64,171,0,0" VerticalAlignment="Top" Width="128" Click="CancelBill" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="100"/>
                 <Label x:Name="label" Content="Data" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy" Content="Sklep" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy1" Content="Paragon" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
@@ -62,14 +64,16 @@
             </Grid>
             <Grid x:Name="gr_produkty" IsEnabled="False" Grid.Column="2">
                 <ComboBox x:Name="cb_product" HorizontalAlignment="Left" Margin="82,21,0,0" VerticalAlignment="Top" Width="250" IsEditable="True" TabIndex="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID" SelectedValue="{Binding ID}" />
-                <TextBox x:Name="tb_cena" HorizontalAlignment="Left" Height="23" Margin="82,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" PreviewTextInput="NumberValidation" TabIndex="6"/>
-                <TextBox x:Name="tb_ilosc" HorizontalAlignment="Left" Height="23" Margin="255,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" PreviewTextInput="NumberValidation" TabIndex="7"/>
+                <TextBox x:Name="tb_cena" HorizontalAlignment="Left" Height="23" Margin="82,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="6"/>
+                <TextBox x:Name="tb_ilosc" HorizontalAlignment="Left" Height="23" Margin="179,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="7"/>
+                <TextBox x:Name="tb_rabat" HorizontalAlignment="Left" Height="23" Margin="280,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="53" PreviewTextInput="NumberValidation" TabIndex="7"/>
                 <TextBox x:Name="tb_opis" HorizontalAlignment="Left" Height="23" Margin="82,78,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250" TabIndex="8"/>
                 <Button x:Name="bt_dodajProdukt" Content="Dodaj produkt" HorizontalAlignment="Left" Margin="82,107,0,0" VerticalAlignment="Top" Width="89" Click="bt_dodajProdukt_Click"  TabIndex="9"/>
                 <Button x:Name="bt_zapisDoBazy" Content="Zapisz w bazie" HorizontalAlignment="Left" Margin="208,107,0,0" VerticalAlignment="Top" Width="92" Click="ZapiszParagonaWBazie"  TabIndex="10"/>
                 <Label  Content="Produkt" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" Width="58" Height="27" />
                 <Label Content="Cena" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top" Width="58" Height="27" />
-                <Label Content="Ilość" HorizontalAlignment="Left" Margin="197,46,0,0" VerticalAlignment="Top" Width="58" Height="27"/>
+                <Label Content="Ilość" HorizontalAlignment="Left" Margin="145,46,0,0" VerticalAlignment="Top" Width="35" Height="27"/>
+                <Label Content="Rabat" HorizontalAlignment="Left" Margin="240,46,0,0" VerticalAlignment="Top" Width="40" Height="27"/>
                 <Label Content="Opis" HorizontalAlignment="Left" Margin="10,78,0,0" VerticalAlignment="Top" Width="58" Height="27" />
             </Grid>
 
@@ -115,7 +119,7 @@
             
             
         </Grid>
-        <Grid x:Name="grid_asortyment" Background="#FFB9B7B7" Visibility="Visible" Margin="0,20,0,0">
+        <Grid x:Name="grid_asortyment" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100*"/>
                 <ColumnDefinition Width="600*"/>
@@ -129,6 +133,17 @@
                     <DataGridTextColumn Binding="{Binding Path=nazwa}" IsReadOnly="True" />
                 </DataGrid.Columns>-->
             </DataGrid>
+        </Grid>
+        <Grid x:Name="grid_budzet" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100*"/>
+                <ColumnDefinition Width="600*"/>
+            </Grid.ColumnDefinitions>
+            
+            <Button x:Name="bt_przelicz_budzety" Content="Przelicz budżety" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,10,10,10" Click="RecalculateBudget"/>
+            <Button x:Name="bt_zaladuj_budzety" Content="Załaduj budżety" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,40,10,10" Click="LoadBudget"/>
+            <Button x:Name="bt_edit_budzet" Click="EditBudget" Content="Edytuj" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,70,10,0"/>
+            <DataGrid x:Name="dg_budzety" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}"/>
         </Grid>
         <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>

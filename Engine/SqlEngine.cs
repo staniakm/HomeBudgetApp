@@ -9,20 +9,22 @@ namespace Engine
     public class SqlEngine
     {
         private SqlConnection _con;
-        private string Database;
+        private string database;
         public string _spid { get; private set; }
         public string id;
+
+
         public SqlEngine(string database, string login, string pass)
         {
             _con = new SqlConnection();
-            Database = database;
-            Polacz_z_baza(login, pass);
+            this.database = database;
+            ConnectSQLDatabase(login, pass);
         }
 
         public SqlEngine(string database)
         {
             _con = new SqlConnection();
-            Database = database;
+            this.database = database;
         }
 
 
@@ -47,17 +49,14 @@ namespace Engine
             }
         }
 
-        public bool Polacz_z_baza(string user, string pass)
+        public bool ConnectSQLDatabase(string user, string pass)
         {
             bool connected = false;
             string dbString = "";
             string strCon = "";
-            //Console.Write("Łączenie: ");
-            //Console.WriteLine(Con);
             if (Con)
             {
                 Con = false;
-                Console.WriteLine("rozłączam");
             }
             else
             {
@@ -66,7 +65,7 @@ namespace Engine
                     dbString = @"MARIUSZ_DOMOWY\SQLEXPRESS";
                 }
                 else { dbString = "MARIUSZ_DOMOWY"; }
-                    strCon = "Data Source=" + dbString + ";Initial Catalog="+Database+";Integrated Security=false;Connection Timeout=10;user id="+user+";password=" + pass; //'NT Authentication
+                    strCon = "Data Source=" + dbString + ";Initial Catalog="+database+";Integrated Security=false;Connection Timeout=10;user id="+user+";password=" + pass; //'NT Authentication
 
                 _con.ConnectionString = strCon;
                 if (Con == false)
@@ -76,7 +75,6 @@ namespace Engine
                         _con.Open();
                         _spid = SQLgetScalar("select @@SPID");
                         connected = true;
-                        Console.WriteLine("Connected to database");
                     }
                     catch (Exception ex)
                     {
@@ -88,8 +86,24 @@ namespace Engine
             return connected;
         }
 
+        public void UpdateBudget(int databaseBudgetRowID, string newValue)
+        {
+            try
+            {
+                SQLexecuteNonQuerry(String.Format("update budzet set planed = {0} where id = {1}", newValue, databaseBudgetRowID));
+                PrzeliczBudzet();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
         public int SQLexecuteNonQuerry(string querry)
         {
+            Console.WriteLine( "query: "+querry);
             int rowsAffected = 0;
             SqlCommand sql = new SqlCommand(querry, _con);
             try
@@ -129,10 +143,11 @@ namespace Engine
             Console.WriteLine(querry);
             foreach (var item in paramet)
             {
-                SqlParameter par = new SqlParameter();
-                Console.WriteLine(string.Format("klucz: {0}. Value: {1}", item.Key, item.Value));
-                par.ParameterName = item.Key;
-                par.Value = item.Value;
+                SqlParameter par = new SqlParameter
+                {
+                    ParameterName = item.Key,
+                    Value = item.Value
+                };
                 command.Parameters.Add(par);
             }
 
@@ -154,6 +169,7 @@ namespace Engine
             try
             {
                 SqlCommand sql = new SqlCommand(querry, _con);
+                
                 output = sql.ExecuteScalar().ToString();
 
             }
@@ -275,6 +291,69 @@ namespace Engine
             SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", paragon));
         }
 
+        public void PrzeliczBudzet()
+        {
+            SQLexecuteNonQuerry("exec RecalculateBudget");
+        }
+
+        public void SaveBilInDatabase(Paragon paragon)
+        {
+
+            /*
+             * Have to change teh way we insert data into database. Try to insert all at once
+             Zmienić sposób insertu danych do bazy.
+             Najlepiej jakby była możliwość insertu wszystkiego na raz.
+             */
+            paragon.IdParagon = int.Parse(SQLgetScalar("exec dbo.getNextIdForParagon"));
+            try
+            {
+
+                string strCommand = String.Format("insert into paragony(nr_paragonu, data, sklep, konto, suma, opis) values ('{0}', '{1}','{2}',{3}, 0,'' );",
+                                                      paragon.NrParagonu.ToUpper(), paragon.Data, paragon.Sklep.ToUpper(), paragon.Konto);
+                //_sql.SQLexecuteNonQuerry(strCommand);
+                //dodawnie pozycji paragonu
+                strCommand += "\n";
+                strCommand += "insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis)\n";
+
+                for (int x = 0; x < paragon.Szczegoly.Count; x++)
+                {
+                    ParagonSzczegoly p = paragon.Szczegoly[x];
+                    strCommand += String.Format("select {0} as id_paragonu, {1} as cena_za_jednostke, {2} as ilosc, {3} as cena, {4} as ID_ASO, '{5}' as opis",
+                                              paragon.IdParagon, p.Cena.ToString().Replace(",", "."), p.Ilosc.ToString().Replace(",", "."), p.CenaCalosc.ToString().Replace(",", "."), p.IDAso, p.Opis);
+
+                    if (x < paragon.Szczegoly.Count - 1)
+                    {
+                        strCommand += "\n union all\n";
+                    }
+                    else
+                    {
+                        strCommand += ";";
+                    }
+                }
+
+                //foreach (ParagonSzczegoly p in _paragon.Szczegoly)
+                //{
+                //_sql.SQLexecuteNonQuerry(string.Format("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values ({0}, {1},{2},{3},{4},'{5}')"
+                //    , _paragon.IdParagon, p.Cena.ToString().Replace(",", "."), p.Ilosc.ToString().Replace(",", "."),
+                //    p.CenaCalosc.ToString().Replace(",", "."), p.IDAso, p.Opis));
+
+
+
+                // }
+                // Console.WriteLine(strCommand);
+                SQLexecuteNonQuerry(strCommand);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+            
+            PrzeliczParagon(paragon.IdParagon);
+        }
+
         /// <summary>
         /// Jeśli procesura zwróci wartość > 0 tzn że sklep został dopisany. 
         /// </summary>
@@ -334,6 +413,26 @@ namespace Engine
                 kategorie.Add(new Category((int)item["id"], (string)item["nazwa"]));
             }
             return kategorie;
+        }
+
+        public object GetBudgets()
+        {
+            int miesiac = 0;
+            string sqlquery = "";
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            if (miesiac != 0)
+            {
+                param.Add("@miesiac", ""+miesiac);
+                sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
+                    "where miesiac = @miesiac; "; 
+                return GetData(sqlquery, param);
+            }
+            else
+            {
+                sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
+                    "where miesiac = month(getdate()); ";
+                return GetData(sqlquery);
+            }
         }
     }
 

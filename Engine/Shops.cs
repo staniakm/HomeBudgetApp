@@ -23,16 +23,6 @@ namespace Engine
             Nazwa = nazwa;
         }
 
-        //public int getID()
-        //{
-        //    return this.ID;
-        //}
-
-        //public string getName()
-        //{
-        //    return this.Nazwa;
-        //}
-
     }
 }
 

@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:My_Finance_app"
         mc:Ignorable="d"
-        Title="LoginForm" Height="172" Width="300" ResizeMode="NoResize">
+        Title="Home Budget" Height="172" Width="300" ResizeMode="NoResize" HorizontalContentAlignment="Center" WindowStartupLocation="CenterScreen">
     <Grid>
         <StackPanel>
             <TabPanel Margin="5,5,5,5">
-                <Label Content="Login" Width="50"/>
-                <ComboBox x:Name="cb_db_name" Width="220">
+                <Label Content="Baza" Width="50"/>
+                <ComboBox x:Name="cb_db_name" Width="220" HorizontalContentAlignment="Center">
                     <ComboBoxItem IsSelected="True" >finanse</ComboBoxItem>
                     <ComboBoxItem >finanse_test</ComboBoxItem>
                     <ComboBoxItem >finanse_test_2</ComboBoxItem>
@@ -18,14 +18,14 @@
             </TabPanel>
             <TabPanel Margin="5,5,5,5">
                 <Label Content="Login" Width="50"/>
-                <TextBox x:Name="login" Width="220"/>
+                <TextBox x:Name="login" Width="220" HorizontalContentAlignment="Center"/>
             </TabPanel>
             <TabPanel Margin="5,5,5,5">
                 <Label Content="Hasło" Width="50"/>
-                <PasswordBox x:Name="pass" Width="220"/>
+                <PasswordBox x:Name="pass" Width="220" HorizontalContentAlignment="Center"/>
             </TabPanel>
             <TabPanel Margin="5,5,5,5">
-                <Button Margin="50,0,-50,0" x:Name="confirmLogin" Content="OK" Click="confirmLogin_Click" Width="200"/>
+                <Button Margin="50,0,-160,0" x:Name="confirmLogin" Content="OK" Click="confirmLogin_Click"/>
             </TabPanel>
         </StackPanel>
     </Grid>

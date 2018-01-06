@@ -37,11 +37,12 @@ namespace My_Finance_app
             //puting grids to dictionary. This will allow us to switch between grids.
             grids.Add("Paragony", grid_paragony);
             grids.Add("Asortyment", grid_asortyment);
+            grids.Add("Budżet", grid_budzet);
             grids.Add("Podział na kategorie", grid_zestawienie);
             grids.Add("Standardowe zestawienie", grid_zestawienie);
             grids.Add("Konta", grid_konta);
 
-            showGrid("Paragony");
+            ShowGrid("Paragony");
         }
 
         private void ConnectDatabase()
@@ -157,9 +158,36 @@ namespace My_Finance_app
                 _paragon = new Paragon();
                 dg_paragony.ItemsSource = _paragon.Szczegoly;
                 UpdateControlsState(false);
+
+                _paragon.Data = (DateTime)dp_data.SelectedDate;
+                _paragon.NrParagonu = tb_nr_paragonu.Text;
+                _paragon.IdSklep = (int)cb_sklep.SelectedValue;
+                _paragon.Konto = (int)cb_konto.SelectedValue;
+                _paragon.Sklep = cb_sklep.Text;
+
+                dp_data.IsEnabled = false;
+                tb_nr_paragonu.IsEnabled = false;
+                cb_sklep.IsEnabled = false;
+                cb_konto.IsEnabled = false;
+                cb_sklep.IsEnabled = false;
+
+
             }
         }
 
+
+        private void CancelBill(object sender, RoutedEventArgs e)
+        {
+            dg_paragony.ItemsSource = null;
+            _paragon = null;
+
+            dp_data.IsEnabled = true;
+            tb_nr_paragonu.IsEnabled = true;
+            cb_sklep.IsEnabled = true;
+            cb_konto.IsEnabled = true;
+            cb_sklep.IsEnabled = true;
+
+        }
         /// <summary>
         /// Ustawiamy dostępnośc kontrolek. true - dostępne sklep, konto, dodanie paragonu
         /// </summary>
@@ -203,9 +231,29 @@ namespace My_Finance_app
             string produkt = cb_product.Text;
             if (tb_cena.Text != "" && tb_ilosc.Text != "")
             {
-                _paragon.Szczegoly.Add(new ParagonSzczegoly((int)cb_product.SelectedValue, produkt, decimal.Parse(tb_cena.Text.Replace(".", ",")), decimal.Parse(tb_ilosc.Text.Replace(".", ",")), tb_opis.Text));
+                string opis = "";
+                decimal rabat=0.0M;
+                decimal cena= decimal.Parse(tb_cena.Text.Replace(".", ","));
+                decimal ilosc = decimal.Parse(tb_ilosc.Text.Replace(".", ","));
+
+                if (tb_rabat.Text != "" )
+                {
+                    rabat = decimal.Parse(tb_rabat.Text.Replace(".",","));
+                    if (rabat != 0)
+                    {
+                        if (rabat < 0)
+                        { rabat = rabat * (-1); }
+
+                        opis = tb_opis.Text + "Cena: "+cena+ " Rabat: " + rabat;
+                        cena = cena - Math.Round((rabat / ilosc),2);
+                        Console.WriteLine("cena " + cena);
+                    }
+                }
+                
+                _paragon.Szczegoly.Add(new ParagonSzczegoly((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
                 tb_cena.Clear();
                 tb_ilosc.Clear();
+                tb_rabat.Clear();
                 cb_product.Focus();
                 cb_product.SelectedIndex = -1;
             }
@@ -231,43 +279,10 @@ namespace My_Finance_app
         /// <param name="e"></param>
         private void ZapiszParagonaWBazie(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("Do POPRAWY");
-            /*
-             * Have to change teh way we insert data into database. Try to insert all at once
-             Zmienić sposób insertu danych do bazy.
-             Najlepiej jakby była możliwość insertu wszystkiego na raz.
-             */
-
-            _paragon.IdParagon = int.Parse(_sql.SQLgetScalar("exec dbo.getNextIdForParagon"));
-            _paragon.Data = (DateTime)dp_data.SelectedDate;
-            _paragon.NrParagonu = tb_nr_paragonu.Text;
-            _paragon.IdSklep = (int)cb_sklep.SelectedValue;
-            _paragon.Konto = (int)cb_konto.SelectedValue;
-            _paragon.Sklep = cb_sklep.Text;
-            try
-            {
-
-                string strCommand = String.Format("insert into paragony(nr_paragonu, data, sklep, konto, suma, opis) values ('{0}', '{1}','{2}',{3}, 0,'' )",
-                                                      _paragon.NrParagonu.ToUpper(), _paragon.Data, _paragon.Sklep.ToUpper(), _paragon.Konto);
-                _sql.SQLexecuteNonQuerry(strCommand);
-                //dodawnie pozycji paragonu
-                foreach (ParagonSzczegoly p in _paragon.Szczegoly)
-                {
-                    _sql.SQLexecuteNonQuerry(string.Format("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values ({0}, {1},{2},{3},{4},'{5}')"
-                        , _paragon.IdParagon, p.Cena.ToString().Replace(",", "."), p.Ilosc.ToString().Replace(",", "."),
-                        p.CenaCalosc.ToString().Replace(",", "."), p.IDAso, p.Opis));
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-
-            dg_paragony.ItemsSource = null;
-            _sql.PrzeliczParagon(_paragon.IdParagon);
-
+            _sql.SaveBilInDatabase(_paragon);
+                                            
             UpdateControlsState(true);
+            dg_paragony.ItemsSource = null;
         }
 
         /// <summary>
@@ -289,7 +304,7 @@ namespace My_Finance_app
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem mi = e.Source as MenuItem;
-            showGrid(mi.Header.ToString());
+            ShowGrid(mi.Header.ToString());
             switch (mi.Header.ToString())
             {
                 case "Podział na kategorie":
@@ -309,7 +324,7 @@ namespace My_Finance_app
             }
         }
 
-        private void showGrid(string v)
+        private void ShowGrid(string v)
         {
             foreach (string s in grids.Keys)
             {
@@ -373,9 +388,34 @@ namespace My_Finance_app
             }
         }
 
+        private void EditBudget(object sender, RoutedEventArgs e)
+        {
+            //Console.WriteLine("zmiana kategorii");
+            //Console.WriteLine(dg_budzety.SelectedIndex);
+            if (dg_budzety.SelectedIndex > -1)
+            {
+                DataRowView dr = (DataRowView)dg_budzety.SelectedItem;
+                Console.WriteLine(dr[0]);
+                BudgetEditWindow cw = new BudgetEditWindow(dr, _sql, this);
+                cw.ShowDialog();
+            }
+        }
+
         private void LoadCategory(object sender, RoutedEventArgs e)
         {
+        
             LoadCategoryData();
+        }
+
+        private void LoadBudget(object sender, RoutedEventArgs e)
+        {
+           
+            dg_budzety.DataContext = _sql.GetBudgets();
+        }
+
+        private void RecalculateBudget(object sender, RoutedEventArgs e)
+        {
+           _sql.PrzeliczBudzet();
         }
 
         private void br_zapisz_konto_Click(object sender, RoutedEventArgs e)

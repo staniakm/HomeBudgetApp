@@ -10,17 +10,17 @@ namespace Engine
     {
         public BankAccount(int iD, string name, decimal value, string opis, string owner, decimal oprocentowanie)
         {
-            ID = iD;
-            Name = name;
-            Value = value;
-            Opis = opis;
-            Owner = owner;
-            Oprocentowanie = oprocentowanie;
+            this.ID = iD;
+            this.Name = name;
+            this.Value = value;
+            this.opis = opis;
+            this.Owner = owner;
+            this.Oprocentowanie = oprocentowanie;
         }
 
         public int ID { get; private set; }
         public string Name { get;  set; }
-        private decimal _Value=1;// { get; set; }
+        private decimal _Value=1;
         private string opis;
         private string owner;
         private decimal oprocentowanie;

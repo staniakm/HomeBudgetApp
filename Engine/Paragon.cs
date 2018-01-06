@@ -20,7 +20,6 @@ namespace Engine
 
         public Paragon()
         {
-            
             Szczegoly = new ObservableCollection<ParagonSzczegoly>();
         }
 

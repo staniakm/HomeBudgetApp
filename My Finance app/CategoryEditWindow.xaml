@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:My_Finance_app"
         mc:Ignorable="d"
-        Title="CategoryEditWindow" Height="208" Width="316">
+        Title="CategoryEditWindow" Height="208" Width="316" WindowStartupLocation="Manual">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
