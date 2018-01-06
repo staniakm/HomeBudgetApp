@@ -435,6 +435,12 @@ namespace Engine
             }
             return sklepy;
         }
+
+        public void ModifyBankAccount(Dictionary<string, string> tmpDic)
+        {
+            SQLexecuteNonQuerryProcedure("dbo.bankAccountModification", tmpDic);
+        }
+
         /// <summary>
         /// Zwracamy kolekcję kategorii. Można bezpośrednio bindować do datacontext
         /// </summary>
@@ -445,7 +451,6 @@ namespace Engine
             DataTable dt = GetTable("kategorie");
             foreach (DataRow item in dt.Rows)
             {
-              //  Console.WriteLine(item["id"] + " " + item["nazwa"]);
                 kategorie.Add(new Category((int)item["id"], (string)item["nazwa"]));
             }
             return kategorie;

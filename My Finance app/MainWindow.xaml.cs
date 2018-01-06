@@ -352,7 +352,6 @@ namespace My_Finance_app
 
         public void LoadCategoryData()
         {
-
             dg_asortyment.DataContext = _sql.GetCategoryItems(cb_kategoria.Text);
         }
 
@@ -370,8 +369,6 @@ namespace My_Finance_app
 
         private void EditBudget(object sender, RoutedEventArgs e)
         {
-            //Console.WriteLine("zmiana kategorii");
-            //Console.WriteLine(dg_budzety.SelectedIndex);
             if (dg_budzety.SelectedIndex > -1)
             {
                 DataRowView dr = (DataRowView)dg_budzety.SelectedItem;
@@ -383,7 +380,6 @@ namespace My_Finance_app
 
         private void LoadCategory(object sender, RoutedEventArgs e)
         {
-        
             LoadCategoryData();
         }
 
@@ -400,7 +396,6 @@ namespace My_Finance_app
 
         private void br_zapisz_konto_Click(object sender, RoutedEventArgs e)
         {
-            //Console.WriteLine(konta_cb_konto.SelectedValue);
             Dictionary<string, string> tmpDic = new Dictionary<string, string>()
             {
                { "@nazwa", konto_nazwa.Text},
@@ -411,7 +406,9 @@ namespace My_Finance_app
                 {"@id", (konto_ID.Text.Equals("")?null:konto_ID.Text)}
             };
 
-            _sql.SQLexecuteNonQuerryProcedure("dbo.bankAccountModification", tmpDic);
+            _sql.ModifyBankAccount(tmpDic);
+
+            
             //_sql.SQLexecuteNonQuerry(String.Format("update konto set kwota = {1}, opis='{2}', wlasciciel='{3}', oprocentowanie = {4} where ID = {0}", konta_cb_konto.SelectedValue, konto_kwota.Text, konto_opis.Text,
             //                                            konto_owner.Text, konto_procent.Text));
         }
