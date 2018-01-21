@@ -21,6 +21,7 @@ namespace My_Finance_app
         SqlEngine _sql;
         Paragon _paragon;
         Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
+
         public MainWindow(SqlEngine _sql)
         {
             InitializeComponent();
@@ -58,8 +59,11 @@ namespace My_Finance_app
         {
 
             cb_sklep.DataContext = _sql.GetShopsCollection();
-            cb_konto.DataContext = _sql.GetAccountColection();
-            grid_konta.DataContext = _sql.GetAccountColection();
+            //cb_konto.DataContext = _sql.GetAccountColection();
+            _sql.GetAccountColection();
+            cb_konto.DataContext = SqlEngine.bankAccounts;
+            // grid_konta.DataContext = _sql.GetAccountColection();
+            grid_konta.DataContext = SqlEngine.bankAccounts;
         }
 
         /// <summary>
@@ -101,7 +105,7 @@ namespace My_Finance_app
             string selectedCategory = cb_kategoria.Text.Length == 0 ? "wszystkie" : cb_kategoria.Text;
             try
             {
-                cb_kategoria.DataContext = _sql.GetCategoryCollection();// _sql.GetData("SELECT row_number() over (order by nazwa) [licznik], nazwa, id FROM kategoria union select 0, 'wszystkie',0 order by licznik;").DefaultView;
+                cb_kategoria.DataContext = _sql.GetCategoryCollection();
                 cb_kategoria.Text = selectedCategory;
             }
             catch (Exception ex)
@@ -121,52 +125,52 @@ namespace My_Finance_app
         }
 
         /// <summary>
-        /// Begining of creating new bill.
+        /// Create new bill.
         /// </summary>
         private void NowyParagon(object sender, RoutedEventArgs e)
         {
             if (cb_sklep.Text != "" && cb_konto.Text != "")
             {
-                //sprawdzamy czy podany sklep jest jak nie to dodajemy. Jeśli został dodany to przeładowyjemy combo sklepy
+                //check if shop is on the list. If not then we add new shop and reload combo.
                 if (_sql.ShopExists(cb_sklep.Text.ToString().ToUpper()) > 0)
                 {
                     string SelectedShop = cb_sklep.Text.ToString().ToUpper();
                     cb_sklep.DataContext = _sql.GetShopsCollection();
                     cb_sklep.Text = SelectedShop;
                 }
-                //ładujemy aso sklepu
+                //Load list of products connected with current shop
                 LoadProducts();
+
+                //new instance of bill
                 _paragon = new Paragon();
+                //setting ItemSource of data grid to bill details
                 dg_paragony.ItemsSource = _paragon.Szczegoly;
                 UpdateControlsState(false);
 
-                _paragon.Data = (DateTime)dp_data.SelectedDate;
-                _paragon.NrParagonu = tb_nr_paragonu.Text;
-                _paragon.IdSklep = (int)cb_sklep.SelectedValue;
-                _paragon.Konto = (int)cb_konto.SelectedValue;
-                _paragon.Sklep = cb_sklep.Text;
+                //read basic info of bill and set the in bill instance
+                _paragon.Data = (DateTime)dp_data.SelectedDate;//bill date
+                _paragon.NrParagonu = tb_nr_paragonu.Text;//bill number
+                _paragon.IdSklep = (int)cb_sklep.SelectedValue;//id of shop
+                _paragon.Konto = (int)cb_konto.SelectedValue;//id of bank accout 
+                _paragon.Sklep = cb_sklep.Text;//shop name - this is not needed
 
+                //disable basic controls so basic bill data can't be changed after bill creation.
                 dp_data.IsEnabled = false;
                 tb_nr_paragonu.IsEnabled = false;
                 cb_sklep.IsEnabled = false;
                 cb_konto.IsEnabled = false;
                 cb_sklep.IsEnabled = false;
-
-
             }
         }
 
 
         private void CancelBill(object sender, RoutedEventArgs e)
         {
+            //after creation bill can be canceled.
             dg_paragony.ItemsSource = null;
             _paragon = null;
 
-            dp_data.IsEnabled = true;
-            tb_nr_paragonu.IsEnabled = true;
-            cb_sklep.IsEnabled = true;
-            cb_konto.IsEnabled = true;
-            cb_sklep.IsEnabled = true;
+            UpdateControlsState(true);
 
         }
         /// <summary>
@@ -196,18 +200,24 @@ namespace My_Finance_app
                 cb_sklep.SelectedIndex = -1;
                 cb_konto.SelectedIndex = -1;
                 tb_nr_paragonu.Clear();
+
+                dp_data.IsEnabled = true;
+                tb_nr_paragonu.IsEnabled = true;
+                cb_sklep.IsEnabled = true;
+                cb_konto.IsEnabled = true;
+                cb_sklep.IsEnabled = true;
             }
         }
 
-        private void bt_dodajProdukt_Click(object sender, RoutedEventArgs e)
+        private void bt_AddProduct_Click(object sender, RoutedEventArgs e)
         {
             if (cb_product.SelectedValue == null)
             {
-                string produkt_wybrany = cb_product.Text.ToString().ToUpper();
-                _sql.AddAsoToStore(produkt_wybrany, cb_sklep.Text.ToString());
+                string chosen = cb_product.Text.ToString().ToUpper();
+                _sql.AddAsoToStore(chosen, cb_sklep.Text.ToString());
 
                 LoadProducts();
-                cb_product.Text = produkt_wybrany;
+                cb_product.Text = chosen;
             }
             string produkt = cb_product.Text;
             if (tb_cena.Text != "" && tb_ilosc.Text != "")
@@ -242,7 +252,7 @@ namespace My_Finance_app
         }
 
         /// <summary>
-        /// sprawdzamy poprawność pól cena i ilość.
+        /// Validate that only numbers dot and coma is entered.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -254,11 +264,11 @@ namespace My_Finance_app
         }
 
         /// <summary>
-        /// Zapisujemy paragon i szczegoly do bazy
+        /// Save bill into database
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ZapiszParagonaWBazie(object sender, RoutedEventArgs e)
+        private void bt_SaveBillInDatabase(object sender, RoutedEventArgs e)
         {
             _sql.SaveBilInDatabase(_paragon);
                                             
@@ -267,7 +277,7 @@ namespace My_Finance_app
         }
 
         /// <summary>
-        /// odświeżanie grida ze szczegolami paragonow.
+        /// Refresh bill details data grid..
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -278,7 +288,7 @@ namespace My_Finance_app
 
         }
         /// <summary>
-        /// Przełączanie między panelami
+        /// Switch between panels
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -320,8 +330,7 @@ namespace My_Finance_app
         }
 
         /// <summary>
-        /// After clicking button we are create session settings for specific report.
-        /// 
+        /// Create session settings for specific report.
         /// </summary>
         private void bt_generuj_Click(object sender, RoutedEventArgs e)
         {
@@ -342,7 +351,6 @@ namespace My_Finance_app
             //shop parametr = 3
             if ((int)cb_sklep_zestawienie.SelectedIndex > 0)
             {
-                Console.WriteLine(cb_sklep_zestawienie.SelectedValue);
                 dic.Add(3, new Tuple<string, string>(cb_sklep_zestawienie.SelectedValue.ToString(), ""));
             }
             _sql.ReportSettings(dic);
@@ -357,8 +365,6 @@ namespace My_Finance_app
 
         private void bt_edit_category_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("zmiana kategorii");
-            Console.WriteLine(dg_asortyment.SelectedIndex);
             if (dg_asortyment.SelectedIndex > -1)
             {
                 DataRowView dr = (DataRowView)dg_asortyment.SelectedItem;
@@ -385,21 +391,24 @@ namespace My_Finance_app
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
-           
             dg_budzety.DataContext = _sql.GetBudgets();
+            lb_przychodzy.Content = _sql.GetBudgetCalculations("earn");
+            lb_pozostalo.Content = _sql.GetBudgetCalculations("left");
+            lb_zaplanowane.Content = _sql.GetBudgetCalculations("planed");
+            lb_wydatek.Content = _sql.GetBudgetCalculations("spend");
         }
 
         private void RecalculateBudget(object sender, RoutedEventArgs e)
         {
-           _sql.PrzeliczBudzet();
+           _sql.RecalculateBudget();
         }
 
         private void br_zapisz_konto_Click(object sender, RoutedEventArgs e)
         {
             Dictionary<string, string> tmpDic = new Dictionary<string, string>()
             {
-               { "@nazwa", konto_nazwa.Text},
-                { "@kwota", konto_kwota.Text},
+                {"@nazwa", konto_nazwa.Text},
+                {"@kwota", konto_kwota.Text},
                 {"@opis", konto_opis.Text },
                 {"@owner", konto_owner.Text },
                 {"@oprocentowanie", konto_procent.Text},
@@ -407,10 +416,6 @@ namespace My_Finance_app
             };
 
             _sql.ModifyBankAccount(tmpDic);
-
-            
-            //_sql.SQLexecuteNonQuerry(String.Format("update konto set kwota = {1}, opis='{2}', wlasciciel='{3}', oprocentowanie = {4} where ID = {0}", konta_cb_konto.SelectedValue, konto_kwota.Text, konto_opis.Text,
-            //                                            konto_owner.Text, konto_procent.Text));
         }
 
         private void bt_nowe_konto_Click(object sender, RoutedEventArgs e)

@@ -44,7 +44,7 @@
     <Compile Include="AsoInStore.cs" />
     <Compile Include="BankAccount.cs" />
     <Compile Include="Category.cs" />
-    <Compile Include="DataConverter.cs" />
+    <Compile Include="Converters.cs" />
     <Compile Include="Paragon.cs" />
     <Compile Include="ParagonSzczegoly.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

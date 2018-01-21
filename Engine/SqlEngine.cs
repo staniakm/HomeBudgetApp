@@ -13,7 +13,7 @@ namespace Engine
         private string database;
         public string _spid { get; private set; }
         public string id;
-
+        public static ObservableCollection<BankAccount> bankAccounts { get; set; }
 
         public SqlEngine(string database, string login, string pass)
         {
@@ -79,7 +79,7 @@ namespace Engine
             {
                 if (Environment.MachineName == "MARIUSZ_DOMOWY")
                 {
-                    dbString = @"MARIUSZ_DOMOWY\SQLEXPRESS";
+                    dbString = @"MARIUSZ_DOMOWY";
                 }
                 else { dbString = "MARIUSZ_DOMOWY"; }
                     strCon = "Data Source=" + dbString + ";Initial Catalog="+database+";Integrated Security=false;Connection Timeout=10;user id="+user+";password=" + pass; //'NT Authentication
@@ -103,9 +103,9 @@ namespace Engine
             return connected;
         }
 
-        public void UpdateAsoCategory(int idASO, string nowaKategoria, int idKAT, string nowaNazwa)
+        public void UpdateCategoryOfAso(int idASO, string newCategory, int category_id, string newName)
         {
-            SQLexecuteNonQuerry(String.Format("exec dbo.updateAsoCategory {0}, '{1}', {2}, '{3}'", idASO, nowaKategoria, idKAT, nowaNazwa));
+            SQLexecuteNonQuerry(String.Format("exec dbo.updateAsoCategory {0}, '{1}', {2}, '{3}'", idASO, newCategory, category_id, newName));
         }
 
         public void UpdateBudget(int databaseBudgetRowID, string newValue)
@@ -113,7 +113,7 @@ namespace Engine
             try
             {
                 SQLexecuteNonQuerry(String.Format("update budzet set planed = {0} where id = {1}", newValue, databaseBudgetRowID));
-                PrzeliczBudzet();
+                RecalculateBudget();
             }
             catch (Exception)
             {
@@ -185,7 +185,7 @@ namespace Engine
             return 0;
         }
 
-        public string SQLgetScalar(string querry)
+        private string SQLgetScalar(string querry)
         {
             string output = "";
             try
@@ -203,7 +203,7 @@ namespace Engine
             return output;
         }
 
-        public DataTable GetData(string sqlCommand)
+        private DataTable GetData(string sqlCommand)
         {
             SqlCommand command = new SqlCommand(sqlCommand, _con);
             SqlDataAdapter adapter = new SqlDataAdapter
@@ -218,7 +218,7 @@ namespace Engine
             return table;
         }
 
-        public DataTable GetTable(string name)
+        private DataTable GetTable(string name)
         {
             string sqlCommand = "";
 
@@ -249,7 +249,7 @@ namespace Engine
             return GetData(querry, dict);
         }
 
-        public DataTable GetData(string sqlCommand, Dictionary<string, string> param)
+        private DataTable GetData(string sqlCommand, Dictionary<string, string> param)
         {
             SqlCommand command = new SqlCommand(sqlCommand, _con);
             SqlParameter par = new SqlParameter();
@@ -308,32 +308,27 @@ namespace Engine
             }
         }
 
-        public void PrzeliczParagon(int paragon)
+        private void RecalculateBill(int paragon)
         {
             SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", paragon));
         }
 
-        public void PrzeliczBudzet()
+        public void RecalculateBudget()
         {
             SQLexecuteNonQuerry("exec RecalculateBudget");
         }
 
         public void SaveBilInDatabase(Paragon paragon)
         {
-
-            /*
-             * Have to change teh way we insert data into database. Try to insert all at once
-             Zmienić sposób insertu danych do bazy.
-             Najlepiej jakby była możliwość insertu wszystkiego na raz.
-             */
+                                    
             paragon.IdParagon = int.Parse(SQLgetScalar("exec dbo.getNextIdForParagon"));
+            
             try
             {
 
                 string strCommand = String.Format("insert into paragony(nr_paragonu, data, sklep, konto, suma, opis) values ('{0}', '{1}','{2}',{3}, 0,'' );",
                                                       paragon.NrParagonu.ToUpper(), paragon.Data, paragon.Sklep.ToUpper(), paragon.Konto);
-                //_sql.SQLexecuteNonQuerry(strCommand);
-                //dodawnie pozycji paragonu
+
                 strCommand += "\n";
                 strCommand += "insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis)\n";
 
@@ -352,28 +347,21 @@ namespace Engine
                         strCommand += ";";
                     }
                 }
-
-                //foreach (ParagonSzczegoly p in _paragon.Szczegoly)
-                //{
-                //_sql.SQLexecuteNonQuerry(string.Format("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values ({0}, {1},{2},{3},{4},'{5}')"
-                //    , _paragon.IdParagon, p.Cena.ToString().Replace(",", "."), p.Ilosc.ToString().Replace(",", "."),
-                //    p.CenaCalosc.ToString().Replace(",", "."), p.IDAso, p.Opis));
-
-
-
-                // }
-                // Console.WriteLine(strCommand);
                 SQLexecuteNonQuerry(strCommand);
+                RecalculateBill(paragon.IdParagon);
+                strCommand = String.Format("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = {0}", paragon.IdParagon);
+                SQLexecuteNonQuerry(strCommand);
+                GetAccountColection();
             }
             catch (Exception)
             {
 
                 throw;
             }
-
-
             
-            PrzeliczParagon(paragon.IdParagon);
+
+
+
         }
 
         /// <summary>
@@ -402,7 +390,7 @@ namespace Engine
                
         }
 
-        public void Backup()
+        private void Backup()
         {
             SQLexecuteNonQuerry("exec BackupDatabase");
         }
@@ -411,7 +399,7 @@ namespace Engine
         /// Zwracamy kolekcję kont. Można ustawiać bezpośrednio do datacontextu.
         /// </summary>
         /// <returns></returns>
-        public ObservableCollection<BankAccount> GetAccountColection()
+        public void GetAccountColection()
         {
             ObservableCollection<BankAccount> konta = new ObservableCollection<BankAccount>();
             DataTable dt = GetTable("konta");
@@ -419,7 +407,8 @@ namespace Engine
             {
                 konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"], (decimal) item["kwota"], (string)item["opis"],(string)item["wlasciciel"],(decimal)item["oprocentowanie"]));
             }
-            return konta;
+            bankAccounts = konta;
+            //return konta;
         }
         /// <summary>
         /// Zwracamy kolekcję sklepów. Można bezpośrednio bindować do datacontext
@@ -434,6 +423,43 @@ namespace Engine
                 sklepy.Add(new Sklep((int)item["id"], (string)item["sklep"]));
             }
             return sklepy;
+        }
+
+        public double GetBudgetCalculations(string v)
+        {
+            switch (v)
+            {
+                case "earn":
+                    return GetCurrentMonthSalary();
+                case "left":
+                    return GetCurrentMonthLeft();
+                case "planed":
+                    return GetCurrentMonthPlaned();
+                case "spend":
+                    return GetCurrentMonthSpend();
+            }
+            return 0;
+        }
+
+        private double GetCurrentMonthSpend()
+        {
+            return System.Convert.ToDouble(SQLgetScalar("select isnull(sum(suma),0) from paragony where YEAR(data) = year(getdate()) and MONTH(data) = month(getdate()) and del = 0"));
+        }
+
+        private double GetCurrentMonthPlaned()
+        {
+            return System.Convert.ToDouble(SQLgetScalar("select sum(planed) from budzet where miesiac = MONTH(getdate()) and rok = year(getdate())"));
+        }
+
+        public double GetCurrentMonthLeft()
+        {
+            return System.Convert.ToDouble(SQLgetScalar("select (select  isnull(sum(kwota), 0) from przychody where MONTH(data) = MONTH(getdate()) and year(data) = year(getdate()))"+
+            "- (select sum(planed) from budzet where miesiac = MONTH(getdate()) and rok = year(getdate())) "));
+        }
+
+        private double GetCurrentMonthSalary()
+        {
+           return System.Convert.ToDouble(SQLgetScalar("select  isnull(sum(kwota),0) from przychody where MONTH(data) = MONTH(getdate()) and year(data) = year(getdate())"));
         }
 
         public void ModifyBankAccount(Dictionary<string, string> tmpDic)
@@ -456,9 +482,9 @@ namespace Engine
             return kategorie;
         }
 
-        public object GetBudgets()
+        public object GetBudgets(int miesiac=0)
         {
-            int miesiac = 0;
+            //int miesiac = 0;
             string sqlquery = "";
             Dictionary<string, string> param = new Dictionary<string, string>();
             if (miesiac != 0)

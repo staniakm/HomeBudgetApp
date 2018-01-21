@@ -28,6 +28,25 @@ namespace Engine
         }
     }
 
+
+    [ValueConversion(typeof(string), typeof(string))]
+    //konwersja defaultowej daty na pusty string
+    public class MoneyConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double val = System.Convert.ToDouble(value);
+            
+            return val.ToString("#0,00");
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     //public class BoolVisibilityConverter : IValueConverter
     //{
     //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

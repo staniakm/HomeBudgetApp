@@ -38,7 +38,7 @@ namespace My_Finance_app
             int idKAT = (cb_nowa_kat.SelectedValue == null)?-1:int.Parse(cb_nowa_kat.SelectedValue.ToString());
             string nowaNazwa = lb_nazwa_aso.Text;
 
-            SQL.UpdateAsoCategory(idASO,nowaKategoria,idKAT,nowaNazwa);
+            SQL.UpdateCategoryOfAso(idASO,nowaKategoria,idKAT,nowaNazwa);
 
             mw.LoadCategories();
             mw.LoadCategoryData();
