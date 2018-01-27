@@ -325,32 +325,60 @@ namespace Engine
             
             try
             {
+                SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, sklep, konto, suma, opis) values (@nrParagonu, @data,@sklep,@konto, 0,'' );", _con);
+                SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar,50);
+                par.Value= paragon.NrParagonu.ToUpper();
+                com.Parameters.Add(par);
+                par = new SqlParameter("@data", SqlDbType.Date);
+                par.Value = paragon.Data;
+                com.Parameters.Add(par);
+                par = new SqlParameter("@sklep", SqlDbType.VarChar,150);
+                par.Value= paragon.Sklep;
+                com.Parameters.Add(par);
 
-                string strCommand = String.Format("insert into paragony(nr_paragonu, data, sklep, konto, suma, opis) values ('{0}', '{1}','{2}',{3}, 0,'' );",
-                                                      paragon.NrParagonu.ToUpper(), paragon.Data, paragon.Sklep.ToUpper(), paragon.Konto);
+                par = new SqlParameter("@konto", SqlDbType.Int);
+                par.Value= paragon.Konto;
+                com.Parameters.Add(par);
+                com.Prepare();
+                com.ExecuteNonQuery();
+                
 
-                strCommand += "\n";
-                strCommand += "insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis)\n";
+                com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values (@idParagon, @cenaJednostkowa, @ilosc, @cena, @idAso, @opis)", _con);
+                par = new SqlParameter("@idParagon", SqlDbType.Int);
+                com.Parameters.Add(par);
+                par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal);
+                par.Precision = 8;
+                par.Scale = 2;
+                
+                com.Parameters.Add(par);
+                par = new SqlParameter("@ilosc", SqlDbType.Decimal);
+                par.Precision = 6;
+                par.Scale = 3;
+                com.Parameters.Add(par);
+                par = new SqlParameter("@cena", SqlDbType.Money);
+
+                com.Parameters.Add(par);
+                par = new SqlParameter("@idAso", SqlDbType.Int);
+                com.Parameters.Add(par);
+                par = new SqlParameter("@opis", SqlDbType.VarChar,150);
+                com.Parameters.Add(par);
+                com.Prepare();
 
                 for (int x = 0; x < paragon.Szczegoly.Count; x++)
                 {
                     ParagonSzczegoly p = paragon.Szczegoly[x];
-                    strCommand += String.Format("select {0} as id_paragonu, {1} as cena_za_jednostke, {2} as ilosc, {3} as cena, {4} as ID_ASO, '{5}' as opis",
-                                              paragon.IdParagon, p.Cena.ToString().Replace(",", "."), p.Ilosc.ToString().Replace(",", "."), p.CenaCalosc.ToString().Replace(",", "."), p.IDAso, p.Opis);
-
-                    if (x < paragon.Szczegoly.Count - 1)
-                    {
-                        strCommand += "\n union all\n";
-                    }
-                    else
-                    {
-                        strCommand += ";";
-                    }
+                    com.Parameters[0].Value = paragon.IdParagon;
+                    com.Parameters[1].Value = p.Cena;
+                    com.Parameters[2].Value = p.Ilosc;
+                    com.Parameters[3].Value = p.CenaCalosc;
+                    com.Parameters[4].Value = p.IDAso;
+                    com.Parameters[5].Value = p.Opis;
+                    com.ExecuteNonQuery();
                 }
-                SQLexecuteNonQuerry(strCommand);
                 RecalculateBill(paragon.IdParagon);
-                strCommand = String.Format("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = {0}", paragon.IdParagon);
-                SQLexecuteNonQuerry(strCommand);
+                com = new SqlCommand("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = @idPagaron", _con);
+                com.Parameters.AddWithValue("@idPagaron", paragon.IdParagon);
+                com.ExecuteNonQuery();
                 GetAccountColection();
             }
             catch (Exception)

@@ -391,11 +391,16 @@ namespace My_Finance_app
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
+            double earn = _sql.GetBudgetCalculations("earn");
+            double spend = _sql.GetBudgetCalculations("spend");
+
             dg_budzety.DataContext = _sql.GetBudgets();
-            lb_przychodzy.Content = _sql.GetBudgetCalculations("earn");
+            lb_przychodzy.Content = earn;
             lb_pozostalo.Content = _sql.GetBudgetCalculations("left");
             lb_zaplanowane.Content = _sql.GetBudgetCalculations("planed");
-            lb_wydatek.Content = _sql.GetBudgetCalculations("spend");
+            lb_wydatek.Content = spend;
+            lb_oszczednosci.Content = earn - spend;
+
         }
 
         private void RecalculateBudget(object sender, RoutedEventArgs e)
