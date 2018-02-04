@@ -14,7 +14,7 @@
     <Grid x:Name="grid_main" Margin="0,0,0,0">
         <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" >
             <Menu DockPanel.Dock="Top">
-                <MenuItem Header="_Zakładki" >
+                <MenuItem Header="Przełącz zakładkę" >
                     <MenuItem x:Name="mi_Paragony" Header="Paragony" Click="MenuItem_Click"/>
                     <MenuItem x:Name="mi_Zestawienia" Header="Zestawienia" IsEnabled="False">
                         <MenuItem Header="Standardowe zestawienie" Click="MenuItem_Click" />
@@ -26,11 +26,11 @@
                 </MenuItem>
             </Menu>
         </DockPanel>
-        <Grid x:Name="grid_paragony" Visibility="Hidden" Background="#FFB9B7B7" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid x:Name="grid_paragony" Visibility="Visible" Background="#FFB9B7B7" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="4*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="3*"></RowDefinition>
@@ -49,15 +49,12 @@
                 <ComboBox x:Name="cb_sklep" HorizontalAlignment="Left" Margin="64,50,0,0" VerticalAlignment="Top" Width="128" IsEditable="True" TabIndex="2" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
                 <TextBox x:Name="tb_nr_paragonu" HorizontalAlignment="Left" Height="23" Margin="64,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" TabIndex="3"/>
                 <ComboBox x:Name="cb_konto" HorizontalAlignment="Left" Margin="64,105,0,0" VerticalAlignment="Top" Width="128" TabIndex="3" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
-                <Button x:Name="bt_dodajParagon" Content="Dodaj paragon" HorizontalAlignment="Left" Margin="64,141,0,0" VerticalAlignment="Top" Width="128" Click="NowyParagon" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="4"/>
+                <Button x:Name="bt_dodajParagon" Content="Dodaj paragon" HorizontalAlignment="Left" Margin="64,141,0,0" VerticalAlignment="Top" Width="128" Click="newBill" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="4"/>
                 <Button x:Name="bt_CancelBill" Content="Anuluj paragon" HorizontalAlignment="Left" Margin="64,171,0,0" VerticalAlignment="Top" Width="128" Click="CancelBill" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="100"/>
                 <Label x:Name="label" Content="Data" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy" Content="Sklep" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy1" Content="Paragon" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy2" Content="Konto" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
-
-
-
             </Grid>
 
             <Grid x:Name="gr_paragon" Grid.Column="1" IsEnabled="False">
@@ -135,7 +132,7 @@
                 </DataGrid.Columns>-->
             </DataGrid>
         </Grid>
-        <Grid x:Name="grid_budzet" Background="#FFB9B7B7" Visibility="Visible" Margin="0,20,0,0">
+        <Grid x:Name="grid_budzet" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="170*"/>
                 <ColumnDefinition Width="600*"/>

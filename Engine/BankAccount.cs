@@ -37,5 +37,13 @@
         public decimal Oprocentowanie { get { return oprocentowanie; } set { oprocentowanie = value; } }
         public string Owner { get { return owner; } set { owner = value; } }
         public string Opis { get { return opis; } set { opis = value; } }
+        public void modifyAccount(string name, string opis, string owner, decimal oprocentowanie, decimal value)
+        {
+            this.Name = name;
+            this.opis = opis;
+            this.owner = owner;
+            this.oprocentowanie = oprocentowanie;
+            this.Value = value;
+        }
     }
 }

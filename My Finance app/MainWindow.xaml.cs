@@ -127,7 +127,7 @@ namespace My_Finance_app
         /// <summary>
         /// Create new bill.
         /// </summary>
-        private void NowyParagon(object sender, RoutedEventArgs e)
+        private void newBill(object sender, RoutedEventArgs e)
         {
             if (cb_sklep.Text != "" && cb_konto.Text != "")
             {
@@ -421,6 +421,9 @@ namespace My_Finance_app
             };
 
             _sql.ModifyBankAccount(tmpDic);
+            
+
+
         }
 
         private void bt_nowe_konto_Click(object sender, RoutedEventArgs e)
