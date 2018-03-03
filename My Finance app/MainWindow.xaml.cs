@@ -18,6 +18,7 @@ namespace My_Finance_app
     public partial class MainWindow : Window
     {
         int id_zest = 1;
+        private DateTime month = DateTime.Now;
         SqlEngine _sql;
         Paragon _paragon;
         Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
@@ -35,6 +36,8 @@ namespace My_Finance_app
             PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
             ConnectDatabase();
 
+            selectedMonth.Content = month.ToShortDateString().Substring(0, 7);
+
             //puting grids to dictionary. This will allow us to switch between grids.
             grids.Add("Paragony", grid_paragony);
             grids.Add("Asortyment", grid_asortyment);
@@ -44,6 +47,10 @@ namespace My_Finance_app
             grids.Add("Konta", grid_konta);
 
             ShowGrid("Paragony");
+
+           ObservableCollection<string> list = new ObservableCollection<string>();
+
+           // budgetMonthCombo.Items.Add("2");// = DateTime.Now.Month.ToString();
         }
 
         private void ConnectDatabase()
@@ -59,10 +66,8 @@ namespace My_Finance_app
         {
 
             cb_sklep.DataContext = _sql.GetShopsCollection();
-            //cb_konto.DataContext = _sql.GetAccountColection();
             _sql.GetAccountColection();
             cb_konto.DataContext = SqlEngine.bankAccounts;
-            // grid_konta.DataContext = _sql.GetAccountColection();
             grid_konta.DataContext = SqlEngine.bankAccounts;
         }
 
@@ -391,13 +396,13 @@ namespace My_Finance_app
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
-            double earn = _sql.GetBudgetCalculations("earn");
-            double spend = _sql.GetBudgetCalculations("spend");
+            double earn = _sql.GetBudgetCalculations("earn", month);
+            double spend = _sql.GetBudgetCalculations("spend", month);
 
-            dg_budzety.DataContext = _sql.GetBudgets();
+            dg_budzety.DataContext = _sql.GetBudgets(month);
             lb_przychodzy.Content = earn;
-            lb_pozostalo.Content = _sql.GetBudgetCalculations("left");
-            lb_zaplanowane.Content = _sql.GetBudgetCalculations("planed");
+            lb_pozostalo.Content = _sql.GetBudgetCalculations("left", month);
+            lb_zaplanowane.Content = _sql.GetBudgetCalculations("planed", month);
             lb_wydatek.Content = spend;
             lb_oszczednosci.Content = earn - spend;
 
@@ -421,10 +426,20 @@ namespace My_Finance_app
             };
 
             _sql.ModifyBankAccount(tmpDic);
-            
-
-
         }
+
+        private void previusMonth(object sender, RoutedEventArgs e)
+        {
+            month = month.AddMonths(-1);
+            selectedMonth.Content = month.ToShortDateString().Substring(0,7);
+        }
+
+        private void nextMonth(object sender, RoutedEventArgs e)
+        {
+            month = month.AddMonths(1);
+            selectedMonth.Content = month.ToShortDateString().Substring(0, 7);
+        }
+
 
         private void bt_nowe_konto_Click(object sender, RoutedEventArgs e)
         {

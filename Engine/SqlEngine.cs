@@ -79,7 +79,7 @@ namespace Engine
             {
                 if (Environment.MachineName == "MARIUSZ_DOMOWY")
                 {
-                    dbString = @"MARIUSZ_DOMOWY";
+                    dbString = @"MARIUSZ_DOMOWY\SQLEXPRESS";
                 }
                 else { dbString = "MARIUSZ_DOMOWY"; }
                     strCon = "Data Source=" + dbString + ";Initial Catalog="+database+";Integrated Security=false;Connection Timeout=10;user id="+user+";password=" + pass; //'NT Authentication
@@ -185,6 +185,33 @@ namespace Engine
             return 0;
         }
 
+        private string SQLgetScalarWithParameters(string querry, Dictionary<string, string> param)
+        {
+            SqlCommand command = new SqlCommand(querry, _con);
+            SqlParameter par;
+            foreach (var item in param)
+            {
+                par = new SqlParameter
+                {
+                    ParameterName = item.Key,
+                    Value = item.Value
+                };
+                command.Parameters.Add(par);
+            }
+
+            string output = "";
+            try
+            {
+                output = command.ExecuteScalar().ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
+                throw;
+            }
+            return output;
+        }
+
         private string SQLgetScalar(string querry)
         {
             string output = "";
@@ -225,7 +252,7 @@ namespace Engine
             switch (name)
             {
                 case "konta":
-                    sqlCommand = "SELECT nazwa, id, kwota, opis, wlasciciel, oprocentowanie FROM konto order by id;";
+                    sqlCommand = "SELECT nazwa, id, kwota, opis, wlasciciel, oprocentowanie FROM konto where del = 0 order by id;";
                     break;
                 case "sklepy":
                     sqlCommand = "select '' sklep, -1 id union SELECT sklep,id FROM sklepy order by sklep;";
@@ -252,15 +279,17 @@ namespace Engine
         private DataTable GetData(string sqlCommand, Dictionary<string, string> param)
         {
             SqlCommand command = new SqlCommand(sqlCommand, _con);
-            SqlParameter par = new SqlParameter();
+            SqlParameter par;// = new SqlParameter();
             foreach (var item in param)
             {
+                par = new SqlParameter();
                 Console.WriteLine(item.Value);
                 par.ParameterName = item.Key;
                 par.Value = item.Value;
                 //command.Parameters.AddWithValue(item.Key,item.Value);
+                command.Parameters.Add(par);
             }
-            command.Parameters.Add(par);
+            
 
             SqlDataAdapter adapter = new SqlDataAdapter
             {
@@ -453,41 +482,49 @@ namespace Engine
             return sklepy;
         }
 
-        public double GetBudgetCalculations(string v)
+        public double GetBudgetCalculations(string v, DateTime date)
         {
             switch (v)
             {
                 case "earn":
-                    return GetCurrentMonthSalary();
+                    return GetCurrentMonthSalary(date);
                 case "left":
-                    return GetCurrentMonthLeft();
+                    return GetCurrentMonthLeft(date);
                 case "planed":
-                    return GetCurrentMonthPlaned();
+                    return GetCurrentMonthPlaned(date);
                 case "spend":
-                    return GetCurrentMonthSpend();
+                    return GetCurrentMonthSpend(date);
             }
             return 0;
         }
 
-        private double GetCurrentMonthSpend()
+        private double GetCurrentMonthSpend(DateTime data)
         {
-            return System.Convert.ToDouble(SQLgetScalar("select isnull(sum(suma),0) from paragony where YEAR(data) = year(getdate()) and MONTH(data) = month(getdate()) and del = 0"));
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("@currentDate", data.ToShortDateString());
+            return System.Convert.ToDouble(SQLgetScalarWithParameters("select isnull(sum(suma),0) from paragony where YEAR(data) = year(@currentDate) and MONTH(data) = month(@currentDate) and del = 0", param));
         }
 
-        private double GetCurrentMonthPlaned()
+        private double GetCurrentMonthPlaned(DateTime data)
         {
-            return System.Convert.ToDouble(SQLgetScalar("select sum(planed) from budzet where miesiac = MONTH(getdate()) and rok = year(getdate())"));
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("@currentDate", data.ToShortDateString());
+            return System.Convert.ToDouble(SQLgetScalarWithParameters ("select sum(planed) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)",param));
         }
 
-        public double GetCurrentMonthLeft()
+        public double GetCurrentMonthLeft( DateTime data)
         {
-            return System.Convert.ToDouble(SQLgetScalar("select (select  isnull(sum(kwota), 0) from przychody where MONTH(data) = MONTH(getdate()) and year(data) = year(getdate()))"+
-            "- (select sum(planed) from budzet where miesiac = MONTH(getdate()) and rok = year(getdate())) "));
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("@currentDate", data.ToShortDateString());
+            return System.Convert.ToDouble(SQLgetScalarWithParameters("select (select  isnull(sum(kwota), 0) from przychody where MONTH(data) = MONTH(@currentDate) and year(data) = year(@currentDate))" +
+            "- (select sum(planed) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)) ",param));
         }
 
-        private double GetCurrentMonthSalary()
+        private double GetCurrentMonthSalary(DateTime data)
         {
-           return System.Convert.ToDouble(SQLgetScalar("select  isnull(sum(kwota),0) from przychody where MONTH(data) = MONTH(getdate()) and year(data) = year(getdate())"));
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("@currentDate", data.ToShortDateString());
+            return System.Convert.ToDouble(SQLgetScalarWithParameters("select  isnull(sum(kwota),0) from przychody where MONTH(data) = MONTH(@currentDate) and year(data) = year(@currentDate)",param));
         }
 
         public void ModifyBankAccount(Dictionary<string, string> tmpDic)
@@ -510,16 +547,22 @@ namespace Engine
             return kategorie;
         }
 
-        public object GetBudgets(int miesiac=0)
+        public object GetBudgets(DateTime date)
         {
+            int month = date.Month;
+            int year = date.Year;
+            Console.WriteLine("miesiac " + month + " rok " + year);
             //int miesiac = 0;
             string sqlquery = "";
             Dictionary<string, string> param = new Dictionary<string, string>();
-            if (miesiac != 0)
+            if (month != 0)
             {
-                param.Add("@miesiac", ""+miesiac);
+                
+                param.Add("@miesiac", ""+month);
+                param.Add("@year", ""+year); 
                 sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
-                    "where miesiac = @miesiac; "; 
+                    "where miesiac = @miesiac and rok = @year; ";
+                Console.WriteLine(sqlquery);
                 return GetData(sqlquery, param);
             }
             else
