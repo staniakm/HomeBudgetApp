@@ -38,6 +38,7 @@ namespace My_Finance_app
             lb_percent_used.Content = id[5];
             SQL = _sql;
             this.mw = mw;
+            
             System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
 
         }
@@ -47,7 +48,7 @@ namespace My_Finance_app
             string newValue = lb_planed.Text.Replace(",",".");
             //try
             //{
-                SQL.UpdateBudget(databaseBudgetRowID, newValue);
+                SQL.UpdateBudget(databaseBudgetRowID, newValue, mw.getCurrentSelectedDate());
             //}
             //catch (Exception)
             //{

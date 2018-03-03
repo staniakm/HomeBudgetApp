@@ -108,12 +108,12 @@ namespace Engine
             SQLexecuteNonQuerry(String.Format("exec dbo.updateAsoCategory {0}, '{1}', {2}, '{3}'", idASO, newCategory, category_id, newName));
         }
 
-        public void UpdateBudget(int databaseBudgetRowID, string newValue)
+        public void UpdateBudget(int databaseBudgetRowID, string newValue, DateTime date)
         {
             try
             {
                 SQLexecuteNonQuerry(String.Format("update budzet set planed = {0} where id = {1}", newValue, databaseBudgetRowID));
-                RecalculateBudget();
+                RecalculateBudget(date);
             }
             catch (Exception)
             {
@@ -152,7 +152,7 @@ namespace Engine
             SQLexecuteNonQuerryProcedure("dbo.addAsoToStore", dic);
         }
 
-        private int SQLexecuteNonQuerryProcedure(string querry, Dictionary<string, string> paramet)
+        private int SQLexecuteNonQuerryProcedure(string querry, Dictionary<string, string> param)
         {
 
             int rowsAffected = 0;
@@ -163,7 +163,7 @@ namespace Engine
 
 
             Console.WriteLine(querry);
-            foreach (var item in paramet)
+            foreach (var item in param)
             {
                 SqlParameter par = new SqlParameter
                 {
@@ -342,9 +342,14 @@ namespace Engine
             SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", paragon));
         }
 
-        public void RecalculateBudget()
+        public void RecalculateBudget(DateTime date)
         {
-            SQLexecuteNonQuerry("exec RecalculateBudget");
+            Dictionary<string, string> dic = new Dictionary<string, string>
+            {
+                { "@month", date.ToShortDateString() }
+            };
+
+            SQLexecuteNonQuerryProcedure("dbo.RecalculateBudget", dic);
         }
 
         public void SaveBilInDatabase(Paragon paragon)

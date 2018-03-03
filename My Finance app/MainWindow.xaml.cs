@@ -48,9 +48,9 @@ namespace My_Finance_app
 
             ShowGrid("Paragony");
 
-           ObservableCollection<string> list = new ObservableCollection<string>();
+            ObservableCollection<string> list = new ObservableCollection<string>();
 
-           // budgetMonthCombo.Items.Add("2");// = DateTime.Now.Month.ToString();
+            // budgetMonthCombo.Items.Add("2");// = DateTime.Now.Month.ToString();
         }
 
         private void ConnectDatabase()
@@ -58,7 +58,7 @@ namespace My_Finance_app
             LoadDataToCombo();
             UpdateControlsState(true);
             LoadCategories();
-           
+
         }
 
         //ustawamy context na sklepy i konto dla 1 zakładki
@@ -184,7 +184,7 @@ namespace My_Finance_app
         /// <param name="state"> bool </param>
         private void UpdateControlsState(bool state)
         {
-            Console.WriteLine("status kontorlek: "+state);
+            Console.WriteLine("status kontorlek: " + state);
             gr_paragon.IsEnabled = state;
             if (_sql != null)
             {
@@ -228,24 +228,24 @@ namespace My_Finance_app
             if (tb_cena.Text != "" && tb_ilosc.Text != "")
             {
                 string opis = "";
-                decimal rabat=0.0M;
-                decimal cena= decimal.Parse(tb_cena.Text.Replace(".", ","));
+                decimal rabat = 0.0M;
+                decimal cena = decimal.Parse(tb_cena.Text.Replace(".", ","));
                 decimal ilosc = decimal.Parse(tb_ilosc.Text.Replace(".", ","));
 
-                if (tb_rabat.Text != "" )
+                if (tb_rabat.Text != "")
                 {
-                    rabat = decimal.Parse(tb_rabat.Text.Replace(".",","));
+                    rabat = decimal.Parse(tb_rabat.Text.Replace(".", ","));
                     if (rabat != 0)
                     {
                         if (rabat < 0)
                         { rabat = rabat * (-1); }
 
-                        opis = tb_opis.Text + "Cena: "+cena+ " Rabat: " + rabat;
-                        cena = cena - Math.Round((rabat / ilosc),2);
+                        opis = tb_opis.Text + "Cena: " + cena + " Rabat: " + rabat;
+                        cena = cena - Math.Round((rabat / ilosc), 2);
                         Console.WriteLine("cena " + cena);
                     }
                 }
-                
+
                 _paragon.Szczegoly.Add(new ParagonSzczegoly((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
                 tb_cena.Clear();
                 tb_ilosc.Clear();
@@ -276,7 +276,7 @@ namespace My_Finance_app
         private void bt_SaveBillInDatabase(object sender, RoutedEventArgs e)
         {
             _sql.SaveBilInDatabase(_paragon);
-                                            
+
             UpdateControlsState(true);
             dg_paragony.ItemsSource = null;
         }
@@ -324,7 +324,7 @@ namespace My_Finance_app
         {
             foreach (string s in grids.Keys)
             {
-                    grids[s].Visibility = Visibility.Hidden;
+                grids[s].Visibility = Visibility.Hidden;
             }
             grids[v].Visibility = Visibility.Visible;
         }
@@ -340,7 +340,7 @@ namespace My_Finance_app
         private void bt_generuj_Click(object sender, RoutedEventArgs e)
         {
             var dic = new Dictionary<int, Tuple<string, string>>();
-            
+
             //date settings parametr = 1
             if (dp_dataOd_zest.SelectedDate.ToString() != "" || dp_dataDo_zest.SelectedDate.ToString() != "")
             {
@@ -408,9 +408,14 @@ namespace My_Finance_app
 
         }
 
+        public DateTime getCurrentSelectedDate()
+        {
+            return month;
+        }
+
         private void RecalculateBudget(object sender, RoutedEventArgs e)
         {
-           _sql.RecalculateBudget();
+           _sql.RecalculateBudget(month);
         }
 
         private void br_zapisz_konto_Click(object sender, RoutedEventArgs e)
