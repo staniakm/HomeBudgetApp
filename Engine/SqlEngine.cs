@@ -95,7 +95,7 @@ namespace Engine
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        //Console.WriteLine(ex.Message);
                         connected = false;
                     }
                 }
@@ -125,17 +125,17 @@ namespace Engine
 
         private int SQLexecuteNonQuerry(string querry)
         {
-            Console.WriteLine( "query: "+querry);
+            //Console.WriteLine( "query: "+querry);
             int rowsAffected = 0;
             SqlCommand sql = new SqlCommand(querry, _con);
             try
             {
-                Console.WriteLine(querry);
+                //Console.WriteLine(querry);
                 rowsAffected = sql.ExecuteNonQuery();
             }
             catch (System.Exception e)
             {
-                Console.WriteLine(e.Message);
+                //Console.WriteLine(e.Message);
                 throw;
             }
             return rowsAffected;
@@ -162,7 +162,7 @@ namespace Engine
             };
 
 
-            Console.WriteLine(querry);
+            //Console.WriteLine(querry);
             foreach (var item in param)
             {
                 SqlParameter par = new SqlParameter
@@ -206,7 +206,7 @@ namespace Engine
             }
             catch (Exception ex)
             {
-                Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
+                //Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
                 throw;
             }
             return output;
@@ -224,7 +224,7 @@ namespace Engine
             }
             catch (Exception ex)
             {
-                Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
+                //Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
                 throw;
             }
             return output;
@@ -283,7 +283,7 @@ namespace Engine
             foreach (var item in param)
             {
                 par = new SqlParameter();
-                Console.WriteLine(item.Value);
+                //Console.WriteLine(item.Value);
                 par.ParameterName = item.Key;
                 par.Value = item.Value;
                 //command.Parameters.AddWithValue(item.Key,item.Value);
@@ -447,7 +447,7 @@ namespace Engine
                 querry += string.Format("insert into rapOrg select '{0}', '{1}', {2} ,{3};\n", entry.Value.Item1, entry.Value.Item2, entry.Key, _spid);
             }
 
-            Console.WriteLine(querry);
+            //Console.WriteLine(querry);
             SQLexecuteNonQuerry(querry);
                
         }
@@ -514,7 +514,7 @@ namespace Engine
         {
             Dictionary<string, string> param = new Dictionary<string, string>();
             param.Add("@currentDate", data.ToShortDateString());
-            return System.Convert.ToDouble(SQLgetScalarWithParameters ("select sum(planed) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)",param));
+            return System.Convert.ToDouble(SQLgetScalarWithParameters ("select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)",param));
         }
 
         public double GetCurrentMonthLeft( DateTime data)
@@ -522,7 +522,7 @@ namespace Engine
             Dictionary<string, string> param = new Dictionary<string, string>();
             param.Add("@currentDate", data.ToShortDateString());
             return System.Convert.ToDouble(SQLgetScalarWithParameters("select (select  isnull(sum(kwota), 0) from przychody where MONTH(data) = MONTH(@currentDate) and year(data) = year(@currentDate))" +
-            "- (select sum(planed) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)) ",param));
+            "- (select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)) ",param));
         }
 
         private double GetCurrentMonthSalary(DateTime data)
@@ -556,7 +556,7 @@ namespace Engine
         {
             int month = date.Month;
             int year = date.Year;
-            Console.WriteLine("miesiac " + month + " rok " + year);
+            //Console.WriteLine("miesiac " + month + " rok " + year);
             //int miesiac = 0;
             string sqlquery = "";
             Dictionary<string, string> param = new Dictionary<string, string>();
@@ -567,7 +567,7 @@ namespace Engine
                 param.Add("@year", ""+year); 
                 sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
                     "where miesiac = @miesiac and rok = @year; ";
-                Console.WriteLine(sqlquery);
+                //Console.WriteLine(sqlquery);
                 return GetData(sqlquery, param);
             }
             else

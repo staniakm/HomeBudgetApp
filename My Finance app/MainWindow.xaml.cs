@@ -437,12 +437,14 @@ namespace My_Finance_app
         {
             month = month.AddMonths(-1);
             selectedMonth.Content = month.ToShortDateString().Substring(0,7);
+            LoadBudget(null,null);
         }
 
         private void nextMonth(object sender, RoutedEventArgs e)
         {
             month = month.AddMonths(1);
             selectedMonth.Content = month.ToShortDateString().Substring(0, 7);
+            LoadBudget(null, null);
         }
 
 
