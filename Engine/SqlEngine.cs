@@ -556,8 +556,6 @@ namespace Engine
         {
             int month = date.Month;
             int year = date.Year;
-            //Console.WriteLine("miesiac " + month + " rok " + year);
-            //int miesiac = 0;
             string sqlquery = "";
             Dictionary<string, string> param = new Dictionary<string, string>();
             if (month != 0)

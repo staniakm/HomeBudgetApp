@@ -457,5 +457,10 @@ namespace My_Finance_app
             konto_owner.Text = "";
             konto_procent.Text = "";
         }
+
+        private void br_add_salary(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }//ostani

@@ -95,7 +95,6 @@
                 </DataGrid>
             </Grid>
         </Grid>
-
         <Grid x:Name="grid_zestawienie" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
@@ -132,7 +131,7 @@
                 </DataGrid.Columns>-->
             </DataGrid>
         </Grid>
-        <Grid x:Name="grid_budzet" Background="#FFB9B7B7" Visibility="Visible" Margin="0,20,0,0">
+        <Grid x:Name="grid_budzet" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="170*"/>
                 <ColumnDefinition Width="600*"/>
@@ -160,7 +159,7 @@
                 <DataGrid x:Name="dg_budzety" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}"/>
             
             </Grid>
-        <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
+        <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Visible" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="159*"/>
                 <ColumnDefinition Width="323*"/>
@@ -170,6 +169,7 @@
                 <Label Content="Edycja kont"/>
                 <ComboBox x:Name="konta_cb_konto" VerticalAlignment="Center" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID" HorizontalAlignment="Stretch" Margin="5"/>
                 <Button x:Name="br_zapisz_konto" Content="Zapisz" Margin="5" HorizontalAlignment="Stretch" Click="br_zapisz_konto_Click"/>
+                <Button x:Name="br_dodajPrzychod" Content="Dodaj przychod" Margin="5" HorizontalAlignment="Stretch" Click="br_add_salary"/>
                 <Button x:Name="bt_nowe_konto" Content="Nowe" Margin="5,50,5,0" Click="bt_nowe_konto_Click"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Grid.ColumnSpan="2">
