@@ -457,7 +457,7 @@ namespace My_Finance_app
 
         private void br_add_salary(object sender, RoutedEventArgs e)
         {
-
+            
         }
     }
 }//ostani

@@ -38,6 +38,11 @@ namespace Engine
 
         }
 
+        public void addNewSallary(int accountId, string description, double moneyAmount)
+        {
+            throw new NotImplementedException();
+        }
+
         public SqlEngine(string database)
         {
             _con = new SqlConnection();
