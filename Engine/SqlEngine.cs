@@ -38,9 +38,38 @@ namespace Engine
 
         }
 
-        public void addNewSallary(int accountId, string description, double moneyAmount)
+        public DataTable getSallaryDescriptions()
         {
-            throw new NotImplementedException();
+            return GetData("select text from SALARY_TYPE;");
+            
+        }
+
+        public void addNewSallary(int accountId, string description, decimal moneyAmount)
+        {
+            SqlCommand com = new SqlCommand("insert into przychody(kwota, opis, konto) values (@kwota, @opis ,@konto);", _con);
+            SqlParameter par = new SqlParameter("@kwota", SqlDbType.Money);
+            par.Value = moneyAmount;
+            com.Parameters.Add(par);
+            par = new SqlParameter("@opis", SqlDbType.VarChar, 100);
+            par.Value = description;
+            com.Parameters.Add(par);
+            par = new SqlParameter("@konto", SqlDbType.Int);
+            par.Value = accountId;
+            com.Parameters.Add(par);
+            com.Prepare();
+            com.ExecuteNonQuery();
+
+            string query = "update konto set kwota = kwota + @kwota where ID = @konto";
+            com = new SqlCommand(query, _con);
+            par = new SqlParameter("@kwota", SqlDbType.Money);
+            par.Value = moneyAmount;
+            com.Parameters.Add(par);
+            par = new SqlParameter("@konto", SqlDbType.Int);
+            par.Value = accountId;
+            com.Parameters.Add(par);
+            com.Prepare();
+            com.ExecuteNonQuery();
+
         }
 
         public SqlEngine(string database)
