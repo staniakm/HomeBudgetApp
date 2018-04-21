@@ -13,7 +13,7 @@ namespace Engine
         private string database;
         public string _spid { get; private set; }
         public string id;
-        public static ObservableCollection<BankAccount> bankAccounts { get; set; }
+        private ObservableCollection<BankAccount> bankAccounts { get; set; }
 
         public SqlEngine(string database, string login, string pass)
         {
@@ -82,7 +82,7 @@ namespace Engine
                     dbString = @"MARIUSZ_DOMOWY\SQLEXPRESS";
                 }
                 else { dbString = "MARIUSZ_DOMOWY"; }
-                    strCon = "Data Source=" + dbString + ";Initial Catalog="+database+";Integrated Security=false;Connection Timeout=10;user id="+user+";password=" + pass; //'NT Authentication
+                strCon = "Data Source=" + dbString + ";Initial Catalog=" + database + ";Integrated Security=false;Connection Timeout=10;user id=" + user + ";password=" + pass; //'NT Authentication
 
                 _con.ConnectionString = strCon;
                 if (Con == false)
@@ -125,17 +125,14 @@ namespace Engine
 
         private int SQLexecuteNonQuerry(string querry)
         {
-            //Console.WriteLine( "query: "+querry);
             int rowsAffected = 0;
             SqlCommand sql = new SqlCommand(querry, _con);
             try
             {
-                //Console.WriteLine(querry);
                 rowsAffected = sql.ExecuteNonQuery();
             }
             catch (System.Exception e)
             {
-                //Console.WriteLine(e.Message);
                 throw;
             }
             return rowsAffected;
@@ -218,7 +215,7 @@ namespace Engine
             try
             {
                 SqlCommand sql = new SqlCommand(querry, _con);
-                
+
                 output = sql.ExecuteScalar().ToString();
 
             }
@@ -283,14 +280,10 @@ namespace Engine
             foreach (var item in param)
             {
                 par = new SqlParameter();
-                //Console.WriteLine(item.Value);
                 par.ParameterName = item.Key;
                 par.Value = item.Value;
-                //command.Parameters.AddWithValue(item.Key,item.Value);
                 command.Parameters.Add(par);
             }
-            
-
             SqlDataAdapter adapter = new SqlDataAdapter
             {
                 SelectCommand = command
@@ -354,28 +347,28 @@ namespace Engine
 
         public void SaveBilInDatabase(Paragon paragon)
         {
-                                    
+
             paragon.IdParagon = int.Parse(SQLgetScalar("exec dbo.getNextIdForParagon"));
-            
+
             try
             {
                 SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, sklep, konto, suma, opis) values (@nrParagonu, @data,@sklep,@konto, 0,'' );", _con);
-                SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar,50);
-                par.Value= paragon.NrParagonu.ToUpper();
+                SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50);
+                par.Value = paragon.NrParagonu.ToUpper();
                 com.Parameters.Add(par);
                 par = new SqlParameter("@data", SqlDbType.Date);
                 par.Value = paragon.Data;
                 com.Parameters.Add(par);
-                par = new SqlParameter("@sklep", SqlDbType.VarChar,150);
-                par.Value= paragon.Sklep;
+                par = new SqlParameter("@sklep", SqlDbType.VarChar, 150);
+                par.Value = paragon.Sklep;
                 com.Parameters.Add(par);
 
                 par = new SqlParameter("@konto", SqlDbType.Int);
-                par.Value= paragon.Konto;
+                par.Value = paragon.Konto;
                 com.Parameters.Add(par);
                 com.Prepare();
                 com.ExecuteNonQuery();
-                
+
 
                 com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values (@idParagon, @cenaJednostkowa, @ilosc, @cena, @idAso, @opis)", _con);
                 par = new SqlParameter("@idParagon", SqlDbType.Int);
@@ -383,7 +376,7 @@ namespace Engine
                 par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal);
                 par.Precision = 8;
                 par.Scale = 2;
-                
+
                 com.Parameters.Add(par);
                 par = new SqlParameter("@ilosc", SqlDbType.Decimal);
                 par.Precision = 6;
@@ -394,7 +387,7 @@ namespace Engine
                 com.Parameters.Add(par);
                 par = new SqlParameter("@idAso", SqlDbType.Int);
                 com.Parameters.Add(par);
-                par = new SqlParameter("@opis", SqlDbType.VarChar,150);
+                par = new SqlParameter("@opis", SqlDbType.VarChar, 150);
                 com.Parameters.Add(par);
                 com.Prepare();
 
@@ -413,17 +406,13 @@ namespace Engine
                 com = new SqlCommand("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = @idPagaron", _con);
                 com.Parameters.AddWithValue("@idPagaron", paragon.IdParagon);
                 com.ExecuteNonQuery();
-                GetAccountColection();
+                CreateAccountColection();
             }
             catch (Exception)
             {
 
                 throw;
             }
-            
-
-
-
         }
 
         /// <summary>
@@ -442,14 +431,14 @@ namespace Engine
         {
             string querry = string.Format("delete from rapOrg where sesja = {0};\n", _spid);
 
-            foreach (KeyValuePair<int, Tuple<string,string>> entry in dic)
+            foreach (KeyValuePair<int, Tuple<string, string>> entry in dic)
             {
                 querry += string.Format("insert into rapOrg select '{0}', '{1}', {2} ,{3};\n", entry.Value.Item1, entry.Value.Item2, entry.Key, _spid);
             }
 
             //Console.WriteLine(querry);
             SQLexecuteNonQuerry(querry);
-               
+
         }
 
         private void Backup()
@@ -461,17 +450,21 @@ namespace Engine
         /// Zwracamy kolekcję kont. Można ustawiać bezpośrednio do datacontextu.
         /// </summary>
         /// <returns></returns>
-        public void GetAccountColection()
+        public void CreateAccountColection()
         {
             ObservableCollection<BankAccount> konta = new ObservableCollection<BankAccount>();
             DataTable dt = GetTable("konta");
             foreach (DataRow item in dt.Rows)
             {
-                konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"], (decimal) item["kwota"], (string)item["opis"],(string)item["wlasciciel"],(decimal)item["oprocentowanie"]));
+                konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"], (decimal)item["kwota"], (string)item["opis"], (string)item["wlasciciel"], (decimal)item["oprocentowanie"]));
             }
             bankAccounts = konta;
-            //return konta;
-        }
+            }
+
+        public ObservableCollection<BankAccount> GetBankAccounts()
+            {
+            return bankAccounts;
+            }
         /// <summary>
         /// Zwracamy kolekcję sklepów. Można bezpośrednio bindować do datacontext
         /// </summary>
@@ -567,7 +560,6 @@ namespace Engine
                 param.Add("@year", ""+year); 
                 sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
                     "where miesiac = @miesiac and rok = @year; ";
-                //Console.WriteLine(sqlquery);
                 return GetData(sqlquery, param);
             }
             else

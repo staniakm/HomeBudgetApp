@@ -60,15 +60,13 @@ namespace My_Finance_app
             LoadCategories();
 
         }
-
-        //ustawamy context na sklepy i konto dla 1 zakładki
+        //create bank accounts and shop collections
         private void LoadDataToCombo()
         {
-
+            _sql.CreateAccountColection();
             cb_sklep.DataContext = _sql.GetShopsCollection();
-            _sql.GetAccountColection();
-            cb_konto.DataContext = SqlEngine.bankAccounts;
-            grid_konta.DataContext = SqlEngine.bankAccounts;
+            cb_konto.DataContext = _sql.GetBankAccounts();
+            grid_konta.DataContext = _sql.GetBankAccounts();
         }
 
         /// <summary>
@@ -242,7 +240,6 @@ namespace My_Finance_app
 
                         opis = tb_opis.Text + "Cena: " + cena + " Rabat: " + rabat;
                         cena = cena - Math.Round((rabat / ilosc), 2);
-                        Console.WriteLine("cena " + cena);
                     }
                 }
 
