@@ -457,9 +457,11 @@ namespace My_Finance_app
 
         private void br_add_salary(object sender, RoutedEventArgs e)
         {
-            //need implementation
+            //need 
+            if (konta_cb_konto.Text != "") { 
             SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, _sql);
             sw.Show();
+        }
         }
     }
 }//ostani
