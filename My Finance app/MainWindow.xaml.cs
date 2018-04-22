@@ -17,7 +17,6 @@ namespace My_Finance_app
     /// </summary>
     public partial class MainWindow : Window
     {
-        int id_zest = 1;
         private DateTime month = DateTime.Now;
         SqlEngine _sql;
         Paragon _paragon;
@@ -38,7 +37,7 @@ namespace My_Finance_app
 
             selectedMonth.Content = month.ToShortDateString().Substring(0, 7);
 
-            //puting grids to dictionary. This will allow us to switch between grids.
+            //puting grids to dictionary. This will allow to switch between grids.
             grids.Add("Paragony", grid_paragony);
             grids.Add("Asortyment", grid_asortyment);
             grids.Add("Budżet", grid_budzet);
@@ -49,8 +48,6 @@ namespace My_Finance_app
             ShowGrid("Paragony");
 
             ObservableCollection<string> list = new ObservableCollection<string>();
-
-            // budgetMonthCombo.Items.Add("2");// = DateTime.Now.Month.ToString();
         }
 
         private void ConnectDatabase()
@@ -70,20 +67,18 @@ namespace My_Finance_app
         }
 
         /// <summary>
-        /// Zestawienie - na później
+        /// Create report
         /// </summary>
-        private void ZaladujZestawienie()
+        private void loadReportStatistic(int reportID)
         {
-
             if (_sql.Con)
             {
                 try
                 {
-                    dg_zestawienie.ItemsSource = _sql.ZestawienieWydatkow(id_zest).DefaultView;
+                    dg_zestawienie.ItemsSource = _sql.ZestawienieWydatkow(reportID).DefaultView;
                 }
                 catch (Exception)
                 {
-
                     throw;
                 }
             }
@@ -91,17 +86,7 @@ namespace My_Finance_app
 
 
 
-        public ObservableCollection<Asortyment> GetProductInStoreCollection(string shop)
-        {
-            ObservableCollection<Asortyment> ShopAso = new ObservableCollection<Asortyment>();
-
-            DataTable dt = _sql.GetAsoList(shop);
-            foreach (DataRow item in dt.Rows)
-            {
-                ShopAso.Add(new Asortyment((int)item["id"], (string)item["NAZWA"]));
-            }
-            return ShopAso;
-        }
+        
 
         public void LoadCategories()
         {
@@ -124,7 +109,7 @@ namespace My_Finance_app
         /// </summary>
         private void LoadProducts()
         {
-            cb_product.DataContext = GetProductInStoreCollection(cb_sklep.Text);
+            cb_product.DataContext = _sql.GetProductsInStore(cb_sklep.Text);
         }
 
         /// <summary>
@@ -302,7 +287,7 @@ namespace My_Finance_app
             {
                 case "Podział na kategorie":
                 case "Standardowe zestawienie":
-                    id_zest = 1;
+                    //id_zest = 1;
 
                     dp_dataOd_zest.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
                     dp_dataDo_zest.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1);
@@ -310,7 +295,7 @@ namespace My_Finance_app
                     cb_sklep_zestawienie.DataContext = _sql.GetShopsCollection();
                     if (mi.Header.ToString() == "Podział na kategorie")
                     {
-                        id_zest = 2;
+                    //    id_zest = 2;
                     }
 
                     break;
@@ -336,29 +321,43 @@ namespace My_Finance_app
         /// </summary>
         private void bt_generuj_Click(object sender, RoutedEventArgs e)
         {
-            var dic = new Dictionary<int, Tuple<string, string>>();
+            set_report_rules();
+            
+            switch (cb_report_type.Text.ToUpper())
+            {
+                case "NORMALNE":
+                    loadReportStatistic(1);
+                    break;
+                case "KATEGORIE":
+                    loadReportStatistic(2);
+                    break;
+            }
+        }
+
+
+        private void set_report_rules()
+        {
+            var settings = new Dictionary<int, Tuple<string, string>>();
 
             //date settings parametr = 1
             if (dp_dataOd_zest.SelectedDate.ToString() != "" || dp_dataDo_zest.SelectedDate.ToString() != "")
             {
                 string dataod = dp_dataOd_zest.SelectedDate.ToString() != "" ? dp_dataOd_zest.SelectedDate.ToString() : "2000-01-01";
                 string datado = dp_dataDo_zest.SelectedDate.ToString() != "" ? dp_dataDo_zest.SelectedDate.ToString() : "2050-01-01";
-                dic.Add(1, new Tuple<string, string>(dataod, datado));
+                settings.Add(1, new Tuple<string, string>(dataod, datado));
             }
             //category parametr = 2
             if ((int)cb_kategoria_zestawienie.SelectedIndex > 0)
             {
-                dic.Add(2, new Tuple<string, string>(cb_kategoria_zestawienie.SelectedValue.ToString(), ""));
+                settings.Add(2, new Tuple<string, string>(cb_kategoria_zestawienie.SelectedValue.ToString(), ""));
             }
             //shop parametr = 3
             if ((int)cb_sklep_zestawienie.SelectedIndex > 0)
             {
-                dic.Add(3, new Tuple<string, string>(cb_sklep_zestawienie.SelectedValue.ToString(), ""));
+                settings.Add(3, new Tuple<string, string>(cb_sklep_zestawienie.SelectedValue.ToString(), ""));
             }
-            _sql.ReportSettings(dic);
-            ZaladujZestawienie();
+            _sql.ReportSettings(settings);
         }
-
 
         public void LoadCategoryData()
         {
@@ -463,5 +462,6 @@ namespace My_Finance_app
             sw.Show();
         }
         }
+
     }
 }//ostani

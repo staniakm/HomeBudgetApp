@@ -295,7 +295,19 @@ namespace Engine
             return GetData(sqlCommand);
         }
 
-        public DataTable GetAsoList(string shop)
+        public ObservableCollection<Asortyment> GetProductsInStore(string shop)
+        {
+            ObservableCollection<Asortyment> ShopAso = new ObservableCollection<Asortyment>();
+
+            DataTable dt = GetAsoList(shop);
+            foreach (DataRow item in dt.Rows)
+            {
+                ShopAso.Add(new Asortyment((int)item["id"], (string)item["NAZWA"]));
+            }
+            return ShopAso;
+        }
+
+        private DataTable GetAsoList(string shop)
         {
             Dictionary<string, string> dict = new Dictionary<string, string>
             {

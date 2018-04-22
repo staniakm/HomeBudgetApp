@@ -95,7 +95,7 @@
                 </DataGrid>
             </Grid>
         </Grid>
-        <Grid x:Name="grid_zestawienie" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
+        <Grid x:Name="grid_zestawienie" Background="#FFB9B7B7" Visibility="Visible" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="12*"/>
@@ -104,6 +104,10 @@
 
             <StackPanel x:Name="sp_ustawieniaRaportu_1">
                 <Button x:Name="bt_generuj" Content="Generuj" HorizontalAlignment="Stretch" Margin="5,10,0,0" VerticalAlignment="Top" Click="bt_generuj_Click"/>
+                <ComboBox x:Name="cb_report_type" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,10,0,0" SelectedIndex="0">
+                    <ComboBoxItem Content="Normalne" />
+                    <ComboBoxItem Content="Kategorie"/>
+                </ComboBox>
                 <Label Content="Data od" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top" />
                 <DatePicker x:Name="dp_dataOd_zest" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
                 <Label Content="Data do" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top"/>
@@ -159,7 +163,7 @@
                 <DataGrid x:Name="dg_budzety" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}"/>
             
             </Grid>
-        <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Visible" Margin="0,20,0,0">
+        <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="159*"/>
                 <ColumnDefinition Width="323*"/>
