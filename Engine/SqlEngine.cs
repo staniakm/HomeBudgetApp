@@ -290,7 +290,7 @@ namespace Engine
                     sqlCommand = "select '' sklep, -1 id union SELECT sklep,id FROM sklepy order by sklep;";
                     break;
                 case "kategorie":
-                    sqlCommand = "select '' nazwa, -1 id union SELECT nazwa,id FROM kategoria order by nazwa;";
+                    sqlCommand = "select 'wszystkie' nazwa, -1 id union SELECT nazwa,id FROM kategoria order by nazwa;";
                     break;
             }
             return GetData(sqlCommand);
