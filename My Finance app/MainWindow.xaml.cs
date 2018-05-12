@@ -224,7 +224,7 @@ namespace My_Finance_app
                         { rabat = rabat * (-1); }
 
                         opis = tb_opis.Text + "Cena: " + cena + " Rabat: " + rabat;
-                        cena = cena - Math.Round((rabat / ilosc), 2);
+                        cena = cena - Math.Round((rabat / ilosc), 2, MidpointRounding.AwayFromZero);
                     }
                 }
 

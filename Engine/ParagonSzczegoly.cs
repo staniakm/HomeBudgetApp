@@ -29,7 +29,7 @@ namespace Engine
 
         public void CenaCaloscSet()
         {
-            CenaCalosc = Math.Round(Cena * Ilosc, 2) ; 
+            CenaCalosc = Math.Round(Cena * Ilosc, 2,MidpointRounding.AwayFromZero) ; 
         }
 
         public decimal Cena
