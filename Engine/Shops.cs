@@ -2,22 +2,11 @@
 
 namespace Engine
 {
-    public class Shops
-    {
-
-        public ObservableCollection<Sklep> ListaSklepow { get; set; }
-
-        public Shops()
-        {
-            ListaSklepow = new ObservableCollection<Sklep>();
-        }
-    }
-
-    public class Sklep {
+     public class Shop {
         public int ID { get; private set; }
         public string Nazwa { get; private set; }
 
-        public Sklep(int id, string nazwa)
+        public Shop(int id, string nazwa)
         {
             ID = id;
             Nazwa = nazwa;

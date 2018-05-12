@@ -442,7 +442,7 @@ namespace Engine
                 {
                     InvoiceDetails p = paragon.Getdetails()[x];
                     com.Parameters[0].Value = paragon.GetInvoiceId();
-                    com.Parameters[1].Value = p.Cena;
+                    com.Parameters[1].Value = p.getPrice();
                     com.Parameters[2].Value = p.GetIlosc();
                     com.Parameters[3].Value = p.GetCenaCalosc();
                     com.Parameters[4].Value = p.GetIDAso();
@@ -515,14 +515,14 @@ namespace Engine
         /// <summary>
         /// Zwracamy kolekcję sklepów. Można bezpośrednio bindować do datacontext
         /// </summary>
-        public ObservableCollection<Sklep> GetShopsCollection()
+        public ObservableCollection<Shop> GetShopsCollection()
         {
-            ObservableCollection<Sklep> sklepy = new ObservableCollection<Sklep>();
+            ObservableCollection<Shop> sklepy = new ObservableCollection<Shop>();
 
             DataTable dt = GetTable("sklepy");
             foreach (DataRow item in dt.Rows)
             {
-                sklepy.Add(new Sklep((int)item["id"], (string)item["sklep"]));
+                sklepy.Add(new Shop((int)item["id"], (string)item["sklep"]));
             }
             return sklepy;
         }

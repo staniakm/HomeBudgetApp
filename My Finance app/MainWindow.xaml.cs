@@ -69,7 +69,7 @@ namespace My_Finance_app
         /// <summary>
         /// Create report
         /// </summary>
-        private void loadReportStatistic(int reportID)
+        private void LoadReportStatistic(int reportID)
         {
             if (_sql.Con)
             {
@@ -168,7 +168,6 @@ namespace My_Finance_app
         /// <param name="state"> bool </param>
         private void UpdateControlsState(bool state)
         {
-            Console.WriteLine("status kontorlek: " + state);
             gr_paragon.IsEnabled = state;
             if (_sql != null)
             {
@@ -322,21 +321,21 @@ namespace My_Finance_app
         /// </summary>
         private void bt_generuj_Click(object sender, RoutedEventArgs e)
         {
-            set_report_rules();
+            SetReportRules();
             
             switch (cb_report_type.Text.ToUpper())
             {
                 case "NORMALNE":
-                    loadReportStatistic(1);
+                    LoadReportStatistic(1);
                     break;
                 case "KATEGORIE":
-                    loadReportStatistic(2);
+                    LoadReportStatistic(2);
                     break;
             }
         }
 
 
-        private void set_report_rules()
+        private void SetReportRules()
         {
             var settings = new Dictionary<int, Tuple<string, string>>();
 
