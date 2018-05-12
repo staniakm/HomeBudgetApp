@@ -19,7 +19,7 @@ namespace My_Finance_app
     {
         private DateTime month = DateTime.Now;
         SqlEngine _sql;
-        Paragon _paragon;
+        Invoice _paragon;
         Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
 
         public MainWindow(SqlEngine _sql)
@@ -107,15 +107,15 @@ namespace My_Finance_app
         /// Loading products connected with selected store into combo 
         /// Require during adding new bill and also when adding products into store.
         /// </summary>
-        private void LoadProducts()
+        private void LoadProducts(int shopId)
         {
-            cb_product.DataContext = _sql.GetProductsInStore(cb_sklep.Text);
+            cb_product.DataContext = _sql.GetProductsInStore(shopId);
         }
 
         /// <summary>
         /// Create new bill.
         /// </summary>
-        private void newBill(object sender, RoutedEventArgs e)
+        private void NewBill(object sender, RoutedEventArgs e)
         {
             if (cb_sklep.Text != "" && cb_konto.Text != "")
             {
@@ -127,20 +127,21 @@ namespace My_Finance_app
                     cb_sklep.Text = SelectedShop;
                 }
                 //Load list of products connected with current shop
-                LoadProducts();
+                int shopId = (int)cb_sklep.SelectedValue;
+                LoadProducts(shopId);
 
                 //new instance of bill
-                _paragon = new Paragon();
+                _paragon = new Invoice();
                 //setting ItemSource of data grid to bill details
-                dg_paragony.ItemsSource = _paragon.Szczegoly;
+                dg_paragony.ItemsSource = _paragon.Getdetails();
                 UpdateControlsState(false);
 
                 //read basic info of bill and set the in bill instance
-                _paragon.Data = (DateTime)dp_data.SelectedDate;//bill date
-                _paragon.NrParagonu = tb_nr_paragonu.Text;//bill number
-                _paragon.IdSklep = (int)cb_sklep.SelectedValue;//id of shop
-                _paragon.Konto = (int)cb_konto.SelectedValue;//id of bank accout 
-                _paragon.Sklep = cb_sklep.Text;//shop name - this is not needed
+                _paragon.SetDate((DateTime)dp_data.SelectedDate);//bill date
+                _paragon.SetInvoiceNumber(tb_nr_paragonu.Text);//bill number
+                _paragon.SetShopId(shopId);//id of shop
+                _paragon.SetAccount((int)cb_konto.SelectedValue);//id of bank accout 
+                _paragon.SetShop(cb_sklep.Text);//shop name - this is not needed
 
                 //disable basic controls so basic bill data can't be changed after bill creation.
                 dp_data.IsEnabled = false;
@@ -203,8 +204,8 @@ namespace My_Finance_app
             {
                 string chosen = cb_product.Text.ToString().ToUpper();
                 _sql.AddAsoToStore(chosen, cb_sklep.Text.ToString());
-
-                LoadProducts();
+                int shopId = (int)cb_sklep.SelectedValue;
+                LoadProducts(shopId);
                 cb_product.Text = chosen;
             }
             string produkt = cb_product.Text;
@@ -228,7 +229,7 @@ namespace My_Finance_app
                     }
                 }
 
-                _paragon.Szczegoly.Add(new ParagonSzczegoly((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
+                _paragon.Getdetails().Add(new ParagonSzczegoly((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
                 tb_cena.Clear();
                 tb_ilosc.Clear();
                 tb_rabat.Clear();
@@ -271,7 +272,7 @@ namespace My_Finance_app
         private void RefreshDataGrid(object sender, RoutedEventArgs e)
         {
             dg_paragony.ItemsSource = null;
-            dg_paragony.ItemsSource = _paragon.Szczegoly;
+            dg_paragony.ItemsSource = _paragon.Getdetails();
 
         }
         /// <summary>

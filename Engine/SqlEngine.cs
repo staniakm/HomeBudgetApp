@@ -31,6 +31,7 @@ namespace Engine
                 }
                 catch (Exception ex)
                 {
+                    
                     //MessageBox.Show(ex.Message, "Error");
                 }
             }
@@ -295,7 +296,7 @@ namespace Engine
             return GetData(sqlCommand);
         }
 
-        public ObservableCollection<Asortyment> GetProductsInStore(string shop)
+        public ObservableCollection<Asortyment> GetProductsInStore(int shop)
         {
             ObservableCollection<Asortyment> ShopAso = new ObservableCollection<Asortyment>();
 
@@ -307,19 +308,19 @@ namespace Engine
             return ShopAso;
         }
 
-        private DataTable GetAsoList(string shop)
+        private DataTable GetAsoList(int shop)
         {
-            Dictionary<string, string> dict = new Dictionary<string, string>
+            Dictionary<string, int> dict = new Dictionary<string, int>
             {
-                { "@sklep", shop }
+                { "@id", shop }
             };
 
-            string querry = "select '' as NAZWA, 0 id union  select a.NAZWA, a.id from ASORTYMENT a join sklepy s on s.sklep = @sklep " +
-           "join ASORTYMENT_SKLEP sk on sk.id_aso = a.id where a.del = 0 and  sk.del = 0 and sk.id_sklep = s.id";
+            string querry = "select '' as NAZWA, 0 id union  select a.NAZWA, a.id from ASORTYMENT a join ASORTYMENT_SKLEP sk on sk.id_aso = a.id " +
+                "join sklepy s on sk.id_sklep = s.id and s.ID = @id where a.del = 0 and sk.del = 0 ";
             return GetData(querry, dict);
         }
 
-        private DataTable GetData(string sqlCommand, Dictionary<string, string> param)
+        private DataTable GetData<T>(string sqlCommand, Dictionary<string, T> param)
         {
             SqlCommand command = new SqlCommand(sqlCommand, _con);
             SqlParameter par;// = new SqlParameter();
@@ -391,33 +392,33 @@ namespace Engine
             SQLexecuteNonQuerryProcedure("dbo.RecalculateBudget", dic);
         }
 
-        public void SaveBilInDatabase(Paragon paragon)
+        public void SaveBilInDatabase(Invoice paragon)
         {
 
-            paragon.IdParagon = int.Parse(SQLgetScalar("exec dbo.getNextIdForParagon"));
+            paragon.SetInvoiceId(int.Parse(SQLgetScalar("exec dbo.getNextIdForParagon")));
 
             try
             {
                 SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, sklep, konto, suma, opis) values (@nrParagonu, @data,@sklep,@konto, 0,'' );", _con);
                 SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50);
-                par.Value = paragon.NrParagonu.ToUpper();
+                par.Value = paragon.GetInvoiceNumber().ToUpper();
                 com.Parameters.Add(par);
                 par = new SqlParameter("@data", SqlDbType.Date);
-                par.Value = paragon.Data;
+                par.Value = paragon.GetDate();
                 com.Parameters.Add(par);
                 par = new SqlParameter("@sklep", SqlDbType.VarChar, 150);
-                par.Value = paragon.Sklep;
+                par.Value = paragon.GetShop();
                 com.Parameters.Add(par);
 
                 par = new SqlParameter("@konto", SqlDbType.Int);
-                par.Value = paragon.Konto;
+                par.Value = paragon.GetAccount();
                 com.Parameters.Add(par);
                 com.Prepare();
                 com.ExecuteNonQuery();
 
 
-                com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values (@idParagon, @cenaJednostkowa, @ilosc, @cena, @idAso, @opis)", _con);
-                par = new SqlParameter("@idParagon", SqlDbType.Int);
+                com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @idAso, @opis)", _con);
+                par = new SqlParameter("@InvoiceId", SqlDbType.Int);
                 com.Parameters.Add(par);
                 par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal);
                 par.Precision = 8;
@@ -437,10 +438,10 @@ namespace Engine
                 com.Parameters.Add(par);
                 com.Prepare();
 
-                for (int x = 0; x < paragon.Szczegoly.Count; x++)
+                for (int x = 0; x < paragon.Getdetails().Count; x++)
                 {
-                    ParagonSzczegoly p = paragon.Szczegoly[x];
-                    com.Parameters[0].Value = paragon.IdParagon;
+                    ParagonSzczegoly p = paragon.Getdetails()[x];
+                    com.Parameters[0].Value = paragon.GetInvoiceId();
                     com.Parameters[1].Value = p.Cena;
                     com.Parameters[2].Value = p.Ilosc;
                     com.Parameters[3].Value = p.CenaCalosc;
@@ -448,9 +449,9 @@ namespace Engine
                     com.Parameters[5].Value = p.Opis;
                     com.ExecuteNonQuery();
                 }
-                RecalculateBill(paragon.IdParagon);
+                RecalculateBill(paragon.GetInvoiceId());
                 com = new SqlCommand("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = @idPagaron", _con);
-                com.Parameters.AddWithValue("@idPagaron", paragon.IdParagon);
+                com.Parameters.AddWithValue("@idPagaron", paragon.GetInvoiceId());
                 com.ExecuteNonQuery();
                 CreateAccountColection();
             }
