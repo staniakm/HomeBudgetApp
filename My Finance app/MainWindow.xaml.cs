@@ -229,7 +229,7 @@ namespace My_Finance_app
                     }
                 }
 
-                _paragon.Getdetails().Add(new ParagonSzczegoly((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
+                _paragon.Getdetails().Add(new InvoiceDetails((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
                 tb_cena.Clear();
                 tb_ilosc.Clear();
                 tb_rabat.Clear();

@@ -440,13 +440,13 @@ namespace Engine
 
                 for (int x = 0; x < paragon.Getdetails().Count; x++)
                 {
-                    ParagonSzczegoly p = paragon.Getdetails()[x];
+                    InvoiceDetails p = paragon.Getdetails()[x];
                     com.Parameters[0].Value = paragon.GetInvoiceId();
                     com.Parameters[1].Value = p.Cena;
-                    com.Parameters[2].Value = p.Ilosc;
-                    com.Parameters[3].Value = p.CenaCalosc;
-                    com.Parameters[4].Value = p.IDAso;
-                    com.Parameters[5].Value = p.Opis;
+                    com.Parameters[2].Value = p.GetIlosc();
+                    com.Parameters[3].Value = p.GetCenaCalosc();
+                    com.Parameters[4].Value = p.GetIDAso();
+                    com.Parameters[5].Value = p.GetOpis();
                     com.ExecuteNonQuery();
                 }
                 RecalculateBill(paragon.GetInvoiceId());
