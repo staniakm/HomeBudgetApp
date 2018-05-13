@@ -17,14 +17,14 @@ namespace My_Finance_app
     public partial class MainWindow : Window
     {
         private DateTime month = DateTime.Now;
-        SqlEngine _sql;
-        Invoice _paragon;
-        Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
+        private SqlEngine _sql;
+        private Invoice _paragon;
+        private Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
 
         public MainWindow(SqlEngine _sql)
         {
-            InitializeComponent();
             this._sql = _sql;
+            InitializeComponent();
             SetupAdditionalData();
         }
 
@@ -32,29 +32,32 @@ namespace My_Finance_app
         {
             dp_data.SelectedDate = DateTime.Now;
             PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
-            ConnectDatabase();
-
             selectedMonth.Content = month.ToShortDateString().Substring(0, 7);
 
+            LoadDataFromDB();
+
             //puting grids to dictionary. This will allow to switch between grids.
+            LoadGrids();
+            
+         //   ObservableCollection<string> list = new ObservableCollection<string>();
+            UpdateControlsState(true);
+        }
+
+        private void LoadGrids()
+        {
             grids.Add("Paragony", grid_paragony);
             grids.Add("Asortyment", grid_asortyment);
             grids.Add("Budżet", grid_budzet);
             grids.Add("Podział na kategorie", grid_zestawienie);
             grids.Add("Standardowe zestawienie", grid_zestawienie);
             grids.Add("Konta", grid_konta);
-
             ShowGrid("Paragony");
-
-            ObservableCollection<string> list = new ObservableCollection<string>();
         }
 
-        private void ConnectDatabase()
+        private void LoadDataFromDB()
         {
             LoadDataToCombo();
-            UpdateControlsState(true);
             LoadCategories();
-
         }
         //create bank accounts and shop collections
         private void LoadDataToCombo()
@@ -62,6 +65,7 @@ namespace My_Finance_app
             _sql.CreateAccountColection();
             cb_sklep.DataContext = _sql.GetShopsCollection();
             cb_konto.DataContext = _sql.GetBankAccounts();
+            
             grid_konta.DataContext = _sql.GetBankAccounts();
         }
 
@@ -70,22 +74,8 @@ namespace My_Finance_app
         /// </summary>
         private void LoadReportStatistic(int reportID)
         {
-            if (_sql.Con)
-            {
-                try
-                {
                     dg_zestawienie.ItemsSource = _sql.ZestawienieWydatkow(reportID).DefaultView;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
         }
-
-
-
-        
 
         public void LoadCategories()
         {
@@ -119,13 +109,17 @@ namespace My_Finance_app
             if (cb_sklep.Text != "" && cb_konto.Text != "")
             {
                 //check if shop is on the list. If not then we add new shop and reload combo.
+                
+                //TODO: method check for shop in DB and automaticly add if shop not exists. 
+                //should be split to two separated methods
                 if (_sql.ShopExists(cb_sklep.Text.ToString().ToUpper()) > 0)
                 {
+
                     string SelectedShop = cb_sklep.Text.ToString().ToUpper();
                     cb_sklep.DataContext = _sql.GetShopsCollection();
                     cb_sklep.Text = SelectedShop;
                 }
-                //Load list of products connected with current shop
+                //Load list of products for selected shop
                 int shopId = (int)cb_sklep.SelectedValue;
                 LoadProducts(shopId);
 
@@ -135,7 +129,7 @@ namespace My_Finance_app
                 dg_paragony.ItemsSource = _paragon.Getdetails();
                 UpdateControlsState(false);
 
-                //read basic info of bill and set the in bill instance
+                //set basic bill details 
                 _paragon.SetDate((DateTime)dp_data.SelectedDate);//bill date
                 _paragon.SetInvoiceNumber(tb_nr_paragonu.Text);//bill number
                 _paragon.SetShopId(shopId);//id of shop
@@ -147,7 +141,6 @@ namespace My_Finance_app
                 tb_nr_paragonu.IsEnabled = false;
                 cb_sklep.IsEnabled = false;
                 cb_konto.IsEnabled = false;
-                cb_sklep.IsEnabled = false;
             }
         }
 
@@ -165,6 +158,8 @@ namespace My_Finance_app
         /// Ustawiamy dostępnośc kontrolek. true - dostępne sklep, konto, dodanie paragonu
         /// </summary>
         /// <param name="state"> bool </param>
+        
+            // TODO: refactor required
         private void UpdateControlsState(bool state)
         {
             gr_paragon.IsEnabled = state;
@@ -213,6 +208,7 @@ namespace My_Finance_app
                 decimal rabat = 0.0M;
                 decimal cena = decimal.Parse(tb_cena.Text.Replace(".", ","));
                 decimal ilosc = decimal.Parse(tb_ilosc.Text.Replace(".", ","));
+                
 
                 if (tb_rabat.Text != "")
                 {
@@ -415,6 +411,7 @@ namespace My_Finance_app
 
         private void br_zapisz_konto_Click(object sender, RoutedEventArgs e)
         {
+            string chosen = konta_cb_konto.Text.ToString();
             Dictionary<string, string> tmpDic = new Dictionary<string, string>()
             {
                 {"@nazwa", konto_nazwa.Text},
@@ -424,8 +421,12 @@ namespace My_Finance_app
                 {"@oprocentowanie", konto_procent.Text},
                 {"@id", (konto_ID.Text.Equals("")?null:konto_ID.Text)}
             };
-
             _sql.ModifyBankAccount(tmpDic);
+            _sql.CreateAccountColection();
+            grid_konta.DataContext = _sql.GetBankAccounts();
+            
+            konta_cb_konto.Text = chosen;
+
         }
 
         private void previusMonth(object sender, RoutedEventArgs e)

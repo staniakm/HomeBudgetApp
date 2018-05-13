@@ -95,7 +95,7 @@
                 </DataGrid>
             </Grid>
         </Grid>
-        <Grid x:Name="grid_zestawienie" Background="#FFB9B7B7" Visibility="Visible" Margin="0,20,0,0">
+        <Grid x:Name="grid_zestawienie" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="12*"/>
@@ -163,7 +163,7 @@
                 <DataGrid x:Name="dg_budzety" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}"/>
             
             </Grid>
-        <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
+        <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Visible" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="159*"/>
                 <ColumnDefinition Width="323*"/>
