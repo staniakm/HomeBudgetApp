@@ -107,6 +107,7 @@
                 <ComboBox x:Name="cb_report_type" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,10,0,0" SelectedIndex="0">
                     <ComboBoxItem Content="Normalne" />
                     <ComboBoxItem Content="Kategorie"/>
+                    <ComboBoxItem Content="Kategorie i konto"/>
                 </ComboBox>
                 <Label Content="Data od" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top" />
                 <DatePicker x:Name="dp_dataOd_zest" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>

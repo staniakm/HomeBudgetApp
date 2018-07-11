@@ -355,7 +355,9 @@ namespace Engine
                 case 2:
                     dt = GetData("exec generuj_zestawienie_podzial_na_kategorie");
                     break;
-
+                case 3:
+                    dt = GetData("exec generuj_zestawienie_podzial_na_kategorie_konto");
+                    break;
             }
             return dt;
         }

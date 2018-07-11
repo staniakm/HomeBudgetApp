@@ -326,6 +326,9 @@ namespace My_Finance_app
                 case "KATEGORIE":
                     LoadReportStatistic(2);
                     break;
+                case "KATEGORIE I KONTO":
+                    LoadReportStatistic(3);
+                    break;
             }
         }
 
