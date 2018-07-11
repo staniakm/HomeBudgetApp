@@ -415,16 +415,18 @@ namespace My_Finance_app
             Dictionary<string, string> tmpDic = new Dictionary<string, string>()
             {
                 {"@nazwa", konto_nazwa.Text},
-                {"@kwota", konto_kwota.Text},
+                {"@kwota", konto_kwota.Text.Replace(",",".")},
                 {"@opis", konto_opis.Text },
                 {"@owner", konto_owner.Text },
                 {"@oprocentowanie", konto_procent.Text},
                 {"@id", (konto_ID.Text.Equals("")?null:konto_ID.Text)}
             };
+            //save accout
             _sql.ModifyBankAccount(tmpDic);
+            //reload account collection
             _sql.CreateAccountColection();
             grid_konta.DataContext = _sql.GetBankAccounts();
-            
+            //reset selected account
             konta_cb_konto.Text = chosen;
 
         }
@@ -456,7 +458,6 @@ namespace My_Finance_app
 
         private void br_add_salary(object sender, RoutedEventArgs e)
         {
-            //need 
             if (konta_cb_konto.Text != "") { 
             SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, _sql);
             sw.Show();
