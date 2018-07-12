@@ -444,11 +444,11 @@ namespace Engine
                 {
                     InvoiceDetails p = paragon.Getdetails()[x];
                     com.Parameters[0].Value = paragon.GetInvoiceId();
-                    com.Parameters[1].Value = p.getPrice();
-                    com.Parameters[2].Value = p.GetIlosc();
+                    com.Parameters[1].Value = p.Price;
+                    com.Parameters[2].Value = p.Quantity;
                     com.Parameters[3].Value = p.GetCenaCalosc();
                     com.Parameters[4].Value = p.GetIDAso();
-                    com.Parameters[5].Value = p.GetOpis();
+                    com.Parameters[5].Value = p.Description;
                     com.ExecuteNonQuery();
                 }
                 RecalculateBill(paragon.GetInvoiceId());

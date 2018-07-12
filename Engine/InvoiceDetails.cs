@@ -23,10 +23,10 @@ namespace Engine
         public InvoiceDetails(int idAso, string produkt, decimal cena, decimal ilosc, string opis = "")
         {
             SetIDAso(idAso);
-            SetNazwaAso(produkt);
+            ProductName =produkt;
             Price = cena;
-            SetIlosc(ilosc);
-            SetOpis(opis);
+            Quantity = ilosc;
+            Description = opis;
 
             setTotalPrice();
         }
@@ -41,26 +41,6 @@ namespace Engine
             productId = value;
         }
 
-        //public string GetNazwaAso()
-        //{
-        //    return productName;
-        //}
-
-        public void SetNazwaAso(string value)
-        {
-            ProductName = value;
-        }
-
-        public decimal GetIlosc()
-        {
-            return Quantity;
-        }
-
-        public void SetIlosc(decimal value)
-        {
-            Quantity = value;
-        }
-
 
         public decimal GetCenaCalosc()
         {
@@ -73,27 +53,13 @@ namespace Engine
         }
 
 
-        public string GetOpis()
-        {
-            return Description;
-        }
-
-        public void SetOpis(string value)
-        {
-            Description = value;
-        }
-
 
         public void setTotalPrice()
         {
             SetCenaCalosc(Math.Round(Price * Quantity, 2,MidpointRounding.AwayFromZero)); 
         }
 
-        public decimal getPrice()
-        {
-            return Price;
-        }
-
+ 
         public void setPrice(decimal value)
         {
             if (Price != value)
