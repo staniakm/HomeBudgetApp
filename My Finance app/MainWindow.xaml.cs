@@ -204,7 +204,7 @@ namespace My_Finance_app
             string produkt = cb_product.Text;
             if (tb_cena.Text != "" && tb_ilosc.Text != "")
             {
-                string opis = "";
+                string opis = tb_opis.Text;
                 decimal rabat = 0.0M;
                 decimal cena = decimal.Parse(tb_cena.Text.Replace(".", ","));
                 decimal ilosc = decimal.Parse(tb_ilosc.Text.Replace(".", ","));
@@ -218,7 +218,7 @@ namespace My_Finance_app
                         if (rabat < 0)
                         { rabat = rabat * (-1); }
 
-                        opis = tb_opis.Text + "Cena: " + cena + " Rabat: " + rabat;
+                        opis = opis + " Cena: " + cena + " Rabat: " + rabat;
                         cena = cena - Math.Round((rabat / ilosc), 2, MidpointRounding.AwayFromZero);
                     }
                 }
