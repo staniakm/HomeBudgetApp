@@ -7,17 +7,24 @@ namespace Engine
     {
         private int productId;
         private string productName;
-        public decimal price;
+        private decimal price;
         private decimal quantity;
         private decimal totalPrice;
         private string description;
+
+        public string ProductName { get => productName; set => productName = value; }
+        public decimal Price { get => price; set => price = value; }
+        public decimal Quantity { get => quantity; set => quantity = value; }
+        public decimal TotalPrice { get => totalPrice; set => totalPrice = value; }
+        public string Description { get => description; set => description = value; }
+
 
 
         public InvoiceDetails(int idAso, string produkt, decimal cena, decimal ilosc, string opis = "")
         {
             SetIDAso(idAso);
             SetNazwaAso(produkt);
-            price = cena;
+            Price = cena;
             SetIlosc(ilosc);
             SetOpis(opis);
 
@@ -34,64 +41,64 @@ namespace Engine
             productId = value;
         }
 
-        public string GetNazwaAso()
-        {
-            return productName;
-        }
+        //public string GetNazwaAso()
+        //{
+        //    return productName;
+        //}
 
         public void SetNazwaAso(string value)
         {
-            productName = value;
+            ProductName = value;
         }
 
         public decimal GetIlosc()
         {
-            return quantity;
+            return Quantity;
         }
 
         public void SetIlosc(decimal value)
         {
-            quantity = value;
+            Quantity = value;
         }
 
 
         public decimal GetCenaCalosc()
         {
-            return totalPrice;
+            return TotalPrice;
         }
 
         public void SetCenaCalosc(decimal value)
         {
-            totalPrice = value;
+            TotalPrice = value;
         }
 
 
         public string GetOpis()
         {
-            return description;
+            return Description;
         }
 
         public void SetOpis(string value)
         {
-            description = value;
+            Description = value;
         }
 
 
         public void setTotalPrice()
         {
-            SetCenaCalosc(Math.Round(price * quantity, 2,MidpointRounding.AwayFromZero)); 
+            SetCenaCalosc(Math.Round(Price * Quantity, 2,MidpointRounding.AwayFromZero)); 
         }
 
         public decimal getPrice()
         {
-            return price;
+            return Price;
         }
 
         public void setPrice(decimal value)
         {
-            if (price != value)
+            if (Price != value)
             {
-                price = value;
+                Price = value;
                 OnPropertyChanged("test");
                 setTotalPrice();
             }

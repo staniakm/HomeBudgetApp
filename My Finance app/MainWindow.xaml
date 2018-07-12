@@ -26,7 +26,7 @@
                 </MenuItem>
             </Menu>
         </DockPanel>
-        <Grid x:Name="grid_paragony" Visibility="Hidden" Background="#FFB9B7B7" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid x:Name="grid_paragony" Visibility="Visible" Background="#FFB9B7B7" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="1*"/>
@@ -83,14 +83,14 @@
                     <ColumnDefinition Width="0*"/>
                     <ColumnDefinition Width="0*"/>
                 </Grid.ColumnDefinitions>-->
-                <DataGrid x:Name="dg_paragony" Margin="10" AutoGenerateColumns="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <DataGrid x:Name="dg_paragony" Margin="10" AutoGenerateColumns="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding}">
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding NazwaAso}" Header="Produkt" IsReadOnly="True"/>
-                        <DataGridTextColumn Binding="{Binding Cena}" Header="Cena jednostkowa"/>
-                        <DataGridTextColumn Binding="{Binding Ilosc}" Header="Ilość"/>
-                        <DataGridTextColumn Binding="{Binding CenaCalosc}" Header="Cena" IsReadOnly="True"/>
-                        <DataGridTextColumn Binding="{Binding Opis}" Header="Opis"/>
+                        <DataGridTextColumn Binding="{Binding ProductName}" Header="Produkt" IsReadOnly="True"/>
+                        <DataGridTextColumn Binding="{Binding Price}" Header="Cena jednostkowa"/>
+                        <DataGridTextColumn Binding="{Binding Quantity}" Header="Ilość"/>
+                        <DataGridTextColumn Binding="{Binding TotalPrice}" Header="Cena" IsReadOnly="True"/>
+                        <DataGridTextColumn Binding="{Binding Description}" Header="Opis"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
@@ -164,7 +164,7 @@
                 <DataGrid x:Name="dg_budzety" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}"/>
             
             </Grid>
-        <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Visible" Margin="0,20,0,0">
+        <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="159*"/>
                 <ColumnDefinition Width="323*"/>

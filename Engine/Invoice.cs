@@ -77,7 +77,7 @@ namespace Engine
             shopId = value;
         }
 
-        private ObservableCollection<InvoiceDetails> details;
+        public  ObservableCollection<InvoiceDetails> details;
 
         public ObservableCollection<InvoiceDetails> Getdetails()
         {

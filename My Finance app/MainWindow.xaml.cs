@@ -126,7 +126,7 @@ namespace My_Finance_app
                 //new instance of bill
                 _paragon = new Invoice();
                 //setting ItemSource of data grid to bill details
-                dg_paragony.ItemsSource = _paragon.Getdetails();
+                dg_paragony.ItemsSource = _paragon.details;
                 UpdateControlsState(false);
 
                 //set basic bill details 
@@ -223,12 +223,15 @@ namespace My_Finance_app
                     }
                 }
 
-                _paragon.Getdetails().Add(new InvoiceDetails((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
+                _paragon.details.Add(new InvoiceDetails((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
                 tb_cena.Clear();
                 tb_ilosc.Clear();
                 tb_rabat.Clear();
                 cb_product.Focus();
                 cb_product.SelectedIndex = -1;
+
+                Console.WriteLine("number of elements "+ _paragon.Getdetails().Count);
+                Console.WriteLine(  _paragon.Getdetails()[0].ProductName);
             }
 
         }
@@ -266,7 +269,7 @@ namespace My_Finance_app
         private void RefreshDataGrid(object sender, RoutedEventArgs e)
         {
             dg_paragony.ItemsSource = null;
-            dg_paragony.ItemsSource = _paragon.Getdetails();
+            dg_paragony.ItemsSource = _paragon.details;
 
         }
         /// <summary>
