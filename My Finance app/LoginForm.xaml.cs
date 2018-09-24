@@ -14,7 +14,7 @@ namespace My_Finance_app
 
         private void confirmLogin_Click(object sender, RoutedEventArgs e)
         {
-            //create instance to SqlEngine for production database
+            //create instance to SqlEngine for selected database
             SqlEngine sql = new SqlEngine(cb_db_name.Text);
             ////check if login data are correct
             if (sql.ConnectSQLDatabase(login.Text, pass.Password.ToString()))

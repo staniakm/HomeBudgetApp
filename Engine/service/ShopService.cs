@@ -8,5 +8,11 @@ namespace Engine.service
 {
     public class ShopService
     {
+        private SqlEngine _sql;
+
+        public ShopService(SqlEngine sql)
+        {
+            _sql = sql;
+        }
     }
 }

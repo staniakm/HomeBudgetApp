@@ -1,4 +1,5 @@
 ﻿using Engine;
+using Engine.service;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,10 +21,12 @@ namespace My_Finance_app
         private SqlEngine _sql;
         private Invoice _paragon;
         private Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
+        private ShopService shopService; 
 
         public MainWindow(SqlEngine _sql)
         {
             this._sql = _sql;
+            shopService = new ShopService(_sql); ;
             InitializeComponent();
             SetupAdditionalData();
         }
