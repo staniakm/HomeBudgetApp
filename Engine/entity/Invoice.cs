@@ -89,6 +89,18 @@ namespace Engine
            details = new ObservableCollection<InvoiceDetails>();
         }
 
+        public decimal GetTotal()
+        {
+            decimal total = 0;
+            foreach(var item in details)
+            {
+                total += item.GetCenaCalosc();
+            }
+
+
+            return total;
+        }
+
 
     }
 }

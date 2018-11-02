@@ -227,11 +227,13 @@ namespace My_Finance_app
                 }
 
                 _paragon.details.Add(new InvoiceDetails((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
+                l_total.Content = _paragon.GetTotal();
                 tb_cena.Clear();
                 tb_ilosc.Clear();
                 tb_rabat.Clear();
                 cb_product.Focus();
                 cb_product.SelectedIndex = -1;
+                tb_opis.Clear();
 
                 Console.WriteLine("number of elements "+ _paragon.Getdetails().Count);
                 Console.WriteLine(  _paragon.Getdetails()[0].ProductName);
