@@ -46,11 +46,11 @@
                 <!--<Label x:Name="l_spid" Visibility="Hidden" Content="" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,81,0,0"/>-->
 
                 <DatePicker x:Name="dp_date" HorizontalAlignment="Left" Margin="64,21,0,0" VerticalAlignment="Top" Width="128" DisplayDate="2017-01-01" FirstDayOfWeek="Monday" Cursor="None" TabIndex="1"/>
-                <ComboBox x:Name="cb_sklep" HorizontalAlignment="Left" Margin="64,50,0,0" VerticalAlignment="Top" Width="128" IsEditable="True" TabIndex="2" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
+                <ComboBox x:Name="cb_shop" HorizontalAlignment="Left" Margin="64,50,0,0" VerticalAlignment="Top" Width="128" IsEditable="True" TabIndex="2" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
                 <TextBox x:Name="tb_nr_paragonu" HorizontalAlignment="Left" Height="23" Margin="64,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" TabIndex="3"/>
-                <ComboBox x:Name="cb_konto" HorizontalAlignment="Left" Margin="64,105,0,0" VerticalAlignment="Top" Width="128" TabIndex="3" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
+                <ComboBox x:Name="cb_bankAccount" HorizontalAlignment="Left" Margin="64,105,0,0" VerticalAlignment="Top" Width="128" TabIndex="3" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
                 <Button x:Name="bt_dodajParagon" Content="Dodaj paragon" HorizontalAlignment="Left" Margin="64,141,0,0" VerticalAlignment="Top" Width="128" Click="CreateNewInvoice" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="4"/>
-                <Button x:Name="bt_CancelBill" Content="Anuluj paragon" HorizontalAlignment="Left" Margin="64,171,0,0" VerticalAlignment="Top" Width="128" Click="CancelBill" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="100"/>
+                <Button x:Name="bt_CancelBill" Content="Anuluj paragon" HorizontalAlignment="Left" Margin="64,171,0,0" VerticalAlignment="Top" Width="128" Click="CancelCurrentBill" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="100"/>
                 <Label x:Name="label" Content="Data" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy" Content="Sklep" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy1" Content="Paragon" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
@@ -62,11 +62,11 @@
             </Grid>
             <Grid x:Name="gr_produkty" IsEnabled="False" Grid.Column="2">
                 <ComboBox x:Name="cb_product" HorizontalAlignment="Left" Margin="82,21,0,0" VerticalAlignment="Top" Width="250" IsEditable="True" TabIndex="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID" SelectedValue="{Binding ID}" />
-                <TextBox x:Name="tb_cena" HorizontalAlignment="Left" Height="23" Margin="82,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="6"/>
-                <TextBox x:Name="tb_ilosc" HorizontalAlignment="Left" Height="23" Margin="179,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="7"/>
-                <TextBox x:Name="tb_rabat" HorizontalAlignment="Left" Height="23" Margin="280,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="53" PreviewTextInput="NumberValidation" TabIndex="7"/>
-                <TextBox x:Name="tb_opis" HorizontalAlignment="Left" Height="23" Margin="82,78,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250" TabIndex="8"/>
-                <Button x:Name="bt_dodajProdukt" Content="Dodaj produkt" HorizontalAlignment="Left" Margin="82,107,0,0" VerticalAlignment="Top" Width="89" Click="bt_AddProduct_Click"  TabIndex="9"/>
+                <TextBox x:Name="tb_price" HorizontalAlignment="Left" Height="23" Margin="82,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="6"/>
+                <TextBox x:Name="tb_quantity" HorizontalAlignment="Left" Height="23" Margin="179,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="7"/>
+                <TextBox x:Name="tb_discount" HorizontalAlignment="Left" Height="23" Margin="280,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="53" PreviewTextInput="NumberValidation" TabIndex="7"/>
+                <TextBox x:Name="tb_description" HorizontalAlignment="Left" Height="23" Margin="82,78,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250" TabIndex="8"/>
+                <Button x:Name="bt_dodajProdukt" Content="Dodaj produkt" HorizontalAlignment="Left" Margin="82,107,0,0" VerticalAlignment="Top" Width="89" Click="bt_AddNewItemToInvoice"  TabIndex="9"/>
                 <Button x:Name="bt_zapisDoBazy" Content="Zapisz w bazie" HorizontalAlignment="Left" Margin="208,107,0,0" VerticalAlignment="Top" Width="92" Click="bt_SaveBillInDatabase"  TabIndex="10"/>
                 <Label  Content="Produkt" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" Width="58" Height="27" />
                 <Label Content="Cena" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top" Width="58" Height="27" />
@@ -95,7 +95,7 @@
                 </DataGrid>
             </Grid>
             <Label Content="Suma:" Grid.Column="2" HorizontalAlignment="Left" Margin="10,169,0,0" VerticalAlignment="Top" Width="48"/>
-            <Label x:Name="l_total" Content="0.00" Grid.Column="2" HorizontalAlignment="Left" Margin="58,169,0,0" VerticalAlignment="Top"/>
+            <Label x:Name="l_totalPrice" Content="0.00" Grid.Column="2" HorizontalAlignment="Left" Margin="58,169,0,0" VerticalAlignment="Top"/>
         </Grid>
         <Grid x:Name="grid_zestawienie" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>

@@ -10,14 +10,16 @@ namespace My_Finance_app
     {
         SqlEngine SQL;
         MainWindow mw;
+        int productId;
         public CategoryEditWindow(DataRowView id, SqlEngine _sql, MainWindow mw)
         {
             InitializeComponent();
             this.Top = SystemParameters.PrimaryScreenHeight/2;
             this.Left = SystemParameters.PrimaryScreenWidth/2;
-  
+
+            productId = (int)id[0];
             lb_id_aso.Content = id[0];
-            lb_nazwa_aso.Text= id["Nazwa"].ToString();
+            lb_product_name.Text= id["Nazwa"].ToString();
             lb_id_kat.Content = id["id_kat"];
             lb_nazwa_kat.Content = id["Nazwa kategorii"];
             SQL = _sql;
@@ -29,16 +31,15 @@ namespace My_Finance_app
 
         private void LoadCategories()
         {
-            cb_nowa_kat.DataContext = SQL.GetCategoryCollection();
+            cb_newCategory.DataContext = SQL.GetCategoryCollection();
         }
         private void bt_zatwierdz_Click(object sender, RoutedEventArgs e)
         {
-            int idASO = (int)lb_id_aso.Content;
-            string nowaKategoria = cb_nowa_kat.Text;
-            int idKAT = (cb_nowa_kat.SelectedValue == null)?-1:int.Parse(cb_nowa_kat.SelectedValue.ToString());
-            string nowaNazwa = lb_nazwa_aso.Text;
+            string newProductName = lb_product_name.Text;
+            string newCategoryName = cb_newCategory.Text;
+            int newCategoryId = (cb_newCategory.SelectedValue == null)?-1:int.Parse(cb_newCategory.SelectedValue.ToString());
 
-            SQL.UpdateCategoryOfAso(idASO,nowaKategoria,idKAT,nowaNazwa);
+            SQL.UpdateCategoryOfAso(productId,newCategoryName,newCategoryId,newProductName);
 
             mw.LoadCategories();
             mw.getItemsByCategory();

@@ -89,7 +89,7 @@ namespace Engine
            invoiceItems = new ObservableCollection<InvoiceDetails>();
         }
 
-        public decimal GetTotal()
+        public decimal GetTotalInvoiceValue()
         {
             decimal total = 0;
             foreach(var item in invoiceItems)
@@ -101,6 +101,9 @@ namespace Engine
             return total;
         }
 
-
+        public void AddInvoiceItem(InvoiceDetails invoiceItem)
+        {
+            invoiceItems.Add(invoiceItem);
+        }
     }
 }

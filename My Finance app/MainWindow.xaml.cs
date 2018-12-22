@@ -66,8 +66,8 @@ namespace My_Finance_app
         private void LoadDataToCombo()
         {
             _sql.reloadBankAccountsCollection();
-            cb_sklep.DataContext = _sql.GetShopsCollection();
-            cb_konto.DataContext = _sql.GetBankAccounts();
+            cb_shop.DataContext = _sql.GetShopsCollection();
+            cb_bankAccount.DataContext = _sql.GetBankAccounts();
             
             grid_konta.DataContext = _sql.GetBankAccounts();
         }
@@ -109,7 +109,7 @@ namespace My_Finance_app
         /// </summary>
         private void CreateNewInvoice(object sender, RoutedEventArgs e)
         {
-            if (cb_sklep.Text != "" && cb_konto.Text != "")
+            if (cb_shop.Text != "" && cb_bankAccount.Text != "")
             {
                 //check if shop is on the list. If not then we add new shop and reload combo.
 
@@ -117,7 +117,7 @@ namespace My_Finance_app
                 //should be split to two separated methods
                 CreateShopIfNotExists();
                 //Load list of products for selected shop
-                int shopId = (int)cb_sklep.SelectedValue;
+                int shopId = (int)cb_shop.SelectedValue;
                 LoadProductsForSelectedShop(shopId);
 
                 //new instance of bill
@@ -127,40 +127,40 @@ namespace My_Finance_app
                 UpdateControlsState(false);
 
                 //set basic invoice details 
-                SetInvoiceVariables(shopId);
+                SetInvoiceBasicValues(shopId);
 
                 //disable basic controls so basic bill data can't be changed after bill creation.
-                DisableBasicInvoiceVariablesFields();
+                DisableBasicInvoiceValuesFields();
             }
         }
 
-        private void DisableBasicInvoiceVariablesFields()
+        private void DisableBasicInvoiceValuesFields()
         {
             dp_date.IsEnabled = false;
             tb_nr_paragonu.IsEnabled = false;
-            cb_sklep.IsEnabled = false;
-            cb_konto.IsEnabled = false;
+            cb_shop.IsEnabled = false;
+            cb_bankAccount.IsEnabled = false;
         }
 
-        private void SetInvoiceVariables(int shopId)
+        private void SetInvoiceBasicValues(int shopId)
         {
             _paragon.SetDate((DateTime)dp_date.SelectedDate);//Invoice date
             _paragon.SetInvoiceNumber(tb_nr_paragonu.Text);//Invoice number
             _paragon.SetShopId(shopId);//id of shop
-            _paragon.SetAccount((int)cb_konto.SelectedValue);//id of bank accout 
+            _paragon.SetAccount((int)cb_bankAccount.SelectedValue);//id of bank accout 
         }
 
         private void CreateShopIfNotExists()
         {
-            if (_sql.CreateNewShopIfNotExists(cb_sklep.Text.ToUpper()) > 0)
+            if (_sql.CreateNewShopIfNotExists(cb_shop.Text.ToUpper()) > 0)
             {
-                string SelectedShop = cb_sklep.Text.ToUpper();
-                cb_sklep.DataContext = _sql.GetShopsCollection();
-                cb_sklep.Text = SelectedShop;
+                string SelectedShop = cb_shop.Text.ToUpper();
+                cb_shop.DataContext = _sql.GetShopsCollection();
+                cb_shop.Text = SelectedShop;
             }
         }
 
-        private void CancelBill(object sender, RoutedEventArgs e)
+        private void CancelCurrentBill(object sender, RoutedEventArgs e)
         {
             //after creation bill can be canceled.
             dg_paragony.ItemsSource = null;
@@ -194,60 +194,75 @@ namespace My_Finance_app
             }
             if (state)
             {
-                cb_sklep.SelectedIndex = -1;
-                cb_konto.SelectedIndex = -1;
+                cb_shop.SelectedIndex = -1;
+                cb_bankAccount.SelectedIndex = -1;
                 tb_nr_paragonu.Clear();
 
                 dp_date.IsEnabled = true;
                 tb_nr_paragonu.IsEnabled = true;
-                cb_sklep.IsEnabled = true;
-                cb_konto.IsEnabled = true;
-                cb_sklep.IsEnabled = true;
+                cb_shop.IsEnabled = true;
+                cb_bankAccount.IsEnabled = true;
+                cb_shop.IsEnabled = true;
             }
         }
 
-        private void bt_AddProduct_Click(object sender, RoutedEventArgs e)
+        private void bt_AddNewItemToInvoice(object sender, RoutedEventArgs e)
         {
             if (cb_product.SelectedValue == null)
             {
                 string chosen = cb_product.Text.ToString().ToUpper();
-                _sql.AddAsoToStore(chosen, cb_sklep.Text.ToString());
-                int shopId = (int)cb_sklep.SelectedValue;
+                _sql.AddAsoToStore(chosen, cb_shop.Text.ToString());
+                int shopId = (int)cb_shop.SelectedValue;
                 LoadProductsForSelectedShop(shopId);
                 cb_product.Text = chosen;
             }
-            string produkt = cb_product.Text;
-            if (tb_cena.Text != "" && tb_ilosc.Text != "")
+            string productName = cb_product.Text;
+            if (tb_price.Text != "" && tb_quantity.Text != "")
             {
-                string opis = tb_opis.Text;
-                decimal rabat = 0.0M;
-                decimal cena = decimal.Parse(tb_cena.Text.Replace(".", ","));
-                decimal ilosc = decimal.Parse(tb_ilosc.Text.Replace(".", ","));
-                
+                int productId = (int)cb_product.SelectedValue;
+                string description = tb_description.Text;
+                decimal discount = 0.0M;
+                decimal price = decimal.Parse(tb_price.Text.Replace(".", ","));
+                decimal quantity = decimal.Parse(tb_quantity.Text.Replace(".", ","));
 
-                if (tb_rabat.Text != "")
+
+                if (tb_discount.Text != "")
                 {
-                    rabat = decimal.Parse(tb_rabat.Text.Replace(".", ","));
-                    if (rabat != 0)
-                    {
-                        if (rabat < 0)
-                        { rabat = rabat * (-1); }
-
-                        opis = opis + " Cena: " + cena + " Rabat: " + rabat;
-                        cena = cena - Math.Round((rabat / ilosc), 2, MidpointRounding.AwayFromZero);
-                    }
+                    discount = CalculateDiscount(tb_discount.Text, quantity);
+                    price = price - discount;
+                    description = description + string.Format("\n Cena: {0} Rabat {1}", price, discount);
                 }
 
-                _paragon.invoiceItems.Add(new InvoiceDetails((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
-                l_total.Content = _paragon.GetTotal();
-                tb_cena.Clear();
-                tb_ilosc.Clear();
-                tb_rabat.Clear();
-                cb_product.Focus();
-                cb_product.SelectedIndex = -1;
-                tb_opis.Clear();
+                _paragon.AddInvoiceItem(new InvoiceDetails(productId, productName, price, quantity, description));
+
+                l_totalPrice.Content = _paragon.GetTotalInvoiceValue();
+
+                ClearInvoiceItemForm();
             }
 
+        }
+
+        private decimal CalculateDiscount(string discount, decimal quantity)
+        {
+            decimal discountAmount = decimal.Parse(discount.Replace(".", ","));
+            if (discountAmount != 0)
+            {
+                if (discountAmount < 0)
+                    { discountAmount = discountAmount * (-1); }
+                return Math.Round((discountAmount / quantity), 2, MidpointRounding.AwayFromZero);
+            }
+            return 0;
+        }
+
+        private void ClearInvoiceItemForm()
+        {
+            tb_price.Clear();
+            tb_quantity.Clear();
+            tb_discount.Clear();
+            tb_description.Clear();
+            cb_product.Focus();
+            cb_product.SelectedIndex = -1;
+            
         }
 
         /// <summary>
