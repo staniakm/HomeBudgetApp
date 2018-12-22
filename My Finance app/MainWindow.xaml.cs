@@ -82,7 +82,7 @@ namespace My_Finance_app
 
         public void LoadCategories()
         {
-            string selectedCategory = cb_kategoria.Text.Length == 0 ? "wszystkie" : cb_kategoria.Text;
+            string selectedCategory = cb_kategoria.Text.Length == 0 ? "" : cb_kategoria.Text;
             try
             {
                 cb_kategoria.DataContext = _sql.GetCategoryCollection();
@@ -353,12 +353,12 @@ namespace My_Finance_app
             }
             //category parametr = 2
             
-            if ((int)cb_report_category_collection.SelectedIndex >= 0 && cb_report_category_collection.Text != "wszystkie")
+            if ((int)cb_report_category_collection.SelectedIndex > 0)
             {
                 settings.Add(2, new Tuple<string, string>(cb_report_category_collection.SelectedValue.ToString(), ""));
             }
             //shop parametr = 3
-            if ((int)cb_report_shop_collection.SelectedIndex >= 0)
+            if ((int)cb_report_shop_collection.SelectedIndex > 0)
             {
                 settings.Add(3, new Tuple<string, string>(cb_report_shop_collection.SelectedValue.ToString(), ""));
             }

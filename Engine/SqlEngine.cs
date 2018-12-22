@@ -289,7 +289,7 @@ namespace Engine
                     sqlCommand = "select '' sklep, -1 id union SELECT sklep,id FROM sklepy order by sklep;";
                     break;
                 case "kategorie":
-                    sqlCommand = "select 'wszystkie' nazwa, -1 id union SELECT nazwa,id FROM kategoria order by nazwa;";
+                    sqlCommand = "select '' nazwa, -1 id union SELECT nazwa,id FROM kategoria order by nazwa;";
                     break;
             }
             return GetData(sqlCommand);
@@ -368,7 +368,7 @@ namespace Engine
         {
             string sqlquery = "";
             Dictionary<string, string> param = new Dictionary<string, string>();
-            if (categoryName != "wszystkie")
+            if (categoryName != "")
             {
                 param.Add("@category", categoryName);
                 sqlquery = "Select a.[id],a.[NAZWA],a.[id_kat], k.nazwa [Nazwa kategorii] From [dbo].[ASORTYMENT] a	Join kategoria k on a.id_kat = k.id where del = 0 and k.nazwa = @category order by a.nazwa;";
