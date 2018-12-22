@@ -75,9 +75,9 @@ namespace My_Finance_app
         /// <summary>
         /// Create report
         /// </summary>
-        private void LoadReportStatistic(int reportID)
+        private void PrepareReportDetails(Reports.ReportType reportType)
         {
-                    dg_zestawienie.ItemsSource = _sql.ZestawienieWydatkow(reportID).DefaultView;
+                    dg_zestawienie.ItemsSource = _sql.PrepareReport(reportType).DefaultView;
         }
 
         public void LoadCategories()
@@ -285,21 +285,18 @@ namespace My_Finance_app
             ShowGrid(mi.Header.ToString());
             switch (mi.Header.ToString())
             {
-                case "Podział na kategorie":
                 case "Standardowe zestawienie":
-                    //id_zest = 1;
-
-                    dp_dataOd_zest.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                    dp_dataDo_zest.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1);
-                    cb_kategoria_zestawienie.DataContext = _sql.GetCategoryCollection();
-                    cb_sklep_zestawienie.DataContext = _sql.GetShopsCollection();
-                    if (mi.Header.ToString() == "Podział na kategorie")
-                    {
-                    //    id_zest = 2;
-                    }
-
+                    LoadReportInitValues();
                     break;
             }
+        }
+
+        private void LoadReportInitValues()
+        {
+            dp_report_start_date.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            dp_report_end_date.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1);
+            cb_report_category_collection.DataContext = _sql.GetCategoryCollection();
+            cb_report_shop_collection.DataContext = _sql.GetShopsCollection();
         }
 
         private void ShowGrid(string v)
@@ -326,16 +323,16 @@ namespace My_Finance_app
             switch (cb_report_type.Text.ToUpper())
             {
                 case "NORMALNE":
-                    LoadReportStatistic(1);
+                    PrepareReportDetails(Reports.ReportType.STANDARD);
                     break;
                 case "KATEGORIE":
-                    LoadReportStatistic(2);
+                    PrepareReportDetails(Reports.ReportType.CATEGORY);
                     break;
                 case "KATEGORIE I KONTO":
-                    LoadReportStatistic(3);
+                    PrepareReportDetails(Reports.ReportType.CATEGORY_AND_ACCOUNT);
                     break;
                 case "LISTA PARAGONÓW":
-                    LoadReportStatistic(4);
+                    PrepareReportDetails(Reports.ReportType.INVOICE_LIST);
                     break;
                 default:
                     break;
@@ -348,21 +345,21 @@ namespace My_Finance_app
             var settings = new Dictionary<int, Tuple<string, string>>();
 
             //date settings parametr = 1
-            if (dp_dataOd_zest.SelectedDate.ToString() != "" || dp_dataDo_zest.SelectedDate.ToString() != "")
+            if (dp_report_start_date.SelectedDate.ToString() != "" || dp_report_end_date.SelectedDate.ToString() != "")
             {
-                string dataod = dp_dataOd_zest.SelectedDate.ToString() != "" ? dp_dataOd_zest.SelectedDate.ToString() : "2000-01-01";
-                string datado = dp_dataDo_zest.SelectedDate.ToString() != "" ? dp_dataDo_zest.SelectedDate.ToString() : "2050-01-01";
+                string dataod = dp_report_start_date.SelectedDate.ToString() != "" ? dp_report_start_date.SelectedDate.ToString() : "2000-01-01";
+                string datado = dp_report_end_date.SelectedDate.ToString() != "" ? dp_report_end_date.SelectedDate.ToString() : "2050-01-01";
                 settings.Add(1, new Tuple<string, string>(dataod, datado));
             }
             //category parametr = 2
-            if ((int)cb_kategoria_zestawienie.SelectedIndex > 0)
+            if ((int)cb_report_category_collection.SelectedIndex > 0)
             {
-                settings.Add(2, new Tuple<string, string>(cb_kategoria_zestawienie.SelectedValue.ToString(), ""));
+                settings.Add(2, new Tuple<string, string>(cb_report_category_collection.SelectedValue.ToString(), ""));
             }
             //shop parametr = 3
-            if ((int)cb_sklep_zestawienie.SelectedIndex > 0)
+            if ((int)cb_report_shop_collection.SelectedIndex > 0)
             {
-                settings.Add(3, new Tuple<string, string>(cb_sklep_zestawienie.SelectedValue.ToString(), ""));
+                settings.Add(3, new Tuple<string, string>(cb_report_shop_collection.SelectedValue.ToString(), ""));
             }
             _sql.ReportSettings(settings);
         }

@@ -18,7 +18,7 @@
                     <MenuItem x:Name="mi_Paragony" Header="Paragony" Click="MenuItem_Click"/>
                     <MenuItem x:Name="mi_Zestawienia" Header="Zestawienia" IsEnabled="False">
                         <MenuItem Header="Standardowe zestawienie" Click="MenuItem_Click" />
-                        <MenuItem Header="Podział na kategorie" Click="MenuItem_Click"/>
+                        <!--<MenuItem Header="Podział na kategorie" Click="MenuItem_Click"/>-->
                     </MenuItem>
                     <MenuItem x:Name="mi_Budzet" Header="Budżet" Click="MenuItem_Click"/>
                     <MenuItem x:Name="mi_Kategorie" Header="Asortyment" Click="MenuItem_Click" IsEnabled="False"/>
@@ -113,13 +113,13 @@
                     <ComboBoxItem Content="Lista paragonów"/>
                 </ComboBox>
                 <Label Content="Data od" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top" />
-                <DatePicker x:Name="dp_dataOd_zest" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                <DatePicker x:Name="dp_report_start_date" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
                 <Label Content="Data do" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top"/>
-                <DatePicker x:Name="dp_dataDo_zest" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Top"/>
+                <DatePicker x:Name="dp_report_end_date" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Top"/>
                 <Label Content="Kategoria" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top" />
-                <ComboBox x:Name="cb_kategoria_zestawienie" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
+                <ComboBox x:Name="cb_report_category_collection" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
                 <Label Content="Sklep" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="cb_sklep_zestawienie" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
+                <ComboBox x:Name="cb_report_shop_collection" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
             </StackPanel>
 
 

@@ -49,6 +49,7 @@
     <Compile Include="entity\InvoiceDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="entity\Shop.cs" />
+    <Compile Include="Reports.cs" />
     <Compile Include="service\ShopService.cs" />
     <Compile Include="SqlEngine.cs" />
   </ItemGroup>

@@ -342,22 +342,22 @@ namespace Engine
             return table;
         }
 
-        public DataTable ZestawienieWydatkow(int id)
+        public DataTable PrepareReport(Reports.ReportType reportId)
         {
             DataTable dt = null;
 
-            switch (id)
+            switch (reportId)
             {
-                case 1:
+                case Reports.ReportType.STANDARD:
                     dt = GetData("exec generuj_zestawienie_2");
                     break;
-                case 2:
+                case Reports.ReportType.CATEGORY:
                     dt = GetData("exec generuj_zestawienie_podzial_na_kategorie");
                     break;
-                case 3:
+                case Reports.ReportType.CATEGORY_AND_ACCOUNT:
                     dt = GetData("exec generuj_zestawienie_podzial_na_kategorie_konto");
                     break;
-                case 4:
+                case Reports.ReportType.INVOICE_LIST:
                     dt = GetData("exec show_invoice_list");
                     break;
             }
