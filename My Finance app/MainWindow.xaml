@@ -50,7 +50,7 @@
                 <TextBox x:Name="tb_nr_paragonu" HorizontalAlignment="Left" Height="23" Margin="64,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" TabIndex="3"/>
                 <ComboBox x:Name="cb_bankAccount" HorizontalAlignment="Left" Margin="64,105,0,0" VerticalAlignment="Top" Width="128" TabIndex="3" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
                 <Button x:Name="bt_dodajParagon" Content="Dodaj paragon" HorizontalAlignment="Left" Margin="64,141,0,0" VerticalAlignment="Top" Width="128" Click="CreateNewInvoice" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="4"/>
-                <Button x:Name="bt_CancelBill" Content="Anuluj paragon" HorizontalAlignment="Left" Margin="64,171,0,0" VerticalAlignment="Top" Width="128" Click="CancelCurrentBill" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="100"/>
+                <Button x:Name="bt_CancelBill" Content="Anuluj paragon" HorizontalAlignment="Left" Margin="64,171,0,0" VerticalAlignment="Top" Width="128" Click="CancelCurrentInvoice" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="100"/>
                 <Label x:Name="label" Content="Data" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy" Content="Sklep" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy1" Content="Paragon" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
@@ -102,7 +102,7 @@
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="12*"/>
             </Grid.ColumnDefinitions>
-            <DataGrid x:Name="dg_zestawienie" Grid.Column="1" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsReadOnly="True"/>
+            <DataGrid x:Name="dg_reports" Grid.Column="1" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsReadOnly="True"/>
 
             <StackPanel x:Name="sp_ustawieniaRaportu_1">
                 <Button x:Name="bt_generuj" Content="Generuj" HorizontalAlignment="Stretch" Margin="5,10,0,0" VerticalAlignment="Top" Click="bt_generuj_Click"/>

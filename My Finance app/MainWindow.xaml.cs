@@ -37,7 +37,9 @@ namespace My_Finance_app
             PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
             selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
 
-            LoadDataFromDB();
+            FillComboboxesWithData();
+
+            grid_konta.DataContext = _sql.GetBankAccounts();
 
             //puting grids to dictionary. This will allow to switch between grids.
             LoadGrids();
@@ -57,27 +59,16 @@ namespace My_Finance_app
             ShowGrid("Paragony");
         }
 
-        private void LoadDataFromDB()
-        {
-            LoadDataToCombo();
-            LoadCategories();
-        }
-        //create bank accounts and shop collections
-        private void LoadDataToCombo()
+        private void FillComboboxesWithData()
         {
             _sql.reloadBankAccountsCollection();
             cb_shop.DataContext = _sql.GetShopsCollection();
             cb_bankAccount.DataContext = _sql.GetBankAccounts();
-            
-            grid_konta.DataContext = _sql.GetBankAccounts();
         }
 
-        /// <summary>
-        /// Create report
-        /// </summary>
         private void PrepareReportDetails(Reports.ReportType reportType)
         {
-                    dg_zestawienie.ItemsSource = _sql.PrepareReport(reportType).DefaultView;
+            dg_reports.ItemsSource = _sql.PrepareReport(reportType).DefaultView;
         }
 
         public void LoadCategories()
@@ -99,7 +90,7 @@ namespace My_Finance_app
         /// Loading products connected with selected store into combo 
         /// Require during adding new bill and also when adding products into store.
         /// </summary>
-        private void LoadProductsForSelectedShop(int shopId)
+        private void FillComboboxWithProductsForSelectedShop(int shopId)
         {
             cb_product.DataContext = _sql.GetProductsInStore(shopId);
         }
@@ -118,20 +109,30 @@ namespace My_Finance_app
                 CreateShopIfNotExists();
                 //Load list of products for selected shop
                 int shopId = (int)cb_shop.SelectedValue;
-                LoadProductsForSelectedShop(shopId);
+                FillComboboxWithProductsForSelectedShop(shopId);
 
                 //new instance of bill
                 _paragon = new Invoice();
+                SetInvoiceBasicValues(shopId);
                 //setting ItemSource of data grid to bill details
                 dg_paragony.ItemsSource = _paragon.GetInvoiceItems();
                 UpdateControlsState(false);
 
                 //set basic invoice details 
-                SetInvoiceBasicValues(shopId);
+                
 
                 //disable basic controls so basic bill data can't be changed after bill creation.
                 DisableBasicInvoiceValuesFields();
             }
+        }
+
+        private void CancelCurrentInvoice(object sender, RoutedEventArgs e)
+        {
+            //after creation bill can be canceled.
+            dg_paragony.ItemsSource = null;
+            _paragon = null;
+
+            UpdateControlsState(true);
         }
 
         private void DisableBasicInvoiceValuesFields()
@@ -160,15 +161,6 @@ namespace My_Finance_app
             }
         }
 
-        private void CancelCurrentBill(object sender, RoutedEventArgs e)
-        {
-            //after creation bill can be canceled.
-            dg_paragony.ItemsSource = null;
-            _paragon = null;
-
-            UpdateControlsState(true);
-
-        }
         /// <summary>
         /// Ustawiamy dostępnośc kontrolek. true - dostępne sklep, konto, dodanie paragonu
         /// </summary>
@@ -210,21 +202,16 @@ namespace My_Finance_app
         {
             if (cb_product.SelectedValue == null)
             {
-                string chosen = cb_product.Text.ToString().ToUpper();
-                _sql.AddAsoToStore(chosen, cb_shop.Text.ToString());
-                int shopId = (int)cb_shop.SelectedValue;
-                LoadProductsForSelectedShop(shopId);
-                cb_product.Text = chosen;
+                CreateNewProduct();
             }
             string productName = cb_product.Text;
-            if (tb_price.Text != "" && tb_quantity.Text != "")
+            if (tb_price.Text.Trim() != "" && tb_quantity.Text.Trim() != "")
             {
                 int productId = (int)cb_product.SelectedValue;
                 string description = tb_description.Text;
                 decimal discount = 0.0M;
                 decimal price = decimal.Parse(tb_price.Text.Replace(".", ","));
                 decimal quantity = decimal.Parse(tb_quantity.Text.Replace(".", ","));
-
 
                 if (tb_discount.Text != "")
                 {
@@ -240,6 +227,14 @@ namespace My_Finance_app
                 ClearInvoiceItemForm();
             }
 
+        }
+
+        private void CreateNewProduct()
+        {
+            string productName = cb_product.Text.ToUpper();
+            _sql.AddAsoToStore(productName, _paragon.GetShopId());
+            FillComboboxWithProductsForSelectedShop(_paragon.GetShopId());
+            cb_product.Text = productName;
         }
 
         private decimal CalculateDiscount(string discount, decimal quantity)
@@ -262,7 +257,6 @@ namespace My_Finance_app
             tb_description.Clear();
             cb_product.Focus();
             cb_product.SelectedIndex = -1;
-            
         }
 
         /// <summary>
@@ -288,6 +282,7 @@ namespace My_Finance_app
 
             UpdateControlsState(true);
             dg_paragony.ItemsSource = null;
+            _paragon = null;
         }
 
         /// <summary>
@@ -314,6 +309,9 @@ namespace My_Finance_app
             {
                 case "Standardowe zestawienie":
                     LoadReportInitValues();
+                    break;
+                case "Asortyment":
+                    LoadCategories();
                     break;
             }
         }

@@ -173,12 +173,12 @@ namespace Engine
             return rowsAffected;
         }
 
-        public void AddAsoToStore(string produkt, string sklep)
+        public void AddAsoToStore(string produkt, int shopId)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>
             {
                 { "@produkt", produkt },
-                { "@sklep", sklep }
+                { "@idsklep", shopId.ToString() }
             };
 
             SQLexecuteNonQuerryProcedure("dbo.addAsoToStore", dic);
@@ -464,7 +464,7 @@ namespace Engine
 
         private void createNewInvoiceInDatabase(Invoice invoice)
         {
-            SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, sklep, konto, suma, opis) values (@nrParagonu, @data,@sklep,@konto, 0,'' );", _con);
+            SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, ID_sklep, konto, suma, opis) values (@nrParagonu, @data,@idsklep,@konto, 0,'' );", _con);
 
             SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50);
             par.Value = invoice.GetInvoiceNumber().ToUpper();
@@ -474,8 +474,8 @@ namespace Engine
             par.Value = invoice.GetDate();
             com.Parameters.Add(par);
 
-            par = new SqlParameter("@sklep", SqlDbType.VarChar, 150);
-            par.Value = invoice.GetShop();
+            par = new SqlParameter("@idsklep", SqlDbType.VarChar, 150);
+            par.Value = invoice.GetShopId();
             com.Parameters.Add(par);
 
             par = new SqlParameter("@konto", SqlDbType.Int);
