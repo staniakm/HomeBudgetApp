@@ -77,22 +77,22 @@ namespace Engine
             shopId = value;
         }
 
-        public  ObservableCollection<InvoiceDetails> details;
+        public  ObservableCollection<InvoiceDetails> invoiceItems;
 
-        public ObservableCollection<InvoiceDetails> Getdetails()
+        public ObservableCollection<InvoiceDetails> GetInvoiceItems()
         {
-            return details;
+            return invoiceItems;
         }
 
         public Invoice()
         {
-           details = new ObservableCollection<InvoiceDetails>();
+           invoiceItems = new ObservableCollection<InvoiceDetails>();
         }
 
         public decimal GetTotal()
         {
             decimal total = 0;
-            foreach(var item in details)
+            foreach(var item in invoiceItems)
             {
                 total += item.GetTotalPrice();
             }

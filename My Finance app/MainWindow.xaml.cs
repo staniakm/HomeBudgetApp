@@ -33,7 +33,7 @@ namespace My_Finance_app
 
         private void SetupAdditionalData()
         {
-            dp_data.SelectedDate = DateTime.Now;
+            dp_date.SelectedDate = DateTime.Now;
             PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
             selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
 
@@ -99,7 +99,7 @@ namespace My_Finance_app
         /// Loading products connected with selected store into combo 
         /// Require during adding new bill and also when adding products into store.
         /// </summary>
-        private void LoadProducts(int shopId)
+        private void LoadProductsForSelectedShop(int shopId)
         {
             cb_product.DataContext = _sql.GetProductsInStore(shopId);
         }
@@ -107,46 +107,58 @@ namespace My_Finance_app
         /// <summary>
         /// Create new bill.
         /// </summary>
-        private void NewBill(object sender, RoutedEventArgs e)
+        private void CreateNewInvoice(object sender, RoutedEventArgs e)
         {
             if (cb_sklep.Text != "" && cb_konto.Text != "")
             {
                 //check if shop is on the list. If not then we add new shop and reload combo.
-                
+
                 //TODO: method check for shop in DB and automaticly add if shop not exists. 
                 //should be split to two separated methods
-                if (_sql.ShopExists(cb_sklep.Text.ToString().ToUpper()) > 0)
-                {
-
-                    string SelectedShop = cb_sklep.Text.ToString().ToUpper();
-                    cb_sklep.DataContext = _sql.GetShopsCollection();
-                    cb_sklep.Text = SelectedShop;
-                }
+                CreateShopIfNotExists();
                 //Load list of products for selected shop
                 int shopId = (int)cb_sklep.SelectedValue;
-                LoadProducts(shopId);
+                LoadProductsForSelectedShop(shopId);
 
                 //new instance of bill
                 _paragon = new Invoice();
                 //setting ItemSource of data grid to bill details
-                dg_paragony.ItemsSource = _paragon.details;
+                dg_paragony.ItemsSource = _paragon.GetInvoiceItems();
                 UpdateControlsState(false);
 
-                //set basic bill details 
-                _paragon.SetDate((DateTime)dp_data.SelectedDate);//bill date
-                _paragon.SetInvoiceNumber(tb_nr_paragonu.Text);//bill number
-                _paragon.SetShopId(shopId);//id of shop
-                _paragon.SetAccount((int)cb_konto.SelectedValue);//id of bank accout 
-                _paragon.SetShop(cb_sklep.Text);//shop name - this is not needed
+                //set basic invoice details 
+                SetInvoiceVariables(shopId);
 
                 //disable basic controls so basic bill data can't be changed after bill creation.
-                dp_data.IsEnabled = false;
-                tb_nr_paragonu.IsEnabled = false;
-                cb_sklep.IsEnabled = false;
-                cb_konto.IsEnabled = false;
+                DisableBasicInvoiceVariablesFields();
             }
         }
 
+        private void DisableBasicInvoiceVariablesFields()
+        {
+            dp_date.IsEnabled = false;
+            tb_nr_paragonu.IsEnabled = false;
+            cb_sklep.IsEnabled = false;
+            cb_konto.IsEnabled = false;
+        }
+
+        private void SetInvoiceVariables(int shopId)
+        {
+            _paragon.SetDate((DateTime)dp_date.SelectedDate);//Invoice date
+            _paragon.SetInvoiceNumber(tb_nr_paragonu.Text);//Invoice number
+            _paragon.SetShopId(shopId);//id of shop
+            _paragon.SetAccount((int)cb_konto.SelectedValue);//id of bank accout 
+        }
+
+        private void CreateShopIfNotExists()
+        {
+            if (_sql.CreateNewShopIfNotExists(cb_sklep.Text.ToUpper()) > 0)
+            {
+                string SelectedShop = cb_sklep.Text.ToUpper();
+                cb_sklep.DataContext = _sql.GetShopsCollection();
+                cb_sklep.Text = SelectedShop;
+            }
+        }
 
         private void CancelBill(object sender, RoutedEventArgs e)
         {
@@ -186,7 +198,7 @@ namespace My_Finance_app
                 cb_konto.SelectedIndex = -1;
                 tb_nr_paragonu.Clear();
 
-                dp_data.IsEnabled = true;
+                dp_date.IsEnabled = true;
                 tb_nr_paragonu.IsEnabled = true;
                 cb_sklep.IsEnabled = true;
                 cb_konto.IsEnabled = true;
@@ -201,7 +213,7 @@ namespace My_Finance_app
                 string chosen = cb_product.Text.ToString().ToUpper();
                 _sql.AddAsoToStore(chosen, cb_sklep.Text.ToString());
                 int shopId = (int)cb_sklep.SelectedValue;
-                LoadProducts(shopId);
+                LoadProductsForSelectedShop(shopId);
                 cb_product.Text = chosen;
             }
             string produkt = cb_product.Text;
@@ -226,7 +238,7 @@ namespace My_Finance_app
                     }
                 }
 
-                _paragon.details.Add(new InvoiceDetails((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
+                _paragon.invoiceItems.Add(new InvoiceDetails((int)cb_product.SelectedValue, produkt, cena, ilosc, opis));
                 l_total.Content = _paragon.GetTotal();
                 tb_cena.Clear();
                 tb_ilosc.Clear();
@@ -271,7 +283,7 @@ namespace My_Finance_app
         private void RefreshDataGrid(object sender, RoutedEventArgs e)
         {
             dg_paragony.ItemsSource = null;
-            dg_paragony.ItemsSource = _paragon.details;
+            dg_paragony.ItemsSource = _paragon.invoiceItems;
 
         }
         /// <summary>

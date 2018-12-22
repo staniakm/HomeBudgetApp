@@ -449,9 +449,9 @@ namespace Engine
             com.Parameters.Add(par);
             com.Prepare();
 
-            for (int x = 0; x < invoice.Getdetails().Count; x++)
+            for (int x = 0; x < invoice.GetInvoiceItems().Count; x++)
             {
-                InvoiceDetails p = invoice.Getdetails()[x];
+                InvoiceDetails p = invoice.GetInvoiceItems()[x];
                 com.Parameters[0].Value = invoice.GetInvoiceId();
                 com.Parameters[1].Value = p.Price;
                 com.Parameters[2].Value = p.Quantity;
@@ -489,13 +489,11 @@ namespace Engine
         /// <summary>
         /// Jeśli procesura zwróci wartość > 0 tzn że sklep został dopisany. 
         /// </summary>
-        /// <param name="sklep"></param>
+        /// <param name="shopName"></param>
         /// <returns></returns>
-        public int ShopExists(string sklep)
+        public int CreateNewShopIfNotExists(string shopName)
         {
-            int rowsNumb = 0;
-            rowsNumb = SQLexecuteNonQuerry(string.Format("if not exists(select 1 from sklepy where sklep = '{0}') insert into sklepy(sklep) select '{0}'", sklep));
-            return rowsNumb;
+            return SQLexecuteNonQuerry(string.Format("if not exists(select 1 from sklepy where sklep = '{0}') insert into sklepy(sklep) select '{0}'", shopName));
         }
 
         public void ReportSettings(Dictionary<int, Tuple<string, string>> dic)
