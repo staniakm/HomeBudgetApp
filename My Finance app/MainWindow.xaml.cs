@@ -65,7 +65,7 @@ namespace My_Finance_app
         //create bank accounts and shop collections
         private void LoadDataToCombo()
         {
-            _sql.CreateAccountColection();
+            _sql.reloadBankAccountsCollection();
             cb_sklep.DataContext = _sql.GetShopsCollection();
             cb_konto.DataContext = _sql.GetBankAccounts();
             
@@ -260,7 +260,7 @@ namespace My_Finance_app
         /// <param name="e"></param>
         private void bt_SaveBillInDatabase(object sender, RoutedEventArgs e)
         {
-            _sql.SaveBilInDatabase(_paragon);
+            _sql.SaveInvoiceInDatabase(_paragon);
 
             UpdateControlsState(true);
             dg_paragony.ItemsSource = null;
@@ -440,7 +440,7 @@ namespace My_Finance_app
             //save accout
             _sql.ModifyBankAccount(tmpDic);
             //reload account collection
-            _sql.CreateAccountColection();
+            _sql.reloadBankAccountsCollection();
             grid_konta.DataContext = _sql.GetBankAccounts();
             //reset selected account
             konta_cb_konto.Text = chosen;

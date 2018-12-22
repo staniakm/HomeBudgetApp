@@ -42,7 +42,7 @@ namespace Engine
         }
 
 
-        public decimal GetCenaCalosc()
+        public decimal GetTotalPrice()
         {
             return TotalPrice;
         }

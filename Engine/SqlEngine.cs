@@ -382,9 +382,9 @@ namespace Engine
             }
         }
 
-        private void RecalculateBill(int paragon)
+        private void recalculateBudgetsAndUpdateInvoiceCategories(int invoiceId)
         {
-            SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", paragon));
+            SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", invoiceId));
         }
 
         public void RecalculateBudget(DateTime date)
@@ -397,74 +397,94 @@ namespace Engine
             SQLexecuteNonQuerryProcedure("dbo.RecalculateBudget", dic);
         }
 
-        public void SaveBilInDatabase(Invoice paragon)
+        public void SaveInvoiceInDatabase(Invoice paragon)
         {
 
             paragon.SetInvoiceId(int.Parse(SQLgetScalar("exec dbo.getNextIdForParagon")));
 
             try
             {
-                SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, sklep, konto, suma, opis) values (@nrParagonu, @data,@sklep,@konto, 0,'' );", _con);
-                SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50);
-                par.Value = paragon.GetInvoiceNumber().ToUpper();
-                com.Parameters.Add(par);
-                par = new SqlParameter("@data", SqlDbType.Date);
-                par.Value = paragon.GetDate();
-                com.Parameters.Add(par);
-                par = new SqlParameter("@sklep", SqlDbType.VarChar, 150);
-                par.Value = paragon.GetShop();
-                com.Parameters.Add(par);
+                createNewInvoiceInDatabase(paragon);
 
-                par = new SqlParameter("@konto", SqlDbType.Int);
-                par.Value = paragon.GetAccount();
-                com.Parameters.Add(par);
-                com.Prepare();
-                com.ExecuteNonQuery();
+                createInvliceDetailsInDatabase(paragon);
 
+                recalculateBudgetsAndUpdateInvoiceCategories(paragon.GetInvoiceId());
 
-                com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @idAso, @opis)", _con);
-                par = new SqlParameter("@InvoiceId", SqlDbType.Int);
-                com.Parameters.Add(par);
-                par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal);
-                par.Precision = 8;
-                par.Scale = 2;
+                updateBankAccount(paragon.GetInvoiceId());
 
-                com.Parameters.Add(par);
-                par = new SqlParameter("@ilosc", SqlDbType.Decimal);
-                par.Precision = 6;
-                par.Scale = 3;
-                com.Parameters.Add(par);
-                par = new SqlParameter("@cena", SqlDbType.Money);
-
-                com.Parameters.Add(par);
-                par = new SqlParameter("@idAso", SqlDbType.Int);
-                com.Parameters.Add(par);
-                par = new SqlParameter("@opis", SqlDbType.VarChar, 150);
-                com.Parameters.Add(par);
-                com.Prepare();
-
-                for (int x = 0; x < paragon.Getdetails().Count; x++)
-                {
-                    InvoiceDetails p = paragon.Getdetails()[x];
-                    com.Parameters[0].Value = paragon.GetInvoiceId();
-                    com.Parameters[1].Value = p.Price;
-                    com.Parameters[2].Value = p.Quantity;
-                    com.Parameters[3].Value = p.GetCenaCalosc();
-                    com.Parameters[4].Value = p.GetIDAso();
-                    com.Parameters[5].Value = p.Description;
-                    com.ExecuteNonQuery();
-                }
-                RecalculateBill(paragon.GetInvoiceId());
-                com = new SqlCommand("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = @idPagaron", _con);
-                com.Parameters.AddWithValue("@idPagaron", paragon.GetInvoiceId());
-                com.ExecuteNonQuery();
-                CreateAccountColection();
+                reloadBankAccountsCollection();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                System.Windows.MessageBox.Show(ex.Message.ToString(), "Error during saving process", System.Windows.MessageBoxButton.OK);
             }
+        }
+
+        private void updateBankAccount(int invoiceId)
+        {
+            SqlCommand com = new SqlCommand("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = @idPagaron", _con);
+            com.Parameters.AddWithValue("@idPagaron", invoiceId);
+            com.ExecuteNonQuery();
+        }
+
+        private void createInvliceDetailsInDatabase(Invoice invoice)
+        {
+            SqlCommand com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @idAso, @opis)", _con);
+            SqlParameter par = new SqlParameter("@InvoiceId", SqlDbType.Int);
+            com.Parameters.Add(par);
+            par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal);
+            par.Precision = 8;
+            par.Scale = 2;
+
+            com.Parameters.Add(par);
+            par = new SqlParameter("@ilosc", SqlDbType.Decimal);
+            par.Precision = 6;
+            par.Scale = 3;
+            com.Parameters.Add(par);
+            par = new SqlParameter("@cena", SqlDbType.Money);
+
+            com.Parameters.Add(par);
+            par = new SqlParameter("@idAso", SqlDbType.Int);
+            com.Parameters.Add(par);
+            par = new SqlParameter("@opis", SqlDbType.VarChar, 150);
+            com.Parameters.Add(par);
+            com.Prepare();
+
+            for (int x = 0; x < invoice.Getdetails().Count; x++)
+            {
+                InvoiceDetails p = invoice.Getdetails()[x];
+                com.Parameters[0].Value = invoice.GetInvoiceId();
+                com.Parameters[1].Value = p.Price;
+                com.Parameters[2].Value = p.Quantity;
+                com.Parameters[3].Value = p.GetTotalPrice();
+                com.Parameters[4].Value = p.GetIDAso();
+                com.Parameters[5].Value = p.Description;
+                com.ExecuteNonQuery();
+            }
+        }
+
+        private void createNewInvoiceInDatabase(Invoice invoice)
+        {
+            SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, sklep, konto, suma, opis) values (@nrParagonu, @data,@sklep,@konto, 0,'' );", _con);
+
+            SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50);
+            par.Value = invoice.GetInvoiceNumber().ToUpper();
+            com.Parameters.Add(par);
+
+            par = new SqlParameter("@data", SqlDbType.Date);
+            par.Value = invoice.GetDate();
+            com.Parameters.Add(par);
+
+            par = new SqlParameter("@sklep", SqlDbType.VarChar, 150);
+            par.Value = invoice.GetShop();
+            com.Parameters.Add(par);
+
+            par = new SqlParameter("@konto", SqlDbType.Int);
+            par.Value = invoice.GetAccount();
+            com.Parameters.Add(par);
+
+            com.Prepare();
+            com.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -502,7 +522,7 @@ namespace Engine
         /// Zwracamy kolekcję kont. Można ustawiać bezpośrednio do datacontextu.
         /// </summary>
         /// <returns></returns>
-        public void CreateAccountColection()
+        public void reloadBankAccountsCollection()
         {
             ObservableCollection<BankAccount> konta = new ObservableCollection<BankAccount>();
             DataTable dt = GetTable("konta");
