@@ -358,6 +358,9 @@ namespace Engine
                 case 3:
                     dt = GetData("exec generuj_zestawienie_podzial_na_kategorie_konto");
                     break;
+                case 4:
+                    dt = GetData("exec show_invoice_list");
+                    break;
             }
             return dt;
         }

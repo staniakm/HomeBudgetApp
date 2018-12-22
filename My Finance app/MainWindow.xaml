@@ -110,6 +110,7 @@
                     <ComboBoxItem Content="Normalne" />
                     <ComboBoxItem Content="Kategorie"/>
                     <ComboBoxItem Content="Kategorie i konto"/>
+                    <ComboBoxItem Content="Lista paragonów"/>
                 </ComboBox>
                 <Label Content="Data od" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top" />
                 <DatePicker x:Name="dp_dataOd_zest" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>

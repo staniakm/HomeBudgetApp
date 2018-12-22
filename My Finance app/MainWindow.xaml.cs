@@ -337,6 +337,11 @@ namespace My_Finance_app
                 case "KATEGORIE I KONTO":
                     LoadReportStatistic(3);
                     break;
+                case "LISTA PARAGONÓW":
+                    LoadReportStatistic(4);
+                    break;
+                default:
+                    break;
             }
         }
 
