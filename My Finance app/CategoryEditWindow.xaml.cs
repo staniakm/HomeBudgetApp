@@ -42,7 +42,7 @@ namespace My_Finance_app
             SQL.UpdateCategoryOfAso(productId,newCategoryName,newCategoryId,newProductName);
 
             mw.LoadCategories();
-            mw.getItemsByCategory();
+            mw.GetItemsByCategory();
             this.Close();
         }
     }

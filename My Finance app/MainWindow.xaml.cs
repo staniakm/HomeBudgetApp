@@ -35,7 +35,7 @@ namespace My_Finance_app
         {
             dp_date.SelectedDate = DateTime.Now;
             PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
-            selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
+            lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
 
             FillComboboxesWithData();
 
@@ -293,7 +293,7 @@ namespace My_Finance_app
         private void RefreshDataGrid(object sender, RoutedEventArgs e)
         {
             dg_paragony.ItemsSource = null;
-            dg_paragony.ItemsSource = _paragon.invoiceItems;
+            dg_paragony.ItemsSource = _paragon.GetInvoiceItems();
 
         }
         /// <summary>
@@ -301,7 +301,7 @@ namespace My_Finance_app
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void MenuItems(object sender, RoutedEventArgs e)
         {
             MenuItem mi = e.Source as MenuItem;
             ShowGrid(mi.Header.ToString());
@@ -341,9 +341,9 @@ namespace My_Finance_app
         /// <summary>
         /// Create session settings for specific report.
         /// </summary>
-        private void bt_generuj_Click(object sender, RoutedEventArgs e)
+        private void GenerateReport(object sender, RoutedEventArgs e)
         {
-            SetReportRules();
+            PrepareReportSettings();
             
             switch (cb_report_type.Text.ToUpper())
             {
@@ -365,7 +365,7 @@ namespace My_Finance_app
         }
 
 
-        private void SetReportRules()
+        private void PrepareReportSettings()
         {
             var settings = new Dictionary<int, Tuple<string, string>>();
 
@@ -390,12 +390,12 @@ namespace My_Finance_app
             _sql.ReportSettings(settings);
         }
 
-        public void getItemsByCategory()
+        public void GetItemsByCategory()
         {
             dg_asortyment.DataContext = _sql.getItemsByCategory(cb_kategoria.Text);
         }
 
-        private void bt_edit_category_Click(object sender, RoutedEventArgs e)
+        private void EditItemCategory(object sender, RoutedEventArgs e)
         {
             if (dg_asortyment.SelectedIndex > -1)
             {
@@ -417,17 +417,17 @@ namespace My_Finance_app
 
         private void LoadCategory(object sender, RoutedEventArgs e)
         {
-            getItemsByCategory();
+            GetItemsByCategory();
         }
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
-            double earned = _sql.GetBudgetCalculations("earned", getCurrentlySelectedDate());
-            double spend = _sql.GetBudgetCalculations("spend", getCurrentlySelectedDate());
-            double planned = _sql.GetBudgetCalculations("planed", getCurrentlySelectedDate());
-            double leftToPlan = _sql.GetBudgetCalculations("left", getCurrentlySelectedDate());
+            double earned = _sql.GetBudgetCalculations("earned", GetCurrentlySelectedDate());
+            double spend = _sql.GetBudgetCalculations("spend", GetCurrentlySelectedDate());
+            double planned = _sql.GetBudgetCalculations("planed", GetCurrentlySelectedDate());
+            double leftToPlan = _sql.GetBudgetCalculations("left", GetCurrentlySelectedDate());
             
-            dg_budzety.DataContext = _sql.GetBudgets(getCurrentlySelectedDate());
+            dg_budzety.DataContext = _sql.GetBudgets(GetCurrentlySelectedDate());
 
             lb_przychodzy.Content = earned;
             lb_wydatek.Content = spend;
@@ -437,7 +437,7 @@ namespace My_Finance_app
 
         }
 
-        public DateTime getCurrentlySelectedDate()
+        public DateTime GetCurrentlySelectedDate()
         {
             return selectedDate;
         }
@@ -447,17 +447,17 @@ namespace My_Finance_app
            _sql.RecalculateBudget(selectedDate);
         }
 
-        private void br_zapisz_konto_Click(object sender, RoutedEventArgs e)
+        private void SaveAccount(object sender, RoutedEventArgs e)
         {
-            string chosen = konta_cb_konto.Text.ToString();
+            string selectedAccount = konta_cb_konto.Text;
             Dictionary<string, string> tmpDic = new Dictionary<string, string>()
             {
-                {"@nazwa", konto_nazwa.Text},
-                {"@kwota", konto_kwota.Text.Replace(",",".")},
-                {"@opis", konto_opis.Text },
-                {"@owner", konto_owner.Text },
+                {"@nazwa", accountName.Text},
+                {"@kwota", accountMoneyAmount.Text.Replace(",",".")},
+                {"@opis", accountDescription.Text },
+                {"@owner", accountOwner.Text },
                 {"@oprocentowanie", konto_procent.Text},
-                {"@id", (konto_ID.Text.Equals("")?null:konto_ID.Text)}
+                {"@id", (accountId.Text.Equals("")?null:accountId.Text)}
             };
             //save accout
             _sql.ModifyBankAccount(tmpDic);
@@ -465,36 +465,24 @@ namespace My_Finance_app
             _sql.reloadBankAccountsCollection();
             grid_konta.DataContext = _sql.GetBankAccounts();
             //reset selected account
-            konta_cb_konto.Text = chosen;
-
+            konta_cb_konto.Text = selectedAccount;
         }
 
-        private void previusMonth(object sender, RoutedEventArgs e)
+        private void SetPreviousMonth(object sender, RoutedEventArgs e)
         {
             selectedDate = selectedDate.AddMonths(-1);
-            selectedMonth.Content = selectedDate.ToShortDateString().Substring(0,7);
+            lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0,7);
             LoadBudget(null,null);
         }
 
-        private void nextMonth(object sender, RoutedEventArgs e)
+        private void SetNextMonth(object sender, RoutedEventArgs e)
         {
             selectedDate = selectedDate.AddMonths(1);
-            selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
+            lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
             LoadBudget(null, null);
         }
 
-
-        private void bt_nowe_konto_Click(object sender, RoutedEventArgs e)
-        {
-            konto_ID.Text = "";
-            konto_nazwa.Text = "";
-            konto_kwota.Text = "";
-            konto_opis.Text = "";
-            konto_owner.Text = "";
-            konto_procent.Text = "";
-        }
-
-        private void br_add_salary(object sender, RoutedEventArgs e)
+        private void AddNewIncome(object sender, RoutedEventArgs e)
         {
             if (konta_cb_konto.Text != "") { 
             SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, _sql);
