@@ -39,13 +39,13 @@ namespace Engine
 
         }
 
-        public DataTable getSallaryDescriptions()
+        public DataTable GetSallaryDescriptions()
         {
             return GetData("select text from SALARY_TYPE;");
             
         }
 
-        public void addNewSallary(int accountId, string description, decimal moneyAmount)
+        public void AddNewSallary(int accountId, string description, decimal moneyAmount)
         {
             SqlCommand com = new SqlCommand("insert into przychody(kwota, opis, konto) values (@kwota, @opis ,@konto);", _con);
             SqlParameter par = new SqlParameter("@kwota", SqlDbType.Money);
@@ -381,7 +381,7 @@ namespace Engine
             }
         }
 
-        private void recalculateBudgetsAndUpdateInvoiceCategories(int invoiceId)
+        private void RecalculateBudgetsAndUpdateInvoiceCategories(int invoiceId)
         {
             SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", invoiceId));
         }
@@ -403,15 +403,15 @@ namespace Engine
 
             try
             {
-                createNewInvoiceInDatabase(paragon);
+                SaveNewInvoiceInDatabase(paragon);
 
-                createInvliceDetailsInDatabase(paragon);
+                SaveInvoiceItemsInDatabase(paragon);
 
-                recalculateBudgetsAndUpdateInvoiceCategories(paragon.GetInvoiceId());
+                RecalculateBudgetsAndUpdateInvoiceCategories(paragon.GetInvoiceId());
 
                 updateBankAccount(paragon.GetInvoiceId());
 
-                reloadBankAccountsCollection();
+                ReloadBankAccountsCollection();
             }
             catch (Exception ex)
             {
@@ -426,7 +426,7 @@ namespace Engine
             com.ExecuteNonQuery();
         }
 
-        private void createInvliceDetailsInDatabase(Invoice invoice)
+        private void SaveInvoiceItemsInDatabase(Invoice invoice)
         {
             SqlCommand com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @idAso, @opis)", _con);
             SqlParameter par = new SqlParameter("@InvoiceId", SqlDbType.Int);
@@ -462,7 +462,7 @@ namespace Engine
             }
         }
 
-        private void createNewInvoiceInDatabase(Invoice invoice)
+        private void SaveNewInvoiceInDatabase(Invoice invoice)
         {
             SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, ID_sklep, konto, suma, opis) values (@nrParagonu, @data,@idsklep,@konto, 0,'' );", _con);
 
@@ -519,7 +519,7 @@ namespace Engine
         /// Zwracamy kolekcję kont. Można ustawiać bezpośrednio do datacontextu.
         /// </summary>
         /// <returns></returns>
-        public void reloadBankAccountsCollection()
+        public void ReloadBankAccountsCollection()
         {
             ObservableCollection<BankAccount> konta = new ObservableCollection<BankAccount>();
             DataTable dt = GetTable("konta");

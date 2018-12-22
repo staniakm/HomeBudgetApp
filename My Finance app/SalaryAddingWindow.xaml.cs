@@ -28,7 +28,7 @@ namespace My_Finance_app
             this._sql = sql;
             this.accountID = accountID;
             InitializeComponent();
-            salary_description.DataContext = _sql.getSallaryDescriptions();
+            salary_description.DataContext = _sql.GetSallaryDescriptions();
         }
 
         private void ok_button_Click(object sender, RoutedEventArgs e)
@@ -38,7 +38,7 @@ namespace My_Finance_app
             {
                 decimal moneyAmount = decimal.Parse(sallary_amount.Text.Replace(".", ","));
 
-                _sql.addNewSallary(this.accountID, description, moneyAmount);
+                _sql.AddNewSallary(this.accountID, description, moneyAmount);
                 this.Close();
             }
         }

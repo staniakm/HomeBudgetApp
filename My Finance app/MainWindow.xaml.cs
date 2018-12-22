@@ -61,7 +61,7 @@ namespace My_Finance_app
 
         private void FillComboboxesWithData()
         {
-            _sql.reloadBankAccountsCollection();
+            _sql.ReloadBankAccountsCollection();
             cb_shop.DataContext = _sql.GetShopsCollection();
             cb_bankAccount.DataContext = _sql.GetBankAccounts();
         }
@@ -462,7 +462,7 @@ namespace My_Finance_app
             //save accout
             _sql.ModifyBankAccount(tmpDic);
             //reload account collection
-            _sql.reloadBankAccountsCollection();
+            _sql.ReloadBankAccountsCollection();
             grid_konta.DataContext = _sql.GetBankAccounts();
             //reset selected account
             konta_cb_konto.Text = selectedAccount;
@@ -485,9 +485,9 @@ namespace My_Finance_app
         private void AddNewIncome(object sender, RoutedEventArgs e)
         {
             if (konta_cb_konto.Text != "") { 
-            SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, _sql);
-            sw.Show();
-        }
+                SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, _sql);
+                sw.Show();
+            }
         }
 
         private void AddNewUserAccount(object sender, RoutedEventArgs e)
