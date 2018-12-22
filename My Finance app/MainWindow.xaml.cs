@@ -490,5 +490,14 @@ namespace My_Finance_app
         }
         }
 
+        private void AddNewUserAccount(object sender, RoutedEventArgs e)
+        {
+            accountId.Text = "";
+            accountName.Text = "";
+            accountMoneyAmount.Text = "";
+            accountDescription.Text = "";
+            accountOwner.Text = "";
+            konto_procent.Text = "";
+        }
     }
 }//ostani
