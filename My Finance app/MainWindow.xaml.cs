@@ -347,17 +347,18 @@ namespace My_Finance_app
             //date settings parametr = 1
             if (dp_report_start_date.SelectedDate.ToString() != "" || dp_report_end_date.SelectedDate.ToString() != "")
             {
-                string dataod = dp_report_start_date.SelectedDate.ToString() != "" ? dp_report_start_date.SelectedDate.ToString() : "2000-01-01";
-                string datado = dp_report_end_date.SelectedDate.ToString() != "" ? dp_report_end_date.SelectedDate.ToString() : "2050-01-01";
-                settings.Add(1, new Tuple<string, string>(dataod, datado));
+                string startDate = dp_report_start_date.SelectedDate.ToString() != "" ? dp_report_start_date.SelectedDate.ToString() : "2000-01-01";
+                string endDate = dp_report_end_date.SelectedDate.ToString() != "" ? dp_report_end_date.SelectedDate.ToString() : "2050-01-01";
+                settings.Add(1, new Tuple<string, string>(startDate, endDate));
             }
             //category parametr = 2
-            if ((int)cb_report_category_collection.SelectedIndex > 0)
+            
+            if ((int)cb_report_category_collection.SelectedIndex >= 0 && cb_report_category_collection.Text != "wszystkie")
             {
                 settings.Add(2, new Tuple<string, string>(cb_report_category_collection.SelectedValue.ToString(), ""));
             }
             //shop parametr = 3
-            if ((int)cb_report_shop_collection.SelectedIndex > 0)
+            if ((int)cb_report_shop_collection.SelectedIndex >= 0)
             {
                 settings.Add(3, new Tuple<string, string>(cb_report_shop_collection.SelectedValue.ToString(), ""));
             }
