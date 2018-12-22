@@ -17,7 +17,7 @@ namespace My_Finance_app
     /// </summary>
     public partial class MainWindow : Window
     {
-        private DateTime month = DateTime.Now;
+        private DateTime selectedDate = DateTime.Now;
         private SqlEngine _sql;
         private Invoice _paragon;
         private Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
@@ -35,7 +35,7 @@ namespace My_Finance_app
         {
             dp_data.SelectedDate = DateTime.Now;
             PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
-            selectedMonth.Content = month.ToShortDateString().Substring(0, 7);
+            selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
 
             LoadDataFromDB();
 
@@ -234,9 +234,6 @@ namespace My_Finance_app
                 cb_product.Focus();
                 cb_product.SelectedIndex = -1;
                 tb_opis.Clear();
-
-                Console.WriteLine("number of elements "+ _paragon.Getdetails().Count);
-                Console.WriteLine(  _paragon.Getdetails()[0].ProductName);
             }
 
         }
@@ -370,9 +367,9 @@ namespace My_Finance_app
             _sql.ReportSettings(settings);
         }
 
-        public void LoadCategoryData()
+        public void getItemsByCategory()
         {
-            dg_asortyment.DataContext = _sql.GetCategoryItems(cb_kategoria.Text);
+            dg_asortyment.DataContext = _sql.getItemsByCategory(cb_kategoria.Text);
         }
 
         private void bt_edit_category_Click(object sender, RoutedEventArgs e)
@@ -390,7 +387,6 @@ namespace My_Finance_app
             if (dg_budzety.SelectedIndex > -1)
             {
                 DataRowView dr = (DataRowView)dg_budzety.SelectedItem;
-                Console.WriteLine(dr[0]);
                 BudgetEditWindow cw = new BudgetEditWindow(dr, _sql, this);
                 cw.ShowDialog();
             }
@@ -398,31 +394,34 @@ namespace My_Finance_app
 
         private void LoadCategory(object sender, RoutedEventArgs e)
         {
-            LoadCategoryData();
+            getItemsByCategory();
         }
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
-            double earn = _sql.GetBudgetCalculations("earn", month);
-            double spend = _sql.GetBudgetCalculations("spend", month);
+            double earned = _sql.GetBudgetCalculations("earned", getCurrentlySelectedDate());
+            double spend = _sql.GetBudgetCalculations("spend", getCurrentlySelectedDate());
+            double planned = _sql.GetBudgetCalculations("planed", getCurrentlySelectedDate());
+            double leftToPlan = _sql.GetBudgetCalculations("left", getCurrentlySelectedDate());
+            
+            dg_budzety.DataContext = _sql.GetBudgets(getCurrentlySelectedDate());
 
-            dg_budzety.DataContext = _sql.GetBudgets(month);
-            lb_przychodzy.Content = earn;
-            lb_pozostalo.Content = _sql.GetBudgetCalculations("left", month);
-            lb_zaplanowane.Content = _sql.GetBudgetCalculations("planed", month);
+            lb_przychodzy.Content = earned;
             lb_wydatek.Content = spend;
-            lb_oszczednosci.Content = earn - spend;
+            lb_zaplanowane.Content = planned;
+            lb_pozostalo.Content = leftToPlan;
+            lb_oszczednosci.Content = earned - spend;
 
         }
 
-        public DateTime getCurrentSelectedDate()
+        public DateTime getCurrentlySelectedDate()
         {
-            return month;
+            return selectedDate;
         }
 
         private void RecalculateBudget(object sender, RoutedEventArgs e)
         {
-           _sql.RecalculateBudget(month);
+           _sql.RecalculateBudget(selectedDate);
         }
 
         private void br_zapisz_konto_Click(object sender, RoutedEventArgs e)
@@ -449,15 +448,15 @@ namespace My_Finance_app
 
         private void previusMonth(object sender, RoutedEventArgs e)
         {
-            month = month.AddMonths(-1);
-            selectedMonth.Content = month.ToShortDateString().Substring(0,7);
+            selectedDate = selectedDate.AddMonths(-1);
+            selectedMonth.Content = selectedDate.ToShortDateString().Substring(0,7);
             LoadBudget(null,null);
         }
 
         private void nextMonth(object sender, RoutedEventArgs e)
         {
-            month = month.AddMonths(1);
-            selectedMonth.Content = month.ToShortDateString().Substring(0, 7);
+            selectedDate = selectedDate.AddMonths(1);
+            selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
             LoadBudget(null, null);
         }
 

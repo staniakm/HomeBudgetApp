@@ -48,7 +48,7 @@ namespace My_Finance_app
             string newValue = lb_planed.Text.Replace(",",".");
             //try
             //{
-                SQL.UpdateBudget(databaseBudgetRowID, newValue, mw.getCurrentSelectedDate());
+                SQL.UpdateBudget(databaseBudgetRowID, newValue, mw.getCurrentlySelectedDate());
             //}
             //catch (Exception)
             //{

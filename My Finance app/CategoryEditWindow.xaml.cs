@@ -41,7 +41,7 @@ namespace My_Finance_app
             SQL.UpdateCategoryOfAso(idASO,nowaKategoria,idKAT,nowaNazwa);
 
             mw.LoadCategories();
-            mw.LoadCategoryData();
+            mw.getItemsByCategory();
             this.Close();
         }
     }

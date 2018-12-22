@@ -238,7 +238,6 @@ namespace Engine
             }
             catch (Exception ex)
             {
-                //Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
                 throw;
             }
             return output;
@@ -365,14 +364,14 @@ namespace Engine
             return dt;
         }
 
-        public DataTable GetCategoryItems(string categoryName)
+        public DataTable getItemsByCategory(string categoryName)
         {
             string sqlquery = "";
             Dictionary<string, string> param = new Dictionary<string, string>();
             if (categoryName != "wszystkie")
             {
-                param.Add("@kategoria", categoryName);
-                sqlquery = "Select a.[id],a.[NAZWA],a.[id_kat], k.nazwa [Nazwa kategorii] From [dbo].[ASORTYMENT] a	Join kategoria k on a.id_kat = k.id where del = 0 and k.nazwa = @kategoria order by a.nazwa;";
+                param.Add("@category", categoryName);
+                sqlquery = "Select a.[id],a.[NAZWA],a.[id_kat], k.nazwa [Nazwa kategorii] From [dbo].[ASORTYMENT] a	Join kategoria k on a.id_kat = k.id where del = 0 and k.nazwa = @category order by a.nazwa;";
                 return GetData(sqlquery, param);
             }
             else
@@ -552,12 +551,12 @@ namespace Engine
             return sklepy;
         }
 
-        public double GetBudgetCalculations(string v, DateTime date)
+        public double GetBudgetCalculations(string operation, DateTime date)
         {
-            switch (v)
+            switch (operation)
             {
-                case "earn":
-                    return GetCurrentMonthSalary(date);
+                case "earned":
+                    return getSelectedMonthSallary(date);
                 case "left":
                     return GetCurrentMonthLeft(date);
                 case "planed":
@@ -590,11 +589,11 @@ namespace Engine
             "- (select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)) ",param));
         }
 
-        private double GetCurrentMonthSalary(DateTime data)
+        private double getSelectedMonthSallary(DateTime providedDate)
         {
             Dictionary<string, string> param = new Dictionary<string, string>();
-            param.Add("@currentDate", data.ToShortDateString());
-            return System.Convert.ToDouble(SQLgetScalarWithParameters("select  isnull(sum(kwota),0) from przychody where MONTH(data) = MONTH(@currentDate) and year(data) = year(@currentDate)",param));
+            param.Add("@providedDate", providedDate.ToShortDateString());
+            return System.Convert.ToDouble(SQLgetScalarWithParameters("select  isnull(sum(kwota),0) from przychody where MONTH(data) = MONTH(@providedDate) and year(data) = year(@providedDate)", param));
         }
 
         public void ModifyBankAccount(Dictionary<string, string> tmpDic)
