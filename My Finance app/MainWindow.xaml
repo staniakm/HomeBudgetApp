@@ -23,7 +23,7 @@
                     <MenuItem x:Name="mi_Budzet" Header="Budżet" Click="MenuItems"/>
                     <MenuItem x:Name="mi_Kategorie" Header="Asortyment" Click="MenuItems" IsEnabled="False"/>
                     <MenuItem x:Name="mi_Konta" Header="Konta" Click="MenuItems" IsEnabled="False"/>
-                    <MenuItem x:Name="mi_Wykresy" Header="Wykresy" Click="MenuItems" IsEnabled="True"/>
+                    <!--<MenuItem x:Name="mi_Wykresy" Header="Wykresy" Click="MenuItems" IsEnabled="True"/>-->
                 </MenuItem>
             </Menu>
         </DockPanel>
@@ -63,7 +63,7 @@
             </Grid>
             <Grid x:Name="gr_produkty" IsEnabled="False" Grid.Column="2">
                 <ComboBox x:Name="cb_product" HorizontalAlignment="Left" Margin="82,21,0,0" VerticalAlignment="Top" Width="250" IsEditable="True" TabIndex="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID" SelectedValue="{Binding ID}" />
-                <TextBox x:Name="tb_price" HorizontalAlignment="Left" Height="23" Margin="82,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="6"/>
+                <TextBox x:Name="tb_price" HorizontalAlignment="Left" Height="23" Margin="82,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="6" />
                 <TextBox x:Name="tb_quantity" HorizontalAlignment="Left" Height="23" Margin="179,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="7"/>
                 <TextBox x:Name="tb_discount" HorizontalAlignment="Left" Height="23" Margin="280,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="53" PreviewTextInput="NumberValidation" TabIndex="7"/>
                 <TextBox x:Name="tb_description" HorizontalAlignment="Left" Height="23" Margin="82,78,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250" TabIndex="8"/>
@@ -80,13 +80,38 @@
             <Grid Grid.Row="1" Grid.ColumnSpan="3">
                 <Grid Margin="10">
                     <DataGrid x:Name="dg_paragony" AutoGenerateColumns="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding}">
-
+                  
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding ProductName}" Header="Produkt" IsReadOnly="True"/>
-                            <DataGridTextColumn Binding="{Binding Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="Cena jednostkowa"/>
-                            <DataGridTextColumn Binding="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="Ilość"/>
+                            
+                            <!--<DataGridTextColumn Binding="{Binding Price, Mode=TwoWay}" Header="Cena jednostkowa"/>-->
+                            <DataGridTemplateColumn Header="Cena jednostkowa" IsReadOnly="False">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding Price, Mode=TwoWay,UpdateSourceTrigger=LostFocus}" PreviewTextInput="CellNumberValidation" BorderThickness="0"></TextBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <!--<DataGridTextColumn Binding="{Binding Quantity, Mode=TwoWay}" Header="Ilość"/>-->
+                            <DataGridTemplateColumn Header="Ilość" IsReadOnly="False">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding Quantity, Mode=TwoWay,UpdateSourceTrigger=LostFocus}" PreviewTextInput="CellNumberValidation" BorderThickness="0"></TextBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <!--<DataGridTextColumn Binding="{Binding Discount, Mode=TwoWay}" Header="Rabat"/>-->
+                            <DataGridTemplateColumn Header="Rabat" IsReadOnly="False">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding Discount, Mode=TwoWay,UpdateSourceTrigger=LostFocus}" PreviewTextInput="CellNumberValidation" BorderThickness="0"></TextBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>                            
+                            
                             <DataGridTextColumn Binding="{Binding TotalPrice, UpdateSourceTrigger=PropertyChanged}" Header="Cena" IsReadOnly="True"/>
                             <DataGridTextColumn Binding="{Binding Description}" Header="Opis"/>
+
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>

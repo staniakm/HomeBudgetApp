@@ -29,6 +29,12 @@ namespace My_Finance_app
             shopService = new ShopService(_sql); ;
             InitializeComponent();
             SetupAdditionalData();
+            this.Closed += new EventHandler(MainWindow_Closed);
+        }
+
+        void MainWindow_Closed(object sender, EventArgs e)
+        {
+            _sql.Con = false;
         }
 
         private void SetupAdditionalData()
@@ -217,11 +223,9 @@ namespace My_Finance_app
                 if (tb_discount.Text != "")
                 {
                     discount = CalculateDiscount(tb_discount.Text, quantity);
-                    price = price - discount;
-                    description = description + string.Format("\n Cena: {0} Rabat {1}", price, discount);
                 }
 
-                _paragon.AddInvoiceItem(new InvoiceDetails(productId, productName, price, quantity, description));
+                _paragon.AddInvoiceItem(new InvoiceDetails(productId, productName, price, quantity, description, discount));
 
                 l_totalPrice.Content = _paragon.GetTotalInvoiceValue();
 
@@ -245,7 +249,7 @@ namespace My_Finance_app
             {
                 if (discountAmount < 0)
                     { discountAmount = discountAmount * (-1); }
-                return Math.Round((discountAmount / quantity), 2, MidpointRounding.AwayFromZero);
+                return discountAmount; //Math.Round((discountAmount / quantity), 2, MidpointRounding.AwayFromZero);
             }
             return 0;
         }
@@ -269,6 +273,13 @@ namespace My_Finance_app
         {
             //Regex regex = new Regex("[^0-9]+");
             Regex regex = new Regex("^[-]?[0-9]*[.,]?[0-9]*$");
+            e.Handled = !regex.IsMatch((sender as TextBox).Text.Insert((sender as TextBox).SelectionStart, e.Text));
+        }
+
+        private void CellNumberValidation(object sender, TextCompositionEventArgs e)
+        {
+            //Regex regex = new Regex("[^0-9]+");
+            Regex regex = new Regex("^[-]?[0-9]*[.]?[0-9]*$");
             e.Handled = !regex.IsMatch((sender as TextBox).Text.Insert((sender as TextBox).SelectionStart, e.Text));
         }
 

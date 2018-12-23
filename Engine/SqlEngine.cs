@@ -84,7 +84,10 @@ namespace Engine
 
         public SqlEngine(string database)
         {
-            _con = new SqlConnection();
+            if (_con == null)
+            {
+                _con = new SqlConnection();
+            }
             this.database = database;
         }
 
@@ -104,6 +107,7 @@ namespace Engine
             {
                 if (value == false)
                 {
+                    Console.WriteLine("Connection closed");
                     _con.Close();
                     _con.Dispose();
                 }
@@ -442,7 +446,7 @@ namespace Engine
 
         private void SaveInvoiceItemsInDatabase(Invoice invoice)
         {
-            SqlCommand com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @idAso, @opis)", _con);
+            SqlCommand com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, rabat, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @rabat, @idAso, @opis)", _con);
             SqlParameter par = new SqlParameter("@InvoiceId", SqlDbType.Int);
             com.Parameters.Add(par);
             par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal)
@@ -458,11 +462,16 @@ namespace Engine
                 Scale = 3
             };
             com.Parameters.Add(par);
-            par = new SqlParameter("@cena", SqlDbType.Money);
 
+            par = new SqlParameter("@cena", SqlDbType.Money);
             com.Parameters.Add(par);
+
+            par = new SqlParameter("@rabat", SqlDbType.Money);
+            com.Parameters.Add(par);
+
             par = new SqlParameter("@idAso", SqlDbType.Int);
             com.Parameters.Add(par);
+
             par = new SqlParameter("@opis", SqlDbType.VarChar, 150);
             com.Parameters.Add(par);
             com.Prepare();
@@ -474,8 +483,9 @@ namespace Engine
                 com.Parameters[1].Value = p.Price;
                 com.Parameters[2].Value = p.Quantity;
                 com.Parameters[3].Value = p.TotalPrice;
-                com.Parameters[4].Value = p.GetIDAso();
-                com.Parameters[5].Value = p.Description;
+                com.Parameters[4].Value = p.Discount;
+                com.Parameters[5].Value = p.GetIDAso();
+                com.Parameters[6].Value = p.Description;
                 com.ExecuteNonQuery();
             }
         }
