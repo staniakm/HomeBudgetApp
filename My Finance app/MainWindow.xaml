@@ -83,9 +83,9 @@
 
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding ProductName}" Header="Produkt" IsReadOnly="True"/>
-                            <DataGridTextColumn Binding="{Binding Price, Mode=TwoWay}" Header="Cena jednostkowa"/>
-                            <DataGridTextColumn Binding="{Binding Quantity, Mode=TwoWay}" Header="Ilość"/>
-                            <DataGridTextColumn Binding="{Binding TotalPrice}" Header="Cena" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="Cena jednostkowa"/>
+                            <DataGridTextColumn Binding="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="Ilość"/>
+                            <DataGridTextColumn Binding="{Binding TotalPrice, UpdateSourceTrigger=PropertyChanged}" Header="Cena" IsReadOnly="True"/>
                             <DataGridTextColumn Binding="{Binding Description}" Header="Opis"/>
                         </DataGrid.Columns>
                     </DataGrid>

@@ -13,8 +13,8 @@ namespace Engine
         private string description;
 
         public string ProductName { get => productName; set => productName = value; }
-        public decimal Price { get => price; set => price = value; }
-        public decimal Quantity { get => quantity; set => quantity = value; }
+        public decimal Price { get => price; set => SetPrice(value) ; }
+        public decimal Quantity { get => quantity; set => SetQuantity(value); }
         public decimal TotalPrice { get => totalPrice; set => totalPrice = value; }
         public string Description { get => description; set => description = value; }
 
@@ -24,10 +24,9 @@ namespace Engine
         {
             SetIDAso(idAso);
             ProductName =produkt;
-            Price = cena;
             Quantity = ilosc;
+            Price = cena;
             Description = opis;
-
             SetTotalPrice();
         }
 
@@ -41,34 +40,27 @@ namespace Engine
             productId = value;
         }
 
-
-        public decimal GetTotalPrice()
-        {
-            return TotalPrice;
-        }
-
-        public void SetCenaCalosc(decimal value)
-        {
-            TotalPrice = value;
-        }
-
-
-
         public void SetTotalPrice()
         {
-            SetCenaCalosc(Math.Round(Price * Quantity, 2,MidpointRounding.AwayFromZero));
-            Console.WriteLine("Total price calculation ");
+            totalPrice = (Math.Round(Price * Quantity, 2,MidpointRounding.AwayFromZero)); 
         }
 
- 
-        public void SetPrice(decimal value)
+        private void SetQuantity(decimal value)
+        {
+            if(Quantity != value)
+            {
+                quantity = value;
+                OnPropertyChanged("quantity");
+            }
+        }
+
+        private void SetPrice(decimal value)
         {
             if (Price != value)
             {
-                Console.WriteLine("Price update");
-                Price = value;
-                SetTotalPrice();
-                OnPropertyChanged("Price");
+                price = value;
+                
+                OnPropertyChanged("price");
             }
         }
 
@@ -76,12 +68,9 @@ namespace Engine
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name)
         {
-            //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-            Console.WriteLine("Property changed triggered");
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            SetTotalPrice();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("totalPrice"));
         }
     }
 }

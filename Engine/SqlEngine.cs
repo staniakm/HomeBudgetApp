@@ -473,7 +473,7 @@ namespace Engine
                 com.Parameters[0].Value = invoice.GetInvoiceId();
                 com.Parameters[1].Value = p.Price;
                 com.Parameters[2].Value = p.Quantity;
-                com.Parameters[3].Value = p.GetTotalPrice();
+                com.Parameters[3].Value = p.TotalPrice;
                 com.Parameters[4].Value = p.GetIDAso();
                 com.Parameters[5].Value = p.Description;
                 com.ExecuteNonQuery();

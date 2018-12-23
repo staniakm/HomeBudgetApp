@@ -94,7 +94,7 @@ namespace Engine
             decimal total = 0;
             foreach(var item in invoiceItems)
             {
-                total += item.GetTotalPrice();
+                total += item.TotalPrice;
             }
 
 
