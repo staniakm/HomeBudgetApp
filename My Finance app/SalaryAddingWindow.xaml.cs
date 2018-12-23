@@ -29,6 +29,7 @@ namespace My_Finance_app
             this.accountID = accountID;
             InitializeComponent();
             salary_description.DataContext = _sql.GetSallaryDescriptions();
+            income_date.SelectedDate = DateTime.Now;
         }
 
         private void ok_button_Click(object sender, RoutedEventArgs e)
@@ -36,9 +37,11 @@ namespace My_Finance_app
             string description = salary_description.Text;
             if (sallary_amount.Text != "")
             {
+                Console.WriteLine("salary adding");
                 decimal moneyAmount = decimal.Parse(sallary_amount.Text.Replace(".", ","));
-
-                _sql.AddNewSallary(this.accountID, description, moneyAmount);
+                DateTime date = (DateTime)income_date.SelectedDate;
+                _sql.AddNewSallary(this.accountID, description, moneyAmount, date);
+                Console.WriteLine(date);
                 this.Close();
             }
         }

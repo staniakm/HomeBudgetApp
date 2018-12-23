@@ -44,9 +44,9 @@ namespace Engine
             
         }
 
-        public void AddNewSallary(int accountId, string description, decimal moneyAmount)
+        public void AddNewSallary(int accountId, string description, decimal moneyAmount, DateTime date)
         {
-            SqlCommand com = new SqlCommand("insert into przychody(kwota, opis, konto) values (@kwota, @opis ,@konto);", _con);
+            SqlCommand com = new SqlCommand("insert into przychody(kwota, opis, konto, data) values (@kwota, @opis ,@konto, @data);", _con);
             SqlParameter par = new SqlParameter("@kwota", SqlDbType.Money)
             {
                 Value = moneyAmount
@@ -60,6 +60,11 @@ namespace Engine
             par = new SqlParameter("@konto", SqlDbType.Int)
             {
                 Value = accountId
+            };
+            com.Parameters.Add(par);
+            par = new SqlParameter("@data", SqlDbType.VarChar, 10)
+            {
+                Value = date
             };
             com.Parameters.Add(par);
             com.Prepare();
