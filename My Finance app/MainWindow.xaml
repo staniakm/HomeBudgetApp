@@ -23,6 +23,7 @@
                     <MenuItem x:Name="mi_Budzet" Header="Budżet" Click="MenuItems"/>
                     <MenuItem x:Name="mi_Kategorie" Header="Asortyment" Click="MenuItems" IsEnabled="False"/>
                     <MenuItem x:Name="mi_Konta" Header="Konta" Click="MenuItems" IsEnabled="False"/>
+                    <MenuItem x:Name="mi_Wykresy" Header="Wykresy" Click="MenuItems" IsEnabled="True"/>
                 </MenuItem>
             </Menu>
         </DockPanel>
@@ -57,8 +58,8 @@
                 <Label x:Name="label_Copy2" Content="Konto" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
             </Grid>
 
-            <Grid x:Name="gr_paragon" Grid.Column="1" IsEnabled="False">
-                <Button x:Name="bt_ref" Content="Refresh" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="76" Click="RefreshDataGrid" IsEnabled="True" Height="22"/>
+            <Grid x:Name="gr_paragon" Grid.Column="1" IsEnabled="True">
+                <Button x:Name="bt_ref" Content="Refresh" HorizontalAlignment="Center" VerticalAlignment="Top" Width="76" Click="RefreshDataGrid" IsEnabled="True" Height="22" Margin="19,178,19,0"/>
             </Grid>
             <Grid x:Name="gr_produkty" IsEnabled="False" Grid.Column="2">
                 <ComboBox x:Name="cb_product" HorizontalAlignment="Left" Margin="82,21,0,0" VerticalAlignment="Top" Width="250" IsEditable="True" TabIndex="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID" SelectedValue="{Binding ID}" />
@@ -77,22 +78,24 @@
 
 
             <Grid Grid.Row="1" Grid.ColumnSpan="3">
+                <Grid Margin="10">
+                    <DataGrid x:Name="dg_paragony" AutoGenerateColumns="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding}">
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding ProductName}" Header="Produkt" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Price, Mode=TwoWay}" Header="Cena jednostkowa"/>
+                            <DataGridTextColumn Binding="{Binding Quantity, Mode=TwoWay}" Header="Ilość"/>
+                            <DataGridTextColumn Binding="{Binding TotalPrice}" Header="Cena" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Description}" Header="Opis"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
                 <!--<Grid.ColumnDefinitions>
                     <ColumnDefinition Width="127*"/>
                     <ColumnDefinition Width="260*"/>
                     <ColumnDefinition Width="0*"/>
                     <ColumnDefinition Width="0*"/>
                 </Grid.ColumnDefinitions>-->
-                <DataGrid x:Name="dg_paragony" Margin="10" AutoGenerateColumns="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding}">
-
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding ProductName}" Header="Produkt" IsReadOnly="True"/>
-                        <DataGridTextColumn Binding="{Binding Price}" Header="Cena jednostkowa"/>
-                        <DataGridTextColumn Binding="{Binding Quantity}" Header="Ilość"/>
-                        <DataGridTextColumn Binding="{Binding TotalPrice}" Header="Cena" IsReadOnly="True"/>
-                        <DataGridTextColumn Binding="{Binding Description}" Header="Opis"/>
-                    </DataGrid.Columns>
-                </DataGrid>
             </Grid>
             <Label Content="Suma:" Grid.Column="2" HorizontalAlignment="Left" Margin="10,169,0,0" VerticalAlignment="Top" Width="48"/>
             <Label x:Name="l_totalPrice" Content="0.00" Grid.Column="2" HorizontalAlignment="Left" Margin="58,169,0,0" VerticalAlignment="Top"/>
@@ -139,6 +142,15 @@
                 </DataGrid.Columns>-->
             </DataGrid>
         </Grid>
+
+        <Grid x:Name="grid_wykresy" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100*"/>
+                <ColumnDefinition Width="600*"/>
+            </Grid.ColumnDefinitions>
+
+        </Grid>
+
         <Grid x:Name="grid_budzet" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="170*"/>
@@ -151,22 +163,22 @@
                     <Button Click="SetNextMonth" Content='&gt;&gt;' Width="30" Margin="5,5,0,5" HorizontalAlignment="Right" />
                 </StackPanel>
                 <Button x:Name="bt_przelicz_budzety" Content="Przelicz budżety" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,2,10,0" Click="RecalculateBudget"/>
-            <Button x:Name="bt_zaladuj_budzety" Content="Załaduj budżety" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,2,10,0" Click="LoadBudget"/>
-            <Button x:Name="bt_edit_budzet" Click="EditBudget" Content="Edytuj" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,2,10,0"/>
-            <Label  Content="Przychód:" Margin="10,5,40,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-            <Label x:Name="lb_przychodzy"  Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"  />
-            <Label  Content="Zaplanowane:" Margin="10,0,40,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-            <Label x:Name="lb_zaplanowane" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-            <Label  Content="Pozostało do zaplanowania:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-            <Label x:Name="lb_pozostalo" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-            <Label  Content="Dotychczas wydane:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-            <Label x:Name="lb_wydatek" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-            <Label  Content="Oszczędności:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-            <Label x:Name="lb_oszczednosci" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+                <Button x:Name="bt_zaladuj_budzety" Content="Załaduj budżety" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,2,10,0" Click="LoadBudget"/>
+                <Button x:Name="bt_edit_budzet" Click="EditBudget" Content="Edytuj" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,2,10,0"/>
+                <Label  Content="Przychód:" Margin="10,5,40,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+                <Label x:Name="lb_przychodzy"  Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"  />
+                <Label  Content="Zaplanowane:" Margin="10,0,40,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+                <Label x:Name="lb_zaplanowane" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+                <Label  Content="Pozostało do zaplanowania:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+                <Label x:Name="lb_pozostalo" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+                <Label  Content="Dotychczas wydane:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+                <Label x:Name="lb_wydatek" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+                <Label  Content="Oszczędności:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+                <Label x:Name="lb_oszczednosci" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
             </StackPanel>
-                <DataGrid x:Name="dg_budzety" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}"/>
-            
-            </Grid>
+            <DataGrid x:Name="dg_budzety" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}"/>
+
+        </Grid>
         <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="159*"/>

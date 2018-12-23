@@ -56,7 +56,8 @@ namespace Engine
 
         public void SetTotalPrice()
         {
-            SetCenaCalosc(Math.Round(Price * Quantity, 2,MidpointRounding.AwayFromZero)); 
+            SetCenaCalosc(Math.Round(Price * Quantity, 2,MidpointRounding.AwayFromZero));
+            Console.WriteLine("Total price calculation ");
         }
 
  
@@ -64,9 +65,10 @@ namespace Engine
         {
             if (Price != value)
             {
+                Console.WriteLine("Price update");
                 Price = value;
-                OnPropertyChanged("test");
                 SetTotalPrice();
+                OnPropertyChanged("Price");
             }
         }
 
@@ -74,7 +76,12 @@ namespace Engine
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            Console.WriteLine("Property changed triggered");
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
         }
     }
 }

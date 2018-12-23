@@ -56,6 +56,7 @@ namespace My_Finance_app
             grids.Add("Podział na kategorie", grid_zestawienie);
             grids.Add("Standardowe zestawienie", grid_zestawienie);
             grids.Add("Konta", grid_konta);
+            grids.Add("Wykresy", grid_wykresy);
             ShowGrid("Paragony");
         }
 
@@ -169,13 +170,13 @@ namespace My_Finance_app
             // TODO: refactor required
         private void UpdateControlsState(bool state)
         {
-            gr_paragon.IsEnabled = state;
+            //gr_paragon.IsEnabled = state;
             if (_sql != null)
             {
                 gr_produkty.IsEnabled = !state;
                 mi_Zestawienia.IsEnabled = true;
                 mi_Kategorie.IsEnabled = true;
-                gr_paragon.IsEnabled = state;
+               // gr_paragon.IsEnabled = state;
                 mi_Konta.IsEnabled = true;
             }
             else
@@ -499,5 +500,6 @@ namespace My_Finance_app
             accountOwner.Text = "";
             konto_procent.Text = "";
         }
+
     }
 }//ostani
