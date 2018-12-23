@@ -138,16 +138,16 @@ namespace Engine
             return connected;
         }
 
-        public void UpdateCategoryOfAso(int idASO, string newCategory, int category_id, string newName)
+        public void UpdateItemCategory(int productId, string newCategoryName, int newCategoryId, string newProductName)
         {
-            SQLexecuteNonQuerry(String.Format("exec dbo.updateAsoCategory {0}, '{1}', {2}, '{3}'", idASO, newCategory, category_id, newName));
+            SQLexecuteNonQuerry(String.Format("exec dbo.updateAsoCategory {0}, '{1}', {2}, '{3}'", productId, newCategoryName, newCategoryId, newProductName));
         }
 
-        public void UpdateBudget(int databaseBudgetRowID, string newValue, DateTime date)
+        public void UpdatePlannedBudget(int databaseBudgetRowID, string newBudgetValue, DateTime date)
         {
             try
             {
-                SQLexecuteNonQuerry(String.Format("update budzet set planed = {0} where id = {1}", newValue, databaseBudgetRowID));
+                SQLexecuteNonQuerry(String.Format("update budzet set planed = {0} where id = {1}", newBudgetValue, databaseBudgetRowID));
                 RecalculateBudget(date);
             }
             catch (Exception)
@@ -569,7 +569,7 @@ namespace Engine
         {
             Dictionary<string, string> param = new Dictionary<string, string>();
             param.Add("@currentDate", data.ToShortDateString());
-            return System.Convert.ToDouble(SQLgetScalarWithParameters("select isnull(sum(suma),0) from paragony where YEAR(data) = year(@currentDate) and MONTH(data) = month(@currentDate) and del = 0", param));
+            return Convert.ToDouble(SQLgetScalarWithParameters("select isnull(sum(suma),0) from paragony where YEAR(data) = year(@currentDate) and MONTH(data) = month(@currentDate) and del = 0", param));
         }
 
         private double GetCurrentMonthPlaned(DateTime data)

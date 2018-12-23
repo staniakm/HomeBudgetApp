@@ -39,7 +39,7 @@ namespace My_Finance_app
             string newCategoryName = cb_newCategory.Text;
             int newCategoryId = (cb_newCategory.SelectedValue == null)?-1:int.Parse(cb_newCategory.SelectedValue.ToString());
 
-            SQL.UpdateCategoryOfAso(productId,newCategoryName,newCategoryId,newProductName);
+            SQL.UpdateItemCategory(productId,newCategoryName,newCategoryId,newProductName);
 
             mw.LoadCategories();
             mw.GetItemsByCategory();
