@@ -66,8 +66,8 @@
                 <TextBox x:Name="tb_quantity" HorizontalAlignment="Left" Height="23" Margin="179,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="7"/>
                 <TextBox x:Name="tb_discount" HorizontalAlignment="Left" Height="23" Margin="280,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="53" PreviewTextInput="NumberValidation" TabIndex="7"/>
                 <TextBox x:Name="tb_description" HorizontalAlignment="Left" Height="23" Margin="82,78,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250" TabIndex="8"/>
-                <Button x:Name="bt_dodajProdukt" Content="Dodaj produkt" HorizontalAlignment="Left" Margin="82,107,0,0" VerticalAlignment="Top" Width="89" Click="bt_AddNewItemToInvoice"  TabIndex="9"/>
-                <Button x:Name="bt_zapisDoBazy" Content="Zapisz w bazie" HorizontalAlignment="Left" Margin="208,107,0,0" VerticalAlignment="Top" Width="92" Click="bt_SaveBillInDatabase"  TabIndex="10"/>
+                <Button x:Name="bt_dodajProdukt" Content="Dodaj produkt" HorizontalAlignment="Left" Margin="82,107,0,0" VerticalAlignment="Top" Width="89" Click="Bt_AddNewItemToInvoice"  TabIndex="9"/>
+                <Button x:Name="bt_zapisDoBazy" Content="Zapisz w bazie" HorizontalAlignment="Left" Margin="208,107,0,0" VerticalAlignment="Top" Width="92" Click="Bt_SaveBillInDatabase"  TabIndex="10"/>
                 <Label  Content="Produkt" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" Width="58" Height="27" />
                 <Label Content="Cena" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top" Width="58" Height="27" />
                 <Label Content="Ilość" HorizontalAlignment="Left" Margin="145,46,0,0" VerticalAlignment="Top" Width="35" Height="27"/>

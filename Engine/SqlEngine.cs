@@ -10,10 +10,10 @@ namespace Engine
     public class SqlEngine
     {
         private SqlConnection _con;
-        private string database;
+        private readonly string database;
         public string _spid { get; private set; }
         public string id;
-        private ObservableCollection<BankAccount> bankAccounts { get; set; }
+        private ObservableCollection<BankAccount> BankAccounts { get; set; }
 
         public SqlEngine(string database, string login, string pass)
         {
@@ -31,8 +31,7 @@ namespace Engine
                 }
                 catch (Exception ex)
                 {
-                    
-                    //MessageBox.Show(ex.Message, "Error");
+                    System.Windows.MessageBox.Show(ex.Message, "Error");
                 }
             }
                 ;
@@ -48,25 +47,35 @@ namespace Engine
         public void AddNewSallary(int accountId, string description, decimal moneyAmount)
         {
             SqlCommand com = new SqlCommand("insert into przychody(kwota, opis, konto) values (@kwota, @opis ,@konto);", _con);
-            SqlParameter par = new SqlParameter("@kwota", SqlDbType.Money);
-            par.Value = moneyAmount;
+            SqlParameter par = new SqlParameter("@kwota", SqlDbType.Money)
+            {
+                Value = moneyAmount
+            };
             com.Parameters.Add(par);
-            par = new SqlParameter("@opis", SqlDbType.VarChar, 100);
-            par.Value = description;
+            par = new SqlParameter("@opis", SqlDbType.VarChar, 100)
+            {
+                Value = description
+            };
             com.Parameters.Add(par);
-            par = new SqlParameter("@konto", SqlDbType.Int);
-            par.Value = accountId;
+            par = new SqlParameter("@konto", SqlDbType.Int)
+            {
+                Value = accountId
+            };
             com.Parameters.Add(par);
             com.Prepare();
             com.ExecuteNonQuery();
 
             string query = "update konto set kwota = kwota + @kwota where ID = @konto";
             com = new SqlCommand(query, _con);
-            par = new SqlParameter("@kwota", SqlDbType.Money);
-            par.Value = moneyAmount;
+            par = new SqlParameter("@kwota", SqlDbType.Money)
+            {
+                Value = moneyAmount
+            };
             com.Parameters.Add(par);
-            par = new SqlParameter("@konto", SqlDbType.Int);
-            par.Value = accountId;
+            par = new SqlParameter("@konto", SqlDbType.Int)
+            {
+                Value = accountId
+            };
             com.Parameters.Add(par);
             com.Prepare();
             com.ExecuteNonQuery();
@@ -130,7 +139,7 @@ namespace Engine
                     }
                     catch (Exception ex)
                     {
-                        //Console.WriteLine(ex.Message);
+                        System.Windows.MessageBox.Show(ex.Message, "Connection error");
                         connected = false;
                     }
                 }
@@ -168,6 +177,7 @@ namespace Engine
             }
             catch (System.Exception e)
             {
+                System.Windows.MessageBox.Show(e.Message, "Non query execution error");
                 throw;
             }
             return rowsAffected;
@@ -238,6 +248,7 @@ namespace Engine
             }
             catch (Exception ex)
             {
+                System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar with parameters error");
                 throw;
             }
             return output;
@@ -255,6 +266,7 @@ namespace Engine
             }
             catch (Exception ex)
             {
+                System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar error");
                 //Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
                 throw;
             }
@@ -325,9 +337,11 @@ namespace Engine
             SqlParameter par;// = new SqlParameter();
             foreach (var item in param)
             {
-                par = new SqlParameter();
-                par.ParameterName = item.Key;
-                par.Value = item.Value;
+                par = new SqlParameter
+                {
+                    ParameterName = item.Key,
+                    Value = item.Value
+                };
                 command.Parameters.Add(par);
             }
             SqlDataAdapter adapter = new SqlDataAdapter
@@ -364,7 +378,7 @@ namespace Engine
             return dt;
         }
 
-        public DataTable getItemsByCategory(string categoryName)
+        public DataTable GetItemsByCategory(string categoryName)
         {
             string sqlquery = "";
             Dictionary<string, string> param = new Dictionary<string, string>();
@@ -409,7 +423,7 @@ namespace Engine
 
                 RecalculateBudgetsAndUpdateInvoiceCategories(paragon.GetInvoiceId());
 
-                updateBankAccount(paragon.GetInvoiceId());
+                UpdateBankAccount(paragon.GetInvoiceId());
 
                 ReloadBankAccountsCollection();
             }
@@ -419,7 +433,7 @@ namespace Engine
             }
         }
 
-        private void updateBankAccount(int invoiceId)
+        private void UpdateBankAccount(int invoiceId)
         {
             SqlCommand com = new SqlCommand("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = @idPagaron", _con);
             com.Parameters.AddWithValue("@idPagaron", invoiceId);
@@ -431,14 +445,18 @@ namespace Engine
             SqlCommand com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @idAso, @opis)", _con);
             SqlParameter par = new SqlParameter("@InvoiceId", SqlDbType.Int);
             com.Parameters.Add(par);
-            par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal);
-            par.Precision = 8;
-            par.Scale = 2;
+            par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal)
+            {
+                Precision = 8,
+                Scale = 2
+            };
 
             com.Parameters.Add(par);
-            par = new SqlParameter("@ilosc", SqlDbType.Decimal);
-            par.Precision = 6;
-            par.Scale = 3;
+            par = new SqlParameter("@ilosc", SqlDbType.Decimal)
+            {
+                Precision = 6,
+                Scale = 3
+            };
             com.Parameters.Add(par);
             par = new SqlParameter("@cena", SqlDbType.Money);
 
@@ -466,20 +484,28 @@ namespace Engine
         {
             SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, ID_sklep, konto, suma, opis) values (@nrParagonu, @data,@idsklep,@konto, 0,'' );", _con);
 
-            SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50);
-            par.Value = invoice.GetInvoiceNumber().ToUpper();
+            SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50)
+            {
+                Value = invoice.GetInvoiceNumber().ToUpper()
+            };
             com.Parameters.Add(par);
 
-            par = new SqlParameter("@data", SqlDbType.Date);
-            par.Value = invoice.GetDate();
+            par = new SqlParameter("@data", SqlDbType.Date)
+            {
+                Value = invoice.GetDate()
+            };
             com.Parameters.Add(par);
 
-            par = new SqlParameter("@idsklep", SqlDbType.VarChar, 150);
-            par.Value = invoice.GetShopId();
+            par = new SqlParameter("@idsklep", SqlDbType.VarChar, 150)
+            {
+                Value = invoice.GetShopId()
+            };
             com.Parameters.Add(par);
 
-            par = new SqlParameter("@konto", SqlDbType.Int);
-            par.Value = invoice.GetAccount();
+            par = new SqlParameter("@konto", SqlDbType.Int)
+            {
+                Value = invoice.GetAccount()
+            };
             com.Parameters.Add(par);
 
             com.Prepare();
@@ -527,12 +553,12 @@ namespace Engine
             {
                 konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"], (decimal)item["kwota"], (string)item["opis"], (string)item["wlasciciel"], (decimal)item["oprocentowanie"]));
             }
-            bankAccounts = konta;
+            BankAccounts = konta;
             }
 
         public ObservableCollection<BankAccount> GetBankAccounts()
             {
-            return bankAccounts;
+            return BankAccounts;
             }
         /// <summary>
         /// Zwracamy kolekcję sklepów. Można bezpośrednio bindować do datacontext
@@ -567,30 +593,38 @@ namespace Engine
 
         private double GetSelectedMonthSpend(DateTime data)
         {
-            Dictionary<string, string> param = new Dictionary<string, string>();
-            param.Add("@currentDate", data.ToShortDateString());
+            Dictionary<string, string> param = new Dictionary<string, string>
+            {
+                { "@currentDate", data.ToShortDateString() }
+            };
             return Convert.ToDouble(SQLgetScalarWithParameters("select isnull(sum(suma),0) from paragony where YEAR(data) = year(@currentDate) and MONTH(data) = month(@currentDate) and del = 0", param));
         }
 
         private double GetSelectedMonthPlaned(DateTime data)
         {
-            Dictionary<string, string> param = new Dictionary<string, string>();
-            param.Add("@currentDate", data.ToShortDateString());
+            Dictionary<string, string> param = new Dictionary<string, string>
+            {
+                { "@currentDate", data.ToShortDateString() }
+            };
             return System.Convert.ToDouble(SQLgetScalarWithParameters ("select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)",param));
         }
 
         public double GetSelectedMonthLeftToPlan( DateTime data)
         {
-            Dictionary<string, string> param = new Dictionary<string, string>();
-            param.Add("@currentDate", data.ToShortDateString());
+            Dictionary<string, string> param = new Dictionary<string, string>
+            {
+                { "@currentDate", data.ToShortDateString() }
+            };
             return System.Convert.ToDouble(SQLgetScalarWithParameters("select (select  isnull(sum(kwota), 0) from przychody where MONTH(data) = MONTH(@currentDate) and year(data) = year(@currentDate))" +
             "- (select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)) ",param));
         }
 
         private double GetSelectedMonthSallary(DateTime providedDate)
         {
-            Dictionary<string, string> param = new Dictionary<string, string>();
-            param.Add("@providedDate", providedDate.ToShortDateString());
+            Dictionary<string, string> param = new Dictionary<string, string>
+            {
+                { "@providedDate", providedDate.ToShortDateString() }
+            };
             return System.Convert.ToDouble(SQLgetScalarWithParameters("select  isnull(sum(kwota),0) from przychody where MONTH(data) = MONTH(@providedDate) and year(data) = year(@providedDate)", param));
         }
 

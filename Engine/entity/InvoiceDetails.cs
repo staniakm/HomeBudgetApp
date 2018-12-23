@@ -60,7 +60,7 @@ namespace Engine
         }
 
  
-        public void setPrice(decimal value)
+        public void SetPrice(decimal value)
         {
             if (Price != value)
             {

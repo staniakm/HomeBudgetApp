@@ -198,7 +198,7 @@ namespace My_Finance_app
             }
         }
 
-        private void bt_AddNewItemToInvoice(object sender, RoutedEventArgs e)
+        private void Bt_AddNewItemToInvoice(object sender, RoutedEventArgs e)
         {
             if (cb_product.SelectedValue == null)
             {
@@ -276,7 +276,7 @@ namespace My_Finance_app
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void bt_SaveBillInDatabase(object sender, RoutedEventArgs e)
+        private void Bt_SaveBillInDatabase(object sender, RoutedEventArgs e)
         {
             _sql.SaveInvoiceInDatabase(_paragon);
 
@@ -392,7 +392,7 @@ namespace My_Finance_app
 
         public void GetItemsByCategory()
         {
-            dg_asortyment.DataContext = _sql.getItemsByCategory(cb_kategoria.Text);
+            dg_asortyment.DataContext = _sql.GetItemsByCategory(cb_kategoria.Text);
         }
 
         private void EditItemCategory(object sender, RoutedEventArgs e)
