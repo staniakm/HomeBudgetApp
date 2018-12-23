@@ -342,22 +342,22 @@ namespace Engine
             return table;
         }
 
-        public DataTable PrepareReport(Reports.ReportType reportId)
+        public DataTable PrepareReport(ReportType.Type reportId)
         {
             DataTable dt = null;
 
             switch (reportId)
             {
-                case Reports.ReportType.STANDARD:
+                case ReportType.Type.STANDARD:
                     dt = GetData("exec generuj_zestawienie_2");
                     break;
-                case Reports.ReportType.CATEGORY:
+                case ReportType.Type.CATEGORY:
                     dt = GetData("exec generuj_zestawienie_podzial_na_kategorie");
                     break;
-                case Reports.ReportType.CATEGORY_AND_ACCOUNT:
+                case ReportType.Type.CATEGORY_AND_ACCOUNT:
                     dt = GetData("exec generuj_zestawienie_podzial_na_kategorie_konto");
                     break;
-                case Reports.ReportType.INVOICE_LIST:
+                case ReportType.Type.INVOICE_LIST:
                     dt = GetData("exec show_invoice_list");
                     break;
             }
@@ -554,32 +554,32 @@ namespace Engine
             switch (operation)
             {
                 case "earned":
-                    return getSelectedMonthSallary(date);
+                    return GetSelectedMonthSallary(date);
                 case "left":
-                    return GetCurrentMonthLeft(date);
+                    return GetSelectedMonthLeftToPlan(date);
                 case "planed":
-                    return GetCurrentMonthPlaned(date);
+                    return GetSelectedMonthPlaned(date);
                 case "spend":
-                    return GetCurrentMonthSpend(date);
+                    return GetSelectedMonthSpend(date);
             }
             return 0;
         }
 
-        private double GetCurrentMonthSpend(DateTime data)
+        private double GetSelectedMonthSpend(DateTime data)
         {
             Dictionary<string, string> param = new Dictionary<string, string>();
             param.Add("@currentDate", data.ToShortDateString());
             return Convert.ToDouble(SQLgetScalarWithParameters("select isnull(sum(suma),0) from paragony where YEAR(data) = year(@currentDate) and MONTH(data) = month(@currentDate) and del = 0", param));
         }
 
-        private double GetCurrentMonthPlaned(DateTime data)
+        private double GetSelectedMonthPlaned(DateTime data)
         {
             Dictionary<string, string> param = new Dictionary<string, string>();
             param.Add("@currentDate", data.ToShortDateString());
             return System.Convert.ToDouble(SQLgetScalarWithParameters ("select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)",param));
         }
 
-        public double GetCurrentMonthLeft( DateTime data)
+        public double GetSelectedMonthLeftToPlan( DateTime data)
         {
             Dictionary<string, string> param = new Dictionary<string, string>();
             param.Add("@currentDate", data.ToShortDateString());
@@ -587,7 +587,7 @@ namespace Engine
             "- (select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)) ",param));
         }
 
-        private double getSelectedMonthSallary(DateTime providedDate)
+        private double GetSelectedMonthSallary(DateTime providedDate)
         {
             Dictionary<string, string> param = new Dictionary<string, string>();
             param.Add("@providedDate", providedDate.ToShortDateString());

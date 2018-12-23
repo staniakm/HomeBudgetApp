@@ -66,7 +66,7 @@ namespace My_Finance_app
             cb_bankAccount.DataContext = _sql.GetBankAccounts();
         }
 
-        private void PrepareReportDetails(Reports.ReportType reportType)
+        private void PrepareReportDetails(ReportType.Type reportType)
         {
             dg_reports.ItemsSource = _sql.PrepareReport(reportType).DefaultView;
         }
@@ -348,16 +348,16 @@ namespace My_Finance_app
             switch (cb_report_type.Text.ToUpper())
             {
                 case "NORMALNE":
-                    PrepareReportDetails(Reports.ReportType.STANDARD);
+                    PrepareReportDetails(ReportType.Type.STANDARD);
                     break;
                 case "KATEGORIE":
-                    PrepareReportDetails(Reports.ReportType.CATEGORY);
+                    PrepareReportDetails(ReportType.Type.CATEGORY);
                     break;
                 case "KATEGORIE I KONTO":
-                    PrepareReportDetails(Reports.ReportType.CATEGORY_AND_ACCOUNT);
+                    PrepareReportDetails(ReportType.Type.CATEGORY_AND_ACCOUNT);
                     break;
                 case "LISTA PARAGONÓW":
-                    PrepareReportDetails(Reports.ReportType.INVOICE_LIST);
+                    PrepareReportDetails(ReportType.Type.INVOICE_LIST);
                     break;
                 default:
                     break;
@@ -422,7 +422,7 @@ namespace My_Finance_app
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
-            double earned = _sql.GetBudgetCalculations("earned", GetCurrentlySelectedDate());
+            double earned = _sql.GetBudgetCalculations( "earned", GetCurrentlySelectedDate());
             double spend = _sql.GetBudgetCalculations("spend", GetCurrentlySelectedDate());
             double planned = _sql.GetBudgetCalculations("planed", GetCurrentlySelectedDate());
             double leftToPlan = _sql.GetBudgetCalculations("left", GetCurrentlySelectedDate());

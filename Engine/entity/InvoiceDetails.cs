@@ -28,7 +28,7 @@ namespace Engine
             Quantity = ilosc;
             Description = opis;
 
-            setTotalPrice();
+            SetTotalPrice();
         }
 
         public int GetIDAso()
@@ -54,7 +54,7 @@ namespace Engine
 
 
 
-        public void setTotalPrice()
+        public void SetTotalPrice()
         {
             SetCenaCalosc(Math.Round(Price * Quantity, 2,MidpointRounding.AwayFromZero)); 
         }
@@ -66,7 +66,7 @@ namespace Engine
             {
                 Price = value;
                 OnPropertyChanged("test");
-                setTotalPrice();
+                SetTotalPrice();
             }
         }
 
