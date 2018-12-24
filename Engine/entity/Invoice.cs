@@ -105,5 +105,15 @@ namespace Engine
         {
             invoiceItems.Add(invoiceItem);
         }
+
+        internal int GetNumberOfItems()
+        {
+            return GetInvoiceItems().Count;
+        }
+
+        internal InvoiceDetails GetItem(int x)
+        {
+            return GetInvoiceItems()[x];
+        }
     }
 }

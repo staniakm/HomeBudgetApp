@@ -17,10 +17,7 @@ namespace Engine
 
         public SqlEngine(string database)
         {
-            if (_con == null)
-            {
-                _con = new SqlConnection();
-            }
+            _con = new SqlConnection();
             this.database = database;
         }
 
@@ -124,17 +121,17 @@ namespace Engine
 
                         SQLexecuteNonQuerry("EXEC dodaj_rachunki");
 
-                        try
-                        {
-                            Task t = Task.Run(() =>
-                            {
-                                Backup();
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Windows.MessageBox.Show(ex.Message, "Error");
-                        }
+                        //try
+                        //{
+                        //    Task t = Task.Run(() =>
+                        //    {
+                        //        Backup();
+                        //    });
+                        //}
+                        //catch (Exception ex)
+                        //{
+                        //    //no neet to log
+                        //}
                     }
                     catch (Exception ex)
                     {
@@ -274,6 +271,7 @@ namespace Engine
 
         private DataTable GetData(string sqlCommand)
         {
+            //Console.WriteLine(sqlCommand);
             SqlCommand command = new SqlCommand(sqlCommand, _con);
             SqlDataAdapter adapter = new SqlDataAdapter
             {
@@ -394,7 +392,7 @@ namespace Engine
             }
         }
 
-        private void RecalculateBudgetsAndUpdateInvoiceCategories(int invoiceId)
+        private void RecalculateInvoiceAndUpdateInvoiceCategories(int invoiceId)
         {
             SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", invoiceId));
         }
@@ -420,7 +418,7 @@ namespace Engine
 
                 SaveInvoiceItemsInDatabase(paragon);
 
-                RecalculateBudgetsAndUpdateInvoiceCategories(paragon.GetInvoiceId());
+                RecalculateInvoiceAndUpdateInvoiceCategories(paragon.GetInvoiceId());
 
                 UpdateBankAccount(paragon.GetInvoiceId());
 
@@ -471,18 +469,23 @@ namespace Engine
             com.Parameters.Add(par);
             com.Prepare();
 
-            for (int x = 0; x < invoice.GetInvoiceItems().Count; x++)
+            for (int x = 0; x < invoice.GetNumberOfItems() ; x++)
             {
-                InvoiceDetails p = invoice.GetInvoiceItems()[x];
-                com.Parameters[0].Value = invoice.GetInvoiceId();
-                com.Parameters[1].Value = p.Price;
-                com.Parameters[2].Value = p.Quantity;
-                com.Parameters[3].Value = p.TotalPrice;
-                com.Parameters[4].Value = p.Discount;
-                com.Parameters[5].Value = p.GetIDAso();
-                com.Parameters[6].Value = p.Description;
+                InvoiceDetails item = invoice.GetItem(x);
+                PrepareInvoiceDetailsInsertQueryParameters(invoice, com, item);
                 com.ExecuteNonQuery();
             }
+        }
+
+        private static void PrepareInvoiceDetailsInsertQueryParameters(Invoice invoice, SqlCommand com, InvoiceDetails item)
+        {
+            com.Parameters[0].Value = invoice.GetInvoiceId();
+            com.Parameters[1].Value = item.Price;
+            com.Parameters[2].Value = item.Quantity;
+            com.Parameters[3].Value = item.TotalPrice;
+            com.Parameters[4].Value = item.Discount;
+            com.Parameters[5].Value = item.GetIDAso();
+            com.Parameters[6].Value = item.Description;
         }
 
         private void SaveNewInvoiceInDatabase(Invoice invoice)
@@ -547,7 +550,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// Zwracamy kolekcję kont. Można ustawiać bezpośrednio do datacontextu.
+        /// Aktualizauje kolekcję kont. Można ustawiać bezpośrednio do datacontextu.
         /// </summary>
         /// <returns></returns>
         public void ReloadBankAccountsCollection()
@@ -662,8 +665,8 @@ namespace Engine
             if (month != 0)
             {
                 
-                param.Add("@miesiac", ""+month);
-                param.Add("@year", ""+year); 
+                param.Add("@miesiac", month.ToString());
+                param.Add("@year", year.ToString()); 
                 sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
                     "where miesiac = @miesiac and rok = @year; ";
                 return GetData(sqlquery, param);
