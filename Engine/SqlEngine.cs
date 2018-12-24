@@ -103,11 +103,7 @@ namespace Engine
             }
             else
             {
-                if (Environment.MachineName == "MARIUSZ_DOMOWY")
-                {
-                    dbString = @"MARIUSZ_DOMOWY\SQLEXPRESS";
-                }
-                else { dbString = "MARIUSZ_DOMOWY"; }
+                dbString = @"localhost\SQLEXPRESS";
                 strCon = "Data Source=" + dbString + ";Initial Catalog=" + database + ";Integrated Security=false;Connection Timeout=10;user id=" + user + ";password=" + pass; //'NT Authentication
 
                 _con.ConnectionString = strCon;
@@ -120,18 +116,6 @@ namespace Engine
                         connected = true;
 
                         SQLexecuteNonQuerry("EXEC dodaj_rachunki");
-
-                        //try
-                        //{
-                        //    Task t = Task.Run(() =>
-                        //    {
-                        //        Backup();
-                        //    });
-                        //}
-                        //catch (Exception ex)
-                        //{
-                        //    //no neet to log
-                        //}
                     }
                     catch (Exception ex)
                     {
