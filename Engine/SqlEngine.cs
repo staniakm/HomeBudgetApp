@@ -15,33 +15,18 @@ namespace Engine
         public string id;
         private ObservableCollection<BankAccount> BankAccounts { get; set; }
 
-        public SqlEngine(string database, string login, string pass)
+        public SqlEngine(string database)
         {
-            _con = new SqlConnection();
-            this.database = database;
-            if (ConnectSQLDatabase(login, pass))
+            if (_con == null)
             {
-                SQLexecuteNonQuerry("EXEC dodaj_rachunki");
-                try
-                {
-                    Task t = Task.Run(() =>
-                    {
-                        Backup();
-                    });
-                }
-                catch (Exception ex)
-                {
-                    System.Windows.MessageBox.Show(ex.Message, "Error");
-                }
+                _con = new SqlConnection();
             }
-                ;
-
+            this.database = database;
         }
 
         public DataTable GetSallaryDescriptions()
         {
             return GetData("select text from SALARY_TYPE;");
-            
         }
 
         public void AddNewSallary(int accountId, string description, decimal moneyAmount, DateTime date)
@@ -85,15 +70,6 @@ namespace Engine
             com.Prepare();
             com.ExecuteNonQuery();
 
-        }
-
-        public SqlEngine(string database)
-        {
-            if (_con == null)
-            {
-                _con = new SqlConnection();
-            }
-            this.database = database;
         }
 
 
@@ -145,6 +121,20 @@ namespace Engine
                         _con.Open();
                         _spid = SQLgetScalar("select @@SPID");
                         connected = true;
+
+                        SQLexecuteNonQuerry("EXEC dodaj_rachunki");
+
+                        try
+                        {
+                            Task t = Task.Run(() =>
+                            {
+                                Backup();
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Windows.MessageBox.Show(ex.Message, "Error");
+                        }
                     }
                     catch (Exception ex)
                     {
