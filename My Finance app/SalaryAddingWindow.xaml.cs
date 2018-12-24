@@ -23,30 +23,32 @@ namespace My_Finance_app
     {
         private SqlEngine _sql;
         private int accountID;
-        public SalaryAddingWindow(int accountID, SqlEngine sql)
+        private MainWindow mw;
+        public SalaryAddingWindow(int accountID, SqlEngine sql, MainWindow mainWindow)
         {
             this._sql = sql;
             this.accountID = accountID;
+            this.mw = mainWindow;
             InitializeComponent();
             salary_description.DataContext = _sql.GetSallaryDescriptions();
             income_date.SelectedDate = DateTime.Now;
+            System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
         }
 
-        private void ok_button_Click(object sender, RoutedEventArgs e)
+        private void SaveNewIncome(object sender, RoutedEventArgs e)
         {
             string description = salary_description.Text;
             if (sallary_amount.Text != "")
             {
-                Console.WriteLine("salary adding");
                 decimal moneyAmount = decimal.Parse(sallary_amount.Text.Replace(".", ","));
                 DateTime date = (DateTime)income_date.SelectedDate;
                 _sql.AddNewSallary(this.accountID, description, moneyAmount, date);
-                Console.WriteLine(date);
+                mw.ReloadAccoutDetails("");
                 this.Close();
             }
         }
 
-        private void cancel_Clicked(object sender, RoutedEventArgs e)
+        private void CancelIncomeAddingProcess(object sender, RoutedEventArgs e)
         {
             this.Close();
         }

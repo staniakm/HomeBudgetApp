@@ -473,6 +473,13 @@ namespace My_Finance_app
             };
             //save accout
             _sql.ModifyBankAccount(tmpDic);
+            ReloadAccoutDetails(selectedAccount);
+        }
+
+        public void ReloadAccoutDetails(string selectedAccount)
+        {
+            if (selectedAccount == "")
+                selectedAccount = konta_cb_konto.Text;
             //reload account collection
             _sql.ReloadBankAccountsCollection();
             grid_konta.DataContext = _sql.GetBankAccounts();
@@ -497,8 +504,8 @@ namespace My_Finance_app
         private void AddNewIncome(object sender, RoutedEventArgs e)
         {
             if (konta_cb_konto.Text != "") { 
-                SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, _sql);
-                sw.Show();
+                SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, _sql, this);
+                sw.ShowDialog();
             }
         }
 
