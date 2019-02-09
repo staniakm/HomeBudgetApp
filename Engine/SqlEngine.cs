@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
 
 namespace Engine
 {
@@ -72,22 +71,21 @@ namespace Engine
 
         public bool Con
         {
-            //return true;
-            get
-            {
+            get {
                 if (_con.State == ConnectionState.Open)
-                {
-                    return true;
+                    {return true;}
+                else
+                    { return false; }
                 }
-                else { return false; }
-            }
-            set
-            {
+
+            set {
                 if (value == false)
                 {
                     Console.WriteLine("Connection closed");
+                    if (_con.State == ConnectionState.Open) { 
                     _con.Close();
                     _con.Dispose();
+                }
                 }
             }
         }
@@ -95,36 +93,35 @@ namespace Engine
         public bool ConnectSQLDatabase(string user, string pass)
         {
             bool connected = false;
-            string dbString = "";
-            string strCon = "";
-            if (Con)
-            {
-                Con = false;
-            }
-            else
-            {
-                dbString = @"localhost\SQLEXPRESS";
-                strCon = "Data Source=" + dbString + ";Initial Catalog=" + database + ";Integrated Security=false;Connection Timeout=10;user id=" + user + ";password=" + pass; //'NT Authentication
+            string dbString = @"localhost\SQLEXPRESS";
+            string strCon = "Data Source=" + dbString + 
+                            ";Initial Catalog=" + database + 
+                            ";Integrated Security=false;" +
+                            "Connection Timeout=10;" +
+                            "user id=" + user + 
+                            ";password=" + pass; //'NT Authentication
 
                 _con.ConnectionString = strCon;
-                if (Con == false)
+                if (!Con)
                 {
                     try
                     {
                         _con.Open();
                         _spid = SQLgetScalar("select @@SPID");
                         connected = true;
-
-                        SQLexecuteNonQuerry("EXEC dodaj_rachunki");
                     }
                     catch (Exception ex)
                     {
                         System.Windows.MessageBox.Show(ex.Message, "Connection error");
                         connected = false;
                     }
-                }
             }
             return connected;
+        }
+
+        public void AddMonthlyBills()
+        {
+            SQLexecuteNonQuerry("EXEC dodaj_rachunki");
         }
 
         public void UpdateItemCategory(int productId, string newCategoryName, int newCategoryId, string newProductName)
@@ -617,7 +614,7 @@ namespace Engine
             {
                 { "@providedDate", providedDate.ToShortDateString() }
             };
-            return System.Convert.ToDouble(SQLgetScalarWithParameters("select  isnull(sum(kwota),0) from przychody where MONTH(data) = MONTH(@providedDate) and year(data) = year(@providedDate)", param));
+            return Convert.ToDouble(SQLgetScalarWithParameters("select  isnull(sum(kwota),0) from przychody where MONTH(data) = MONTH(@providedDate) and year(data) = year(@providedDate)", param));
         }
 
         public void ModifyBankAccount(Dictionary<string, string> tmpDic)

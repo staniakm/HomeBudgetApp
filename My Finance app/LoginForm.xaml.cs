@@ -17,7 +17,9 @@ namespace My_Finance_app
             //create instance to SqlEngine for selected database
             SqlEngine sql = new SqlEngine(cb_db_name.Text);
             ////check if login data are correct
-            if (sql.ConnectSQLDatabase(login.Text, pass.Password.ToString()))
+            ///
+            bool isLogged = sql.ConnectSQLDatabase(login.Text, pass.Password.ToString());
+            if (isLogged)
             {
                 //if login data are correctthen we can create main window.
                 //we can pass sql instance to main window so we don't have to create another instance in main window

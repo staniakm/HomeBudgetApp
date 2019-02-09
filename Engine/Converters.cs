@@ -9,17 +9,14 @@ namespace Engine
     //konwersja defaultowej daty na pusty string
     public class DataConverter : IValueConverter
     {
-
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            DateTime original = (DateTime)value;
-            if (original.ToString("yyyy-MM-dd") == "0001-01-01")
-            {
-                return "";
-            }
-            return original.ToString("yyyy-MM-dd");
+            DateTime originalDate = (DateTime) value;
 
+            if (originalDate.ToString("yyyy-MM-dd").Equals("0001-01-01"))
+            {return "";}
+
+            return originalDate.ToString("yyyy-MM-dd");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -2,7 +2,6 @@
 using Engine.service;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -52,6 +51,8 @@ namespace My_Finance_app
             
          //   ObservableCollection<string> list = new ObservableCollection<string>();
             UpdateControlsState(true);
+
+            _sql.AddMonthlyBills();
         }
 
         private void LoadGrids()
@@ -479,7 +480,9 @@ namespace My_Finance_app
         public void ReloadAccoutDetails(string selectedAccount)
         {
             if (selectedAccount == "")
+            {
                 selectedAccount = konta_cb_konto.Text;
+            }
             //reload account collection
             _sql.ReloadBankAccountsCollection();
             grid_konta.DataContext = _sql.GetBankAccounts();
