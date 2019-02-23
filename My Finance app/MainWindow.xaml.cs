@@ -445,7 +445,7 @@ namespace My_Finance_app
             lb_przychodzy.Content = earned;
             lb_wydatek.Content = spend;
             lb_zaplanowane.Content = planned;
-            lb_pozostalo.Content = leftToPlan;
+            lb_pozostalo.Content = leftToPlan < 0 ? 0.0:leftToPlan;
             lb_oszczednosci.Content = earned - spend;
 
         }

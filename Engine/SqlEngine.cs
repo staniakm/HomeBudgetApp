@@ -94,16 +94,11 @@ namespace Engine
         {
             bool connected = false;
             string dbString = @"localhost\SQLEXPRESS";
-            string strCon = "Data Source=" + dbString + 
-                            ";Initial Catalog=" + database + 
-                            ";Integrated Security=false;" +
-                            "Connection Timeout=10;" +
-                            "user id=" + user + 
-                            ";password=" + pass; //'NT Authentication
+            string strCon = string.Format("Data Source={0}; Initial Catalog={1}; Integrated Security=false;" +
+                            "Connection Timeout=10; user id={2}; password={3}", dbString, database, user, pass);
 
-                _con.ConnectionString = strCon;
-                if (!Con)
-                {
+            _con.ConnectionString = strCon;
+
                     try
                     {
                         _con.Open();
@@ -112,52 +107,23 @@ namespace Engine
                     }
                     catch (Exception ex)
                     {
-                        System.Windows.MessageBox.Show(ex.Message, "Connection error");
+                        //System.Windows.MessageBox.Show(ex.Message, "Connection error");
                         connected = false;
                     }
-            }
             return connected;
         }
 
-        public void AddMonthlyBills()
-        {
-            SQLexecuteNonQuerry("EXEC dodaj_rachunki");
-        }
+        public void AddMonthlyBills() => SQLexecuteNonQuerry("EXEC dodaj_rachunki");
 
         public void UpdateItemCategory(int productId, string newCategoryName, int newCategoryId, string newProductName)
         {
-            SQLexecuteNonQuerry(String.Format("exec dbo.updateAsoCategory {0}, '{1}', {2}, '{3}'", productId, newCategoryName, newCategoryId, newProductName));
+            SQLexecuteNonQuerry(string.Format("exec dbo.updateAsoCategory {0}, '{1}', {2}, '{3}'", productId, newCategoryName, newCategoryId, newProductName));
         }
 
         public void UpdatePlannedBudget(int databaseBudgetRowID, string newBudgetValue, DateTime date)
         {
-            try
-            {
-                SQLexecuteNonQuerry(String.Format("update budzet set planed = {0} where id = {1}", newBudgetValue, databaseBudgetRowID));
+                SQLexecuteNonQuerry(string.Format("update budzet set planed = {0} where id = {1}", newBudgetValue, databaseBudgetRowID));
                 RecalculateBudget(date);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-
-        }
-
-        private int SQLexecuteNonQuerry(string querry)
-        {
-            int rowsAffected = 0;
-            SqlCommand sql = new SqlCommand(querry, _con);
-            try
-            {
-                rowsAffected = sql.ExecuteNonQuery();
-            }
-            catch (System.Exception e)
-            {
-                System.Windows.MessageBox.Show(e.Message, "Non query execution error");
-                throw;
-            }
-            return rowsAffected;
         }
 
         public void AddAsoToStore(string produkt, int shopId)
@@ -169,85 +135,6 @@ namespace Engine
             };
 
             SQLexecuteNonQuerryProcedure("dbo.addAsoToStore", dic);
-        }
-
-        private int SQLexecuteNonQuerryProcedure(string querry, Dictionary<string, string> param)
-        {
-
-            int rowsAffected = 0;
-            SqlCommand command = new SqlCommand(querry, _con)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
-
-
-            //Console.WriteLine(querry);
-            foreach (var item in param)
-            {
-                SqlParameter par = new SqlParameter
-                {
-                    ParameterName = item.Key,
-                    Value = item.Value
-                };
-                command.Parameters.Add(par);
-            }
-
-            try
-            {
-                rowsAffected = command.ExecuteNonQuery();
-            }
-            catch (System.Exception)
-            {
-
-                throw;
-            }
-            return 0;
-        }
-
-        private string SQLgetScalarWithParameters(string querry, Dictionary<string, string> param)
-        {
-            SqlCommand command = new SqlCommand(querry, _con);
-            SqlParameter par;
-            foreach (var item in param)
-            {
-                par = new SqlParameter
-                {
-                    ParameterName = item.Key,
-                    Value = item.Value
-                };
-                command.Parameters.Add(par);
-            }
-
-            string output = "";
-            try
-            {
-                output = command.ExecuteScalar().ToString();
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar with parameters error");
-                throw;
-            }
-            return output;
-        }
-
-        private string SQLgetScalar(string querry)
-        {
-            string output = "";
-            try
-            {
-                SqlCommand sql = new SqlCommand(querry, _con);
-
-                output = sql.ExecuteScalar().ToString();
-
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar error");
-                //Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
-                throw;
-            }
-            return output;
         }
 
         private DataTable GetData(string sqlCommand)
@@ -604,7 +491,7 @@ namespace Engine
             {
                 { "@currentDate", data.ToShortDateString() }
             };
-            return System.Convert.ToDouble(SQLgetScalarWithParameters("select (select  isnull(sum(kwota), 0) from przychody where MONTH(data) = MONTH(@currentDate) and year(data) = year(@currentDate))" +
+            return Convert.ToDouble(SQLgetScalarWithParameters("select (select  isnull(sum(kwota), 0) from przychody where MONTH(data) = MONTH(@currentDate) and year(data) = year(@currentDate))" +
             "- (select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)) ",param));
         }
 
@@ -658,6 +545,100 @@ namespace Engine
                     "where miesiac = month(getdate()); ";
                 return GetData(sqlquery);
             }
+        }
+        private int SQLexecuteNonQuerry(string querry)
+        {
+            int rowsAffected = 0;
+            SqlCommand sql = new SqlCommand(querry, _con);
+            try
+            {
+                rowsAffected = sql.ExecuteNonQuery();
+            }
+            catch (System.Exception e)
+            {
+                System.Windows.MessageBox.Show(e.Message, "Non query execution error");
+                throw;
+            }
+            return rowsAffected;
+        }
+
+        private int SQLexecuteNonQuerryProcedure(string querry, Dictionary<string, string> param)
+        {
+
+            int rowsAffected = 0;
+            SqlCommand command = new SqlCommand(querry, _con)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+
+            //Console.WriteLine(querry);
+            foreach (var item in param)
+            {
+                SqlParameter par = new SqlParameter
+                {
+                    ParameterName = item.Key,
+                    Value = item.Value
+                };
+                command.Parameters.Add(par);
+            }
+
+            try
+            {
+                rowsAffected = command.ExecuteNonQuery();
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+            return 0;
+        }
+
+        private string SQLgetScalarWithParameters(string querry, Dictionary<string, string> param)
+        {
+            SqlCommand command = new SqlCommand(querry, _con);
+            SqlParameter par;
+            foreach (var item in param)
+            {
+                par = new SqlParameter
+                {
+                    ParameterName = item.Key,
+                    Value = item.Value
+                };
+                command.Parameters.Add(par);
+            }
+
+            string output = "";
+            try
+            {
+                output = command.ExecuteScalar().ToString();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar with parameters error");
+                throw;
+            }
+            return output;
+        }
+
+        private string SQLgetScalar(string querry)
+        {
+            string output = "";
+            try
+            {
+                SqlCommand sql = new SqlCommand(querry, _con);
+
+                output = sql.ExecuteScalar().ToString();
+
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar error");
+                //Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
+                throw;
+            }
+            return output;
         }
     }
 
