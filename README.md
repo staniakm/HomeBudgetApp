@@ -1,6 +1,5 @@
 # HomeBudgetApp
-Desktop app based on SQL server database.
+Desktop app build with C# WPF technology. 
+As database SQL Server express edition is used.
 
-Created for tracking home budget flow (mostly expenses). 
-
-New feature: budget planing and tracking
+Created for tracking home budget flow (expenses, income, account balance)
