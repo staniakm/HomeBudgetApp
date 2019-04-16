@@ -72,7 +72,6 @@ namespace Engine
         {
             if (Discount != value)
             {
-                Console.WriteLine("Quantity updated " + value);
                 discount = value;
 
                 OnPropertyChanged("discount");

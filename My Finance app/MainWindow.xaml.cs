@@ -1,5 +1,4 @@
 ﻿using Engine;
-using Engine.service;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,21 +10,17 @@ using System.Windows.Input;
 
 namespace My_Finance_app
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private DateTime selectedDate = DateTime.Now;
         private SqlEngine _sql;
-        private Invoice _paragon;
+        private Invoice invoice;
         private Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
-        private ShopService shopService; 
 
         public MainWindow(SqlEngine _sql)
         {
             this._sql = _sql;
-            shopService = new ShopService(_sql); ;
+            //shopService = new ShopService(_sql); ;
             InitializeComponent();
             SetupAdditionalData();
             this.Closed += new EventHandler(MainWindow_Closed);
@@ -46,10 +41,8 @@ namespace My_Finance_app
 
             grid_konta.DataContext = _sql.GetBankAccounts();
 
-            //puting grids to dictionary. This will allow to switch between grids.
             LoadGrids();
-            
-         //   ObservableCollection<string> list = new ObservableCollection<string>();
+
             UpdateControlsState(true);
 
             _sql.AddMonthlyBills();
@@ -108,29 +101,25 @@ namespace My_Finance_app
         /// </summary>
         private void CreateNewInvoice(object sender, RoutedEventArgs e)
         {
-            if (cb_shop.Text != "" && cb_bankAccount.Text != "")
+            if (!string.IsNullOrEmpty(cb_shop.Text) && !string.IsNullOrEmpty(cb_bankAccount.Text))
             {
-                //check if shop is on the list. If not then we add new shop and reload combo.
+                //check if shop is on the list. If not then add new shop and reload combo.
 
                 //TODO: method check for shop in DB and automaticly add if shop not exists. 
                 //should be split to two separated methods
                 CreateShopIfNotExists();
+
                 //Load list of products for selected shop
                 int shopId = (int)cb_shop.SelectedValue;
                 FillComboboxWithProductsForSelectedShop(shopId);
 
                 //new instance of bill
-                _paragon = new Invoice();
+                invoice = new Invoice();
                 SetInvoiceBasicValues(shopId);
+
                 //setting ItemSource of data grid to bill details
-                dg_paragony.ItemsSource = _paragon.GetInvoiceItems();
+                dg_paragony.ItemsSource = invoice.GetInvoiceItems();
                 UpdateControlsState(false);
-
-                //set basic invoice details 
-                
-
-                //disable basic controls so basic bill data can't be changed after bill creation.
-                DisableBasicInvoiceValuesFields();
             }
         }
 
@@ -138,9 +127,10 @@ namespace My_Finance_app
         {
             //after creation bill can be canceled.
             dg_paragony.ItemsSource = null;
-            _paragon = null;
+            invoice = null;
 
             UpdateControlsState(true);
+            //l_totalPrice.Content = 0.00;
         }
 
         private void DisableBasicInvoiceValuesFields()
@@ -153,10 +143,10 @@ namespace My_Finance_app
 
         private void SetInvoiceBasicValues(int shopId)
         {
-            _paragon.SetDate((DateTime)dp_date.SelectedDate);//Invoice date
-            _paragon.SetInvoiceNumber(tb_nr_paragonu.Text);//Invoice number
-            _paragon.SetShopId(shopId);//id of shop
-            _paragon.SetAccount((int)cb_bankAccount.SelectedValue);//id of bank accout 
+            invoice.SetDate((DateTime)dp_date.SelectedDate);
+            invoice.SetInvoiceNumber(tb_nr_paragonu.Text);
+            invoice.SetShopId(shopId);
+            invoice.SetAccount((int)cb_bankAccount.SelectedValue);
         }
 
         private void CreateShopIfNotExists()
@@ -170,40 +160,22 @@ namespace My_Finance_app
         }
 
         /// <summary>
-        /// Ustawiamy dostępnośc kontrolek. true - dostępne sklep, konto, dodanie paragonu
+        /// Set availability of controls
         /// </summary>
         /// <param name="state"> bool </param>
-        
-            // TODO: refactor required
+
         private void UpdateControlsState(bool state)
         {
-            //gr_paragon.IsEnabled = state;
-            if (_sql != null)
-            {
-                gr_produkty.IsEnabled = !state;
-                mi_Zestawienia.IsEnabled = true;
-                mi_Kategorie.IsEnabled = true;
-               // gr_paragon.IsEnabled = state;
-                mi_Konta.IsEnabled = true;
-            }
-            else
-            {
-                gr_produkty.IsEnabled = false;
-                mi_Zestawienia.IsEnabled = false;
-                mi_Kategorie.IsEnabled = false;
-            }
             if (state)
             {
                 cb_shop.SelectedIndex = -1;
                 cb_bankAccount.SelectedIndex = -1;
                 tb_nr_paragonu.Clear();
-
-                dp_date.IsEnabled = true;
-                tb_nr_paragonu.IsEnabled = true;
-                cb_shop.IsEnabled = true;
-                cb_bankAccount.IsEnabled = true;
-                cb_shop.IsEnabled = true;
             }
+
+            gr_produkty.IsEnabled = !state;
+            gr_invoice.IsEnabled = state;
+            bt_CancelBill.IsEnabled = !state;
         }
 
         private void Bt_AddNewItemToInvoice(object sender, RoutedEventArgs e)
@@ -226,9 +198,7 @@ namespace My_Finance_app
                     discount = CalculateDiscount(tb_discount.Text, quantity);
                 }
 
-                _paragon.AddInvoiceItem(new InvoiceDetails(productId, productName, price, quantity, description, discount));
-
-                l_totalPrice.Content = _paragon.GetTotalInvoiceValue();
+                invoice.AddInvoiceItem(new InvoiceDetails(productId, productName, price, quantity, description, discount));
 
                 ClearInvoiceItemForm();
             }
@@ -238,8 +208,8 @@ namespace My_Finance_app
         private void CreateNewProduct()
         {
             string productName = cb_product.Text.ToUpper();
-            _sql.AddAsoToStore(productName, _paragon.GetShopId());
-            FillComboboxWithProductsForSelectedShop(_paragon.GetShopId());
+            _sql.AddAsoToStore(productName, invoice.GetShopId());
+            FillComboboxWithProductsForSelectedShop(invoice.GetShopId());
             cb_product.Text = productName;
         }
 
@@ -249,8 +219,8 @@ namespace My_Finance_app
             if (discountAmount != 0)
             {
                 if (discountAmount < 0)
-                    { discountAmount = discountAmount * (-1); }
-                return discountAmount; //Math.Round((discountAmount / quantity), 2, MidpointRounding.AwayFromZero);
+                { discountAmount = discountAmount * (-1); }
+                return discountAmount;
             }
             return 0;
         }
@@ -291,11 +261,12 @@ namespace My_Finance_app
         /// <param name="e"></param>
         private void Bt_SaveBillInDatabase(object sender, RoutedEventArgs e)
         {
-            _sql.SaveInvoiceInDatabase(_paragon);
+            _sql.SaveInvoiceInDatabase(invoice);
 
             UpdateControlsState(true);
             dg_paragony.ItemsSource = null;
-            _paragon = null;
+            invoice = null;
+            //l_totalPrice.Content = 0.00;
         }
 
         /// <summary>
@@ -306,7 +277,7 @@ namespace My_Finance_app
         private void RefreshDataGrid(object sender, RoutedEventArgs e)
         {
             dg_paragony.ItemsSource = null;
-            dg_paragony.ItemsSource = _paragon.GetInvoiceItems();
+            dg_paragony.ItemsSource = invoice.GetInvoiceItems();
 
         }
         /// <summary>
@@ -357,7 +328,7 @@ namespace My_Finance_app
         private void GenerateReport(object sender, RoutedEventArgs e)
         {
             PrepareReportSettings();
-            
+
             switch (cb_report_type.Text.ToUpper())
             {
                 case "NORMALNE":
@@ -390,7 +361,7 @@ namespace My_Finance_app
                 settings.Add(1, new Tuple<string, string>(startDate, endDate));
             }
             //category parametr = 2
-            
+
             if ((int)cb_report_category_collection.SelectedIndex > 0)
             {
                 settings.Add(2, new Tuple<string, string>(cb_report_category_collection.SelectedValue.ToString(), ""));
@@ -435,17 +406,17 @@ namespace My_Finance_app
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
-            double earned = _sql.GetBudgetCalculations( "earned", GetCurrentlySelectedDate());
+            double earned = _sql.GetBudgetCalculations("earned", GetCurrentlySelectedDate());
             double spend = _sql.GetBudgetCalculations("spend", GetCurrentlySelectedDate());
             double planned = _sql.GetBudgetCalculations("planed", GetCurrentlySelectedDate());
             double leftToPlan = _sql.GetBudgetCalculations("left", GetCurrentlySelectedDate());
-            
+
             dg_budzety.DataContext = _sql.GetBudgets(GetCurrentlySelectedDate());
 
             lb_przychodzy.Content = earned;
             lb_wydatek.Content = spend;
             lb_zaplanowane.Content = planned;
-            lb_pozostalo.Content = leftToPlan < 0 ? 0.0:leftToPlan;
+            lb_pozostalo.Content = leftToPlan < 0 ? 0.0 : leftToPlan;
             lb_oszczednosci.Content = earned - spend;
 
         }
@@ -457,7 +428,7 @@ namespace My_Finance_app
 
         private void RecalculateBudget(object sender, RoutedEventArgs e)
         {
-           _sql.RecalculateBudget(selectedDate);
+            _sql.RecalculateBudget(selectedDate);
         }
 
         private void SaveAccount(object sender, RoutedEventArgs e)
@@ -493,8 +464,8 @@ namespace My_Finance_app
         private void SetPreviousMonth(object sender, RoutedEventArgs e)
         {
             selectedDate = selectedDate.AddMonths(-1);
-            lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0,7);
-            LoadBudget(null,null);
+            lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
+            LoadBudget(null, null);
         }
 
         private void SetNextMonth(object sender, RoutedEventArgs e)
@@ -506,7 +477,8 @@ namespace My_Finance_app
 
         private void AddNewIncome(object sender, RoutedEventArgs e)
         {
-            if (konta_cb_konto.Text != "") { 
+            if (konta_cb_konto.Text != "")
+            {
                 SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, _sql, this);
                 sw.ShowDialog();
             }

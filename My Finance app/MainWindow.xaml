@@ -16,13 +16,13 @@
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="Przełącz zakładkę" >
                     <MenuItem x:Name="mi_Paragony" Header="Paragony" Click="MenuItems"/>
-                    <MenuItem x:Name="mi_Zestawienia" Header="Zestawienia" IsEnabled="False">
+                    <MenuItem x:Name="mi_Zestawienia" Header="Zestawienia">
                         <MenuItem Header="Standardowe zestawienie" Click="MenuItems" />
                         <!--<MenuItem Header="Podział na kategorie" Click="MenuItem_Click"/>-->
                     </MenuItem>
                     <MenuItem x:Name="mi_Budzet" Header="Budżet" Click="MenuItems"/>
-                    <MenuItem x:Name="mi_Kategorie" Header="Asortyment" Click="MenuItems" IsEnabled="False"/>
-                    <MenuItem x:Name="mi_Konta" Header="Konta" Click="MenuItems" IsEnabled="False"/>
+                    <MenuItem x:Name="mi_Kategorie" Header="Asortyment" Click="MenuItems"/>
+                    <MenuItem x:Name="mi_Konta" Header="Konta" Click="MenuItems"/>
                     <!--<MenuItem x:Name="mi_Wykresy" Header="Wykresy" Click="MenuItems" IsEnabled="True"/>-->
                 </MenuItem>
             </Menu>
@@ -38,7 +38,7 @@
                 <RowDefinition Height="3*"></RowDefinition>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal"></StackPanel>
-            <Grid>
+            <Grid x:Name="gr_invoice">
                 <!--<ComboBox x:Name="cb_database" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" Margin="0,21,0,0" AutomationProperties.Name="db_database">
                     <Label Content="Normalna"/>
                     <Label Content="Testowa"/>
@@ -51,7 +51,7 @@
                 <TextBox x:Name="tb_nr_paragonu" HorizontalAlignment="Left" Height="23" Margin="64,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" TabIndex="3"/>
                 <ComboBox x:Name="cb_bankAccount" HorizontalAlignment="Left" Margin="64,105,0,0" VerticalAlignment="Top" Width="128" TabIndex="3" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
                 <Button x:Name="bt_dodajParagon" Content="Dodaj paragon" HorizontalAlignment="Left" Margin="64,141,0,0" VerticalAlignment="Top" Width="128" Click="CreateNewInvoice" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="4"/>
-                <Button x:Name="bt_CancelBill" Content="Anuluj paragon" HorizontalAlignment="Left" Margin="64,171,0,0" VerticalAlignment="Top" Width="128" Click="CancelCurrentInvoice" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="100"/>
+                
                 <Label x:Name="label" Content="Data" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy" Content="Sklep" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy1" Content="Paragon" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
@@ -59,6 +59,7 @@
             </Grid>
 
             <Grid x:Name="gr_paragon" Grid.Column="1" IsEnabled="True">
+                <Button x:Name="bt_CancelBill" Content="Anuluj paragon" Margin="0,141,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="100" Click="CancelCurrentInvoice" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="100"/>
                 <Button x:Name="bt_ref" Content="Refresh" HorizontalAlignment="Center" VerticalAlignment="Top" Width="76" Click="RefreshDataGrid" IsEnabled="True" Height="22" Margin="19,178,19,0"/>
             </Grid>
             <Grid x:Name="gr_produkty" IsEnabled="False" Grid.Column="2">
@@ -123,7 +124,7 @@
                 </Grid.ColumnDefinitions>-->
             </Grid>
             <Label Content="Suma:" Grid.Column="2" HorizontalAlignment="Left" Margin="10,169,0,0" VerticalAlignment="Top" Width="48"/>
-            <Label x:Name="l_totalPrice" Content="0.00" Grid.Column="2" HorizontalAlignment="Left" Margin="58,169,0,0" VerticalAlignment="Top"/>
+            <Label x:Name="l_totalPrice" Content="{Binding TotalPrice, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" HorizontalAlignment="Left" Margin="58,169,0,0" VerticalAlignment="Top"/>
         </Grid>
         <Grid x:Name="grid_zestawienie" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>

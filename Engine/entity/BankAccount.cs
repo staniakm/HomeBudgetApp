@@ -2,22 +2,22 @@
 {
     public class BankAccount
     {
-        public BankAccount(int iD, string name, decimal value, string opis, string owner, decimal oprocentowanie)
+        public BankAccount(int iD, string name, decimal value, string description, string owner, decimal interestRate)
         {
             this.ID = iD;
             this.Name = name;
             this.Value = value;
-            this.opis = opis;
+            this.description = description;
             this.Owner = owner;
-            this.Oprocentowanie = oprocentowanie;
+            this.InterestRate = interestRate;
         }
 
         public int ID { get; private set; }
         public string Name { get;  set; }
         private decimal _Value=1;
-        private string opis;
+        private string description;
         private string owner;
-        private decimal oprocentowanie;
+        private decimal interestRate;
 
 
 
@@ -34,15 +34,15 @@
             }
         }
 
-        public decimal Oprocentowanie { get { return oprocentowanie; } set { oprocentowanie = value; } }
+        public decimal InterestRate { get { return interestRate; } set { interestRate = value; } }
         public string Owner { get { return owner; } set { owner = value; } }
-        public string Opis { get { return opis; } set { opis = value; } }
+        public string Opis { get { return description; } set { description = value; } }
         public void modifyAccount(string name, string opis, string owner, decimal oprocentowanie, decimal value)
         {
             this.Name = name;
-            this.opis = opis;
+            this.description = opis;
             this.owner = owner;
-            this.oprocentowanie = oprocentowanie;
+            this.interestRate = oprocentowanie;
             this.Value = value;
         }
     }

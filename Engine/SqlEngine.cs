@@ -96,7 +96,7 @@ namespace Engine
             string dbString = @"localhost\SQLEXPRESS";
             string strCon = string.Format("Data Source={0}; Initial Catalog={1}; Integrated Security=false;" +
                             "Connection Timeout=10; user id={2}; password={3}", dbString, database, user, pass);
-
+            Console.WriteLine(strCon);
             _con.ConnectionString = strCon;
 
                     try
@@ -275,20 +275,20 @@ namespace Engine
             SQLexecuteNonQuerryProcedure("dbo.RecalculateBudget", dic);
         }
 
-        public void SaveInvoiceInDatabase(Invoice paragon)
+        public void SaveInvoiceInDatabase(Invoice invoice)
         {
 
-            paragon.SetInvoiceId(int.Parse(SQLgetScalar("exec dbo.getNextIdForParagon")));
+            invoice.SetInvoiceId(int.Parse(SQLgetScalar("exec dbo.getNextIdForParagon")));
 
             try
             {
-                SaveNewInvoiceInDatabase(paragon);
+                SaveNewInvoiceInDatabase(invoice);
 
-                SaveInvoiceItemsInDatabase(paragon);
+                SaveInvoiceItemsInDatabase(invoice);
 
-                RecalculateInvoiceAndUpdateInvoiceCategories(paragon.GetInvoiceId());
+                RecalculateInvoiceAndUpdateInvoiceCategories(invoice.GetInvoiceId());
 
-                UpdateBankAccount(paragon.GetInvoiceId());
+                UpdateBankAccount(invoice.GetInvoiceId());
 
                 ReloadBankAccountsCollection();
             }
@@ -536,13 +536,13 @@ namespace Engine
                 param.Add("@miesiac", month.ToString());
                 param.Add("@year", year.ToString()); 
                 sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
-                    "where miesiac = @miesiac and rok = @year; ";
+                    "where miesiac = @miesiac and rok = @year order by k.nazwa; ";
                 return GetData(sqlquery, param);
             }
             else
             {
                 sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
-                    "where miesiac = month(getdate()); ";
+                    "where miesiac = month(getdate()) order by k.nazwa; ";
                 return GetData(sqlquery);
             }
         }
