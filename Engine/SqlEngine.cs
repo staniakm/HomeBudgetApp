@@ -113,7 +113,7 @@ namespace Engine
             return connected;
         }
 
-        public void AddMonthlyBills() => SQLexecuteNonQuerry("EXEC dodaj_rachunki");
+        public void AddAutomaticBills() => SQLexecuteNonQuerry("EXEC dodaj_rachunki");
 
         public void UpdateItemCategory(int productId, string newCategoryName, int newCategoryId, string newProductName)
         {

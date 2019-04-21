@@ -34,7 +34,7 @@ namespace My_Finance_app
         private void SetupAdditionalData()
         {
             dp_date.SelectedDate = DateTime.Now;
-            PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
+            PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Critical;
             lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
 
             FillComboboxesWithData();
@@ -45,7 +45,7 @@ namespace My_Finance_app
 
             UpdateControlsState(true);
 
-            _sql.AddMonthlyBills();
+            _sql.AddAutomaticBills();
         }
 
         private void LoadGrids()
@@ -82,10 +82,9 @@ namespace My_Finance_app
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error");
+                MessageBox.Show(ex.Message, "Error. Incorrect category selected.");
             }
         }
-
 
         /// <summary>
         /// Loading products connected with selected store into combo 
@@ -97,9 +96,21 @@ namespace My_Finance_app
         }
 
         /// <summary>
-        /// Create new bill.
+        /// Create or cancel new bill.
         /// </summary>
-        private void CreateNewInvoice(object sender, RoutedEventArgs e)
+        /// 
+        private void InvoiceOperation (object sender, RoutedEventArgs e)
+        {
+            if (invoice == null)
+            {
+                CreateNewInvoice();
+            }else
+            {
+                CancelCurrentInvoice();
+            }
+        }
+
+        private void CreateNewInvoice()
         {
             if (!string.IsNullOrEmpty(cb_shop.Text) && !string.IsNullOrEmpty(cb_bankAccount.Text))
             {
@@ -120,17 +131,22 @@ namespace My_Finance_app
                 //setting ItemSource of data grid to bill details
                 dg_paragony.ItemsSource = invoice.GetInvoiceItems();
                 UpdateControlsState(false);
+                bt_invoiceOperation.Content = "Anuluj paragon";
+
             }
         }
 
-        private void CancelCurrentInvoice(object sender, RoutedEventArgs e)
+        /*
+         * Invoice can be canceled at anytime.
+         */
+        private void CancelCurrentInvoice()
         {
-            //after creation bill can be canceled.
             dg_paragony.ItemsSource = null;
             invoice = null;
 
             UpdateControlsState(true);
-            //l_totalPrice.Content = 0.00;
+            bt_invoiceOperation.Content = "Dodaj paragon";
+            
         }
 
         private void DisableBasicInvoiceValuesFields()
@@ -175,7 +191,7 @@ namespace My_Finance_app
 
             gr_produkty.IsEnabled = !state;
             gr_invoice.IsEnabled = state;
-            bt_CancelBill.IsEnabled = !state;
+            bt_invoiceOperation.IsEnabled = true;
         }
 
         private void Bt_AddNewItemToInvoice(object sender, RoutedEventArgs e)
