@@ -1,4 +1,5 @@
 ﻿using Engine;
+using Engine.service;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,22 +14,21 @@ namespace My_Finance_app
     public partial class MainWindow : Window
     {
         private DateTime selectedDate = DateTime.Now;
-        private SqlEngine _sql;
-        private Invoice invoice;
+        private readonly SqlEngine sqlEngine;
         private Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
+        private InvoiceService invoiceService = new InvoiceService();
 
-        public MainWindow(SqlEngine _sql)
+        public MainWindow(SqlEngine sqlEngine)
         {
-            this._sql = _sql;
-            //shopService = new ShopService(_sql); ;
+            this.sqlEngine = sqlEngine;
             InitializeComponent();
             SetupAdditionalData();
             this.Closed += new EventHandler(MainWindow_Closed);
         }
 
-        void MainWindow_Closed(object sender, EventArgs e)
+        private void MainWindow_Closed(object sender, EventArgs e)
         {
-            _sql.Con = false;
+            sqlEngine.CloseConnection();
         }
 
         private void SetupAdditionalData()
@@ -39,13 +39,13 @@ namespace My_Finance_app
 
             FillComboboxesWithData();
 
-            grid_konta.DataContext = _sql.GetBankAccounts();
+            grid_konta.DataContext = sqlEngine.GetBankAccounts();
 
             LoadGrids();
 
             UpdateControlsState(true);
 
-            _sql.AddAutomaticBills();
+            sqlEngine.AddAutomaticBills();
         }
 
         private void LoadGrids()
@@ -62,28 +62,22 @@ namespace My_Finance_app
 
         private void FillComboboxesWithData()
         {
-            _sql.ReloadBankAccountsCollection();
-            cb_shop.DataContext = _sql.GetShopsCollection();
-            cb_bankAccount.DataContext = _sql.GetBankAccounts();
+            sqlEngine.ReloadBankAccountsCollection();
+            cb_shop.DataContext = sqlEngine.GetShopsCollection();
+            cb_bankAccount.DataContext = sqlEngine.GetBankAccounts();
         }
 
         private void PrepareReportDetails(ReportType.Type reportType)
         {
-            dg_reports.ItemsSource = _sql.PrepareReport(reportType).DefaultView;
+            dg_reports.ItemsSource = sqlEngine.PrepareReport(reportType).DefaultView;
         }
 
         public void LoadCategories()
         {
             string selectedCategory = cb_kategoria.Text.Length == 0 ? "" : cb_kategoria.Text;
-            try
-            {
-                cb_kategoria.DataContext = _sql.GetCategoryCollection();
+            
+                cb_kategoria.DataContext = sqlEngine.GetCategoryCollection();
                 cb_kategoria.Text = selectedCategory;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error. Incorrect category selected.");
-            }
         }
 
         /// <summary>
@@ -92,7 +86,7 @@ namespace My_Finance_app
         /// </summary>
         private void FillComboboxWithProductsForSelectedShop(int shopId)
         {
-            cb_product.DataContext = _sql.GetProductsInStore(shopId);
+            cb_product.DataContext = sqlEngine.GetProductsInStore(shopId);
         }
 
         /// <summary>
@@ -101,12 +95,13 @@ namespace My_Finance_app
         /// 
         private void InvoiceOperation (object sender, RoutedEventArgs e)
         {
-            if (invoice == null)
-            {
-                CreateNewInvoice();
-            }else
+            if (invoiceService.invoiceExists() )
             {
                 CancelCurrentInvoice();
+            }
+            else
+            {
+                CreateNewInvoice();
             }
         }
 
@@ -125,11 +120,10 @@ namespace My_Finance_app
                 FillComboboxWithProductsForSelectedShop(shopId);
 
                 //new instance of bill
-                invoice = new Invoice();
-                SetInvoiceBasicValues(shopId);
+                invoiceService.CreateNewInvoice(shopId, (int)cb_bankAccount.SelectedValue, (DateTime)dp_date.SelectedDate, tb_nr_paragonu.Text);
 
                 //setting ItemSource of data grid to bill details
-                dg_paragony.ItemsSource = invoice.GetInvoiceItems();
+                dg_paragony.ItemsSource = invoiceService.GetInvoiceItems();
                 UpdateControlsState(false);
                 bt_invoiceOperation.Content = "Anuluj paragon";
 
@@ -142,35 +136,19 @@ namespace My_Finance_app
         private void CancelCurrentInvoice()
         {
             dg_paragony.ItemsSource = null;
-            invoice = null;
+            invoiceService.cancelInvoice();
 
             UpdateControlsState(true);
             bt_invoiceOperation.Content = "Dodaj paragon";
             
         }
 
-        private void DisableBasicInvoiceValuesFields()
-        {
-            dp_date.IsEnabled = false;
-            tb_nr_paragonu.IsEnabled = false;
-            cb_shop.IsEnabled = false;
-            cb_bankAccount.IsEnabled = false;
-        }
-
-        private void SetInvoiceBasicValues(int shopId)
-        {
-            invoice.SetDate((DateTime)dp_date.SelectedDate);
-            invoice.SetInvoiceNumber(tb_nr_paragonu.Text);
-            invoice.SetShopId(shopId);
-            invoice.SetAccount((int)cb_bankAccount.SelectedValue);
-        }
-
         private void CreateShopIfNotExists()
         {
-            if (_sql.CreateNewShopIfNotExists(cb_shop.Text.ToUpper()) > 0)
+            if (sqlEngine.CreateNewShopIfNotExists(cb_shop.Text.ToUpper()) > 0)
             {
                 string SelectedShop = cb_shop.Text.ToUpper();
-                cb_shop.DataContext = _sql.GetShopsCollection();
+                cb_shop.DataContext = sqlEngine.GetShopsCollection();
                 cb_shop.Text = SelectedShop;
             }
         }
@@ -198,7 +176,7 @@ namespace My_Finance_app
         {
             if (cb_product.SelectedValue == null)
             {
-                CreateNewProduct();
+                CreateNewProduct((int)cb_shop.SelectedValue);
             }
             string productName = cb_product.Text;
             if (tb_price.Text.Trim() != "" && tb_quantity.Text.Trim() != "")
@@ -211,32 +189,30 @@ namespace My_Finance_app
 
                 if (tb_discount.Text != "")
                 {
-                    discount = CalculateDiscount(tb_discount.Text, quantity);
+                    discount = CalculateDiscount(tb_discount.Text);
                 }
-
-                invoice.AddInvoiceItem(new InvoiceDetails(productId, productName, price, quantity, description, discount));
-
+                
+                invoiceService.addInvoiceItem(productId, productName, price, quantity, description, discount);
+                
                 ClearInvoiceItemForm();
             }
 
         }
 
-        private void CreateNewProduct()
+        private void CreateNewProduct(int shopId)
         {
             string productName = cb_product.Text.ToUpper();
-            _sql.AddAsoToStore(productName, invoice.GetShopId());
-            FillComboboxWithProductsForSelectedShop(invoice.GetShopId());
+            sqlEngine.AddAsoToShop(productName, shopId);
+            FillComboboxWithProductsForSelectedShop(shopId);
             cb_product.Text = productName;
         }
 
-        private decimal CalculateDiscount(string discount, decimal quantity)
+        private decimal CalculateDiscount(string discount)
         {
             decimal discountAmount = decimal.Parse(discount.Replace(".", ","));
             if (discountAmount != 0)
             {
-                if (discountAmount < 0)
-                { discountAmount = discountAmount * (-1); }
-                return discountAmount;
+                return Math.Abs(discountAmount);
             }
             return 0;
         }
@@ -252,7 +228,7 @@ namespace My_Finance_app
         }
 
         /// <summary>
-        /// Validate that only numbers dot and coma is entered.
+        /// Validate that only numbers dot and coma is accepted.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -275,13 +251,15 @@ namespace My_Finance_app
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Bt_SaveBillInDatabase(object sender, RoutedEventArgs e)
+        private void Bt_SaveInvoiceInDatabase(object sender, RoutedEventArgs e)
         {
-            _sql.SaveInvoiceInDatabase(invoice);
+            sqlEngine.SaveInvoiceInDatabase(invoiceService.GetInvoice());
 
             UpdateControlsState(true);
             dg_paragony.ItemsSource = null;
-            invoice = null;
+            invoiceService.Clear();
+            
+            bt_invoiceOperation.Content = "Dodaj paragon";
             //l_totalPrice.Content = 0.00;
         }
 
@@ -293,7 +271,7 @@ namespace My_Finance_app
         private void RefreshDataGrid(object sender, RoutedEventArgs e)
         {
             dg_paragony.ItemsSource = null;
-            dg_paragony.ItemsSource = invoice.GetInvoiceItems();
+            dg_paragony.ItemsSource = invoiceService.GetInvoiceItems();
 
         }
         /// <summary>
@@ -320,8 +298,8 @@ namespace My_Finance_app
         {
             dp_report_start_date.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             dp_report_end_date.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1);
-            cb_report_category_collection.DataContext = _sql.GetCategoryCollection();
-            cb_report_shop_collection.DataContext = _sql.GetShopsCollection();
+            cb_report_category_collection.DataContext = sqlEngine.GetCategoryCollection();
+            cb_report_shop_collection.DataContext = sqlEngine.GetShopsCollection();
         }
 
         private void ShowGrid(string v)
@@ -387,12 +365,12 @@ namespace My_Finance_app
             {
                 settings.Add(3, new Tuple<string, string>(cb_report_shop_collection.SelectedValue.ToString(), ""));
             }
-            _sql.ReportSettings(settings);
+            sqlEngine.ReportSettings(settings);
         }
 
         public void GetItemsByCategory()
         {
-            dg_asortyment.DataContext = _sql.GetItemsByCategory(cb_kategoria.Text);
+            dg_asortyment.DataContext = sqlEngine.GetItemsByCategory(cb_kategoria.Text);
         }
 
         private void EditItemCategory(object sender, RoutedEventArgs e)
@@ -400,7 +378,7 @@ namespace My_Finance_app
             if (dg_asortyment.SelectedIndex > -1)
             {
                 DataRowView dr = (DataRowView)dg_asortyment.SelectedItem;
-                CategoryEditWindow cw = new CategoryEditWindow(dr, _sql, this);
+                CategoryEditWindow cw = new CategoryEditWindow(dr, sqlEngine, this);
                 cw.ShowDialog();
             }
         }
@@ -410,7 +388,7 @@ namespace My_Finance_app
             if (dg_budzety.SelectedIndex > -1)
             {
                 DataRowView dr = (DataRowView)dg_budzety.SelectedItem;
-                BudgetEditWindow cw = new BudgetEditWindow(dr, _sql, this);
+                BudgetEditWindow cw = new BudgetEditWindow(dr, sqlEngine, this);
                 cw.ShowDialog();
             }
         }
@@ -422,12 +400,12 @@ namespace My_Finance_app
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
-            double earned = _sql.GetBudgetCalculations("earned", GetCurrentlySelectedDate());
-            double spend = _sql.GetBudgetCalculations("spend", GetCurrentlySelectedDate());
-            double planned = _sql.GetBudgetCalculations("planed", GetCurrentlySelectedDate());
-            double leftToPlan = _sql.GetBudgetCalculations("left", GetCurrentlySelectedDate());
+            double earned = sqlEngine.GetBudgetCalculations("earned", GetCurrentlySelectedDate());
+            double spend = sqlEngine.GetBudgetCalculations("spend", GetCurrentlySelectedDate());
+            double planned = sqlEngine.GetBudgetCalculations("planed", GetCurrentlySelectedDate());
+            double leftToPlan = sqlEngine.GetBudgetCalculations("left", GetCurrentlySelectedDate());
 
-            dg_budzety.DataContext = _sql.GetBudgets(GetCurrentlySelectedDate());
+            dg_budzety.DataContext = sqlEngine.GetBudgets(GetCurrentlySelectedDate());
 
             lb_przychodzy.Content = earned;
             lb_wydatek.Content = spend;
@@ -444,7 +422,7 @@ namespace My_Finance_app
 
         private void RecalculateBudget(object sender, RoutedEventArgs e)
         {
-            _sql.RecalculateBudget(selectedDate);
+            sqlEngine.RecalculateBudget(selectedDate);
         }
 
         private void SaveAccount(object sender, RoutedEventArgs e)
@@ -460,7 +438,7 @@ namespace My_Finance_app
                 {"@id", (accountId.Text.Equals("")?null:accountId.Text)}
             };
             //save accout
-            _sql.ModifyBankAccount(tmpDic);
+            sqlEngine.ModifyBankAccount(tmpDic);
             ReloadAccoutDetails(selectedAccount);
         }
 
@@ -471,8 +449,8 @@ namespace My_Finance_app
                 selectedAccount = konta_cb_konto.Text;
             }
             //reload account collection
-            _sql.ReloadBankAccountsCollection();
-            grid_konta.DataContext = _sql.GetBankAccounts();
+            sqlEngine.ReloadBankAccountsCollection();
+            grid_konta.DataContext = sqlEngine.GetBankAccounts();
             //reset selected account
             konta_cb_konto.Text = selectedAccount;
         }
@@ -495,7 +473,7 @@ namespace My_Finance_app
         {
             if (konta_cb_konto.Text != "")
             {
-                SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, _sql, this);
+                SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, sqlEngine, this);
                 sw.ShowDialog();
             }
         }

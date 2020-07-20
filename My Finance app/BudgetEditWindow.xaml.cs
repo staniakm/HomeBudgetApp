@@ -25,7 +25,7 @@ namespace My_Finance_app
         SqlEngine SQL;
         MainWindow mw;
         private int databaseBudgetRowID;
-        public BudgetEditWindow(DataRowView id, SqlEngine _sql, MainWindow mw)
+        public BudgetEditWindow(DataRowView id, SqlEngine sqlEngine, MainWindow mw)
         {
             InitializeComponent();
             this.Top = SystemParameters.PrimaryScreenHeight / 2;
@@ -36,7 +36,7 @@ namespace My_Finance_app
             lb_planed.Text = id[3].ToString();
             lb_used.Content = id[4];
             lb_percent_used.Content = id[5];
-            SQL = _sql;
+            SQL = sqlEngine;
             this.mw = mw;
             
             System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;

@@ -41,8 +41,8 @@
                 <ComboBox x:Name="cb_shop" HorizontalAlignment="Left" Margin="64,50,0,0" VerticalAlignment="Top" Width="128" IsEditable="True" TabIndex="2" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
                 <TextBox x:Name="tb_nr_paragonu" HorizontalAlignment="Left" Height="23" Margin="64,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" TabIndex="3"/>
                 <ComboBox x:Name="cb_bankAccount" HorizontalAlignment="Left" Margin="64,105,0,0" VerticalAlignment="Top" Width="128" TabIndex="3" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
-                
-                
+
+
                 <Label x:Name="label" Content="Data" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy" Content="Sklep" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
                 <Label x:Name="label_Copy1" Content="Paragon" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
@@ -60,23 +60,24 @@
                 <TextBox x:Name="tb_quantity" HorizontalAlignment="Left" Height="23" Margin="179,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="7"/>
                 <TextBox x:Name="tb_discount" HorizontalAlignment="Left" Height="23" Margin="280,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="53" PreviewTextInput="NumberValidation" TabIndex="7"/>
                 <TextBox x:Name="tb_description" HorizontalAlignment="Left" Height="23" Margin="82,78,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250" TabIndex="8"/>
-                <Button x:Name="bt_dodajProdukt" Content="Dodaj produkt" HorizontalAlignment="Left" Margin="82,107,0,0" VerticalAlignment="Top" Width="89" Click="Bt_AddNewItemToInvoice"  TabIndex="9"/>
-                <Button x:Name="bt_zapisDoBazy" Content="Zapisz w bazie" HorizontalAlignment="Left" Margin="208,107,0,0" VerticalAlignment="Top" Width="92" Click="Bt_SaveBillInDatabase"  TabIndex="10"/>
+                <Button x:Name="bt_dodajProdukt" Content="Dodaj produkt" HorizontalAlignment="Left" Margin="240,106,0,0" VerticalAlignment="Top" Width="89" Click="Bt_AddNewItemToInvoice"  TabIndex="9"/>
+                <Button x:Name="bt_zapisDoBazy" Content="Zapisz w bazie" HorizontalAlignment="Left" Margin="241,168,0,0" VerticalAlignment="Top" Width="92" Click="Bt_SaveInvoiceInDatabase"  TabIndex="10" RenderTransformOrigin="1.669,3.523"/>
                 <Label  Content="Produkt" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" Width="58" Height="27" />
                 <Label Content="Cena" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top" Width="58" Height="27" />
                 <Label Content="Ilość" HorizontalAlignment="Left" Margin="145,46,0,0" VerticalAlignment="Top" Width="35" Height="27"/>
                 <Label Content="Rabat" HorizontalAlignment="Left" Margin="240,46,0,0" VerticalAlignment="Top" Width="40" Height="27"/>
                 <Label Content="Opis" HorizontalAlignment="Left" Margin="10,78,0,0" VerticalAlignment="Top" Width="58" Height="27" />
+                <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="82,106,0,0" VerticalAlignment="Top" Width="120" IsEditable="True"/>
             </Grid>
 
 
             <Grid Grid.Row="1" Grid.ColumnSpan="3">
                 <Grid Margin="10">
                     <DataGrid x:Name="dg_paragony" AutoGenerateColumns="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding}">
-                  
+
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding ProductName}" Header="Produkt" IsReadOnly="True"/>
-                            
+
                             <!--<DataGridTextColumn Binding="{Binding Price, Mode=TwoWay}" Header="Cena jednostkowa"/>-->
                             <DataGridTemplateColumn Header="Cena jednostkowa" IsReadOnly="False">
                                 <DataGridTemplateColumn.CellTemplate>
@@ -100,10 +101,11 @@
                                         <TextBox Text="{Binding Discount, Mode=TwoWay,UpdateSourceTrigger=LostFocus}" PreviewTextInput="CellNumberValidation" BorderThickness="0"></TextBox>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>                            
-                            
+                            </DataGridTemplateColumn>
+
                             <DataGridTextColumn Binding="{Binding TotalPrice, UpdateSourceTrigger=PropertyChanged}" Header="Cena" IsReadOnly="True"/>
                             <DataGridTextColumn Binding="{Binding Description}" Header="Opis"/>
+                            <DataGridTextColumn Binding="{Binding Description}" Header="Kategoria" IsReadOnly="True" />
 
                         </DataGrid.Columns>
                     </DataGrid>

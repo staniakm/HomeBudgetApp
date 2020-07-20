@@ -68,6 +68,13 @@ namespace Engine
 
         }
 
+        public void CloseConnection()
+        {
+            if (_con != null && _con.State != 0)
+            {
+                _con.Close();
+            }
+        }
 
         public bool Con
         {
@@ -107,7 +114,7 @@ namespace Engine
                     }
                     catch (Exception ex)
                     {
-                        //System.Windows.MessageBox.Show(ex.Message, "Connection error");
+                        System.Windows.MessageBox.Show(ex.Message, "Connection error");
                         connected = false;
                     }
             return connected;
@@ -126,7 +133,7 @@ namespace Engine
                 RecalculateBudget(date);
         }
 
-        public void AddAsoToStore(string produkt, int shopId)
+        public void AddAsoToShop(string produkt, int shopId)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>
             {

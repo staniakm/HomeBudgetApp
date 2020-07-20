@@ -11,7 +11,7 @@ namespace My_Finance_app
         SqlEngine SQL;
         MainWindow mw;
         int productId;
-        public CategoryEditWindow(DataRowView id, SqlEngine _sql, MainWindow mw)
+        public CategoryEditWindow(DataRowView id, SqlEngine sqlEngine, MainWindow mw)
         {
             InitializeComponent();
             this.Top = SystemParameters.PrimaryScreenHeight/2;
@@ -22,7 +22,7 @@ namespace My_Finance_app
             lb_product_name.Text= id["Nazwa"].ToString();
             lb_id_kat.Content = id["id_kat"];
             lb_nazwa_kat.Content = id["Nazwa kategorii"];
-            SQL = _sql;
+            SQL = sqlEngine;
             this.mw = mw;
             LoadCategories();
             System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
