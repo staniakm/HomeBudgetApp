@@ -8,16 +8,38 @@ namespace Engine
 {
     public class SqlEngine
     {
-        private SqlConnection _con;
+        private readonly string conString;
         private readonly string database;
         public string _spid { get; private set; }
         public string id;
         private ObservableCollection<BankAccount> BankAccounts { get; set; }
 
-        public SqlEngine(string database)
+        public SqlEngine(string database, string user, string pass)
         {
-            _con = new SqlConnection();
+            string dbString = @"localhost\SQLEXPRESS";
+            conString = string.Format("Data Source={0}; Initial Catalog={1}; Integrated Security=false;" +
+                    "Connection Timeout=10; user id={2}; password={3}", dbString, database, user, pass);
             this.database = database;
+        }
+        public bool TryToLoginIntoDatabase()
+        {
+            bool connected = false;
+            using (SqlConnection _con = new SqlConnection(conString))
+            {
+                try
+                {
+                    _con.Open();
+                    _spid = SQLgetScalar("select @@SPID", _con);
+                    connected = true;
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show(ex.Message, "Connection error");
+                    connected = false;
+                }
+            }
+
+            return connected;
         }
 
         public DataTable GetSallaryDescriptions()
@@ -27,97 +49,49 @@ namespace Engine
 
         public void AddNewSallary(int accountId, string description, decimal moneyAmount, DateTime date)
         {
-            SqlCommand com = new SqlCommand("insert into przychody(kwota, opis, konto, data) values (@kwota, @opis ,@konto, @data);", _con);
-            SqlParameter par = new SqlParameter("@kwota", SqlDbType.Money)
+            using (SqlConnection _con = new SqlConnection(conString))
             {
-                Value = moneyAmount
-            };
-            com.Parameters.Add(par);
-            par = new SqlParameter("@opis", SqlDbType.VarChar, 100)
-            {
-                Value = description
-            };
-            com.Parameters.Add(par);
-            par = new SqlParameter("@konto", SqlDbType.Int)
-            {
-                Value = accountId
-            };
-            com.Parameters.Add(par);
-            par = new SqlParameter("@data", SqlDbType.VarChar, 10)
-            {
-                Value = date
-            };
-            com.Parameters.Add(par);
-            com.Prepare();
-            com.ExecuteNonQuery();
-
-            string query = "update konto set kwota = kwota + @kwota where ID = @konto";
-            com = new SqlCommand(query, _con);
-            par = new SqlParameter("@kwota", SqlDbType.Money)
-            {
-                Value = moneyAmount
-            };
-            com.Parameters.Add(par);
-            par = new SqlParameter("@konto", SqlDbType.Int)
-            {
-                Value = accountId
-            };
-            com.Parameters.Add(par);
-            com.Prepare();
-            com.ExecuteNonQuery();
-
-        }
-
-        public void CloseConnection()
-        {
-            if (_con != null && _con.State != 0)
-            {
-                _con.Close();
-            }
-        }
-
-        public bool Con
-        {
-            get {
-                if (_con.State == ConnectionState.Open)
-                    {return true;}
-                else
-                    { return false; }
-                }
-
-            set {
-                if (value == false)
+                _con.Open();
+                SqlCommand com = new SqlCommand("insert into przychody(kwota, opis, konto, data) values (@kwota, @opis ,@konto, @data);", _con);
+                SqlParameter par = new SqlParameter("@kwota", SqlDbType.Money)
                 {
-                    Console.WriteLine("Connection closed");
-                    if (_con.State == ConnectionState.Open) { 
-                    _con.Close();
-                    _con.Dispose();
-                }
-                }
+                    Value = moneyAmount
+                };
+                com.Parameters.Add(par);
+                par = new SqlParameter("@opis", SqlDbType.VarChar, 100)
+                {
+                    Value = description
+                };
+                com.Parameters.Add(par);
+                par = new SqlParameter("@konto", SqlDbType.Int)
+                {
+                    Value = accountId
+                };
+                com.Parameters.Add(par);
+                par = new SqlParameter("@data", SqlDbType.VarChar, 10)
+                {
+                    Value = date
+                };
+                com.Parameters.Add(par);
+                com.Prepare();
+                com.ExecuteNonQuery();
+
+                string query = "update konto set kwota = kwota + @kwota where ID = @konto";
+                com = new SqlCommand(query, _con);
+                par = new SqlParameter("@kwota", SqlDbType.Money)
+                {
+                    Value = moneyAmount
+                };
+                com.Parameters.Add(par);
+                par = new SqlParameter("@konto", SqlDbType.Int)
+                {
+                    Value = accountId
+                };
+                com.Parameters.Add(par);
+                com.Prepare();
+                com.ExecuteNonQuery();
             }
-        }
 
-        public bool ConnectSQLDatabase(string user, string pass)
-        {
-            bool connected = false;
-            string dbString = @"localhost\SQLEXPRESS";
-            string strCon = string.Format("Data Source={0}; Initial Catalog={1}; Integrated Security=false;" +
-                            "Connection Timeout=10; user id={2}; password={3}", dbString, database, user, pass);
-            Console.WriteLine(strCon);
-            _con.ConnectionString = strCon;
-
-                    try
-                    {
-                        _con.Open();
-                        _spid = SQLgetScalar("select @@SPID");
-                        connected = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Windows.MessageBox.Show(ex.Message, "Connection error");
-                        connected = false;
-                    }
-            return connected;
         }
 
         public void AddAutomaticBills() => SQLexecuteNonQuerry("EXEC dodaj_rachunki");
@@ -129,8 +103,8 @@ namespace Engine
 
         public void UpdatePlannedBudget(int databaseBudgetRowID, string newBudgetValue, DateTime date)
         {
-                SQLexecuteNonQuerry(string.Format("update budzet set planed = {0} where id = {1}", newBudgetValue, databaseBudgetRowID));
-                RecalculateBudget(date);
+            SQLexecuteNonQuerry(string.Format("update budzet set planed = {0} where id = {1}", newBudgetValue, databaseBudgetRowID));
+            RecalculateBudget(date);
         }
 
         public void AddAsoToShop(string produkt, int shopId)
@@ -144,41 +118,6 @@ namespace Engine
             SQLexecuteNonQuerryProcedure("dbo.addAsoToStore", dic);
         }
 
-        private DataTable GetData(string sqlCommand)
-        {
-            //Console.WriteLine(sqlCommand);
-            SqlCommand command = new SqlCommand(sqlCommand, _con);
-            SqlDataAdapter adapter = new SqlDataAdapter
-            {
-                SelectCommand = command
-            };
-            DataTable table = new DataTable
-            {
-                Locale = System.Globalization.CultureInfo.InvariantCulture
-            };
-            adapter.Fill(table);
-            return table;
-        }
-
-        private DataTable GetTable(string name)
-        {
-            string sqlCommand = "";
-
-            switch (name)
-            {
-                case "konta":
-                    sqlCommand = "SELECT nazwa, id, kwota, opis, wlasciciel, oprocentowanie FROM konto where del = 0 order by id;";
-                    break;
-                case "sklepy":
-                    sqlCommand = "select '' sklep, -1 id union SELECT sklep,id FROM sklepy order by sklep;";
-                    break;
-                case "kategorie":
-                    sqlCommand = "select '' nazwa, -1 id union SELECT nazwa,id FROM kategoria order by nazwa;";
-                    break;
-            }
-            return GetData(sqlCommand);
-        }
-
         public ObservableCollection<Asortyment> GetProductsInStore(int shop)
         {
             ObservableCollection<Asortyment> ShopAso = new ObservableCollection<Asortyment>();
@@ -189,43 +128,6 @@ namespace Engine
                 ShopAso.Add(new Asortyment((int)item["id"], (string)item["NAZWA"]));
             }
             return ShopAso;
-        }
-
-        private DataTable GetAsoList(int shop)
-        {
-            Dictionary<string, int> dict = new Dictionary<string, int>
-            {
-                { "@id", shop }
-            };
-
-            string querry = "select '' as NAZWA, 0 id union  select a.NAZWA, a.id from ASORTYMENT a join ASORTYMENT_SKLEP sk on sk.id_aso = a.id " +
-                "join sklepy s on sk.id_sklep = s.id and s.ID = @id where a.del = 0 and sk.del = 0 order by nazwa";
-            return GetData(querry, dict);
-        }
-
-        private DataTable GetData<T>(string sqlCommand, Dictionary<string, T> param)
-        {
-            SqlCommand command = new SqlCommand(sqlCommand, _con);
-            SqlParameter par;// = new SqlParameter();
-            foreach (var item in param)
-            {
-                par = new SqlParameter
-                {
-                    ParameterName = item.Key,
-                    Value = item.Value
-                };
-                command.Parameters.Add(par);
-            }
-            SqlDataAdapter adapter = new SqlDataAdapter
-            {
-                SelectCommand = command
-            };
-            DataTable table = new DataTable
-            {
-                Locale = System.Globalization.CultureInfo.InvariantCulture
-            };
-            adapter.Fill(table);
-            return table;
         }
 
         public DataTable PrepareReport(ReportType.Type reportId)
@@ -267,11 +169,6 @@ namespace Engine
             }
         }
 
-        private void RecalculateInvoiceAndUpdateInvoiceCategories(int invoiceId)
-        {
-            SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", invoiceId));
-        }
-
         public void RecalculateBudget(DateTime date)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>
@@ -305,96 +202,6 @@ namespace Engine
             }
         }
 
-        private void UpdateBankAccount(int invoiceId)
-        {
-            SqlCommand com = new SqlCommand("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = @idPagaron", _con);
-            com.Parameters.AddWithValue("@idPagaron", invoiceId);
-            com.ExecuteNonQuery();
-        }
-
-        private void SaveInvoiceItemsInDatabase(Invoice invoice)
-        {
-            SqlCommand com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, rabat, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @rabat, @idAso, @opis)", _con);
-            SqlParameter par = new SqlParameter("@InvoiceId", SqlDbType.Int);
-            com.Parameters.Add(par);
-            par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal)
-            {
-                Precision = 8,
-                Scale = 2
-            };
-
-            com.Parameters.Add(par);
-            par = new SqlParameter("@ilosc", SqlDbType.Decimal)
-            {
-                Precision = 6,
-                Scale = 3
-            };
-            com.Parameters.Add(par);
-
-            par = new SqlParameter("@cena", SqlDbType.Money);
-            com.Parameters.Add(par);
-
-            par = new SqlParameter("@rabat", SqlDbType.Money);
-            com.Parameters.Add(par);
-
-            par = new SqlParameter("@idAso", SqlDbType.Int);
-            com.Parameters.Add(par);
-
-            par = new SqlParameter("@opis", SqlDbType.VarChar, 150);
-            com.Parameters.Add(par);
-            com.Prepare();
-
-            for (int x = 0; x < invoice.GetNumberOfItems() ; x++)
-            {
-                InvoiceDetails item = invoice.GetItem(x);
-                PrepareInvoiceDetailsInsertQueryParameters(invoice, com, item);
-                com.ExecuteNonQuery();
-            }
-        }
-
-        private static void PrepareInvoiceDetailsInsertQueryParameters(Invoice invoice, SqlCommand com, InvoiceDetails item)
-        {
-            com.Parameters[0].Value = invoice.GetInvoiceId();
-            com.Parameters[1].Value = item.Price;
-            com.Parameters[2].Value = item.Quantity;
-            com.Parameters[3].Value = item.TotalPrice;
-            com.Parameters[4].Value = item.Discount;
-            com.Parameters[5].Value = item.GetIDAso();
-            com.Parameters[6].Value = item.Description;
-        }
-
-        private void SaveNewInvoiceInDatabase(Invoice invoice)
-        {
-            SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, ID_sklep, konto, suma, opis) values (@nrParagonu, @data,@idsklep,@konto, 0,'' );", _con);
-
-            SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50)
-            {
-                Value = invoice.GetInvoiceNumber().ToUpper()
-            };
-            com.Parameters.Add(par);
-
-            par = new SqlParameter("@data", SqlDbType.Date)
-            {
-                Value = invoice.GetDate()
-            };
-            com.Parameters.Add(par);
-
-            par = new SqlParameter("@idsklep", SqlDbType.VarChar, 150)
-            {
-                Value = invoice.GetShopId()
-            };
-            com.Parameters.Add(par);
-
-            par = new SqlParameter("@konto", SqlDbType.Int)
-            {
-                Value = invoice.GetAccount()
-            };
-            com.Parameters.Add(par);
-
-            com.Prepare();
-            com.ExecuteNonQuery();
-        }
-
         /// <summary>
         /// Jeśli procesura zwróci wartość > 0 tzn że sklep został dopisany. 
         /// </summary>
@@ -419,11 +226,6 @@ namespace Engine
 
         }
 
-        private void Backup()
-        {
-            SQLexecuteNonQuerry("exec BackupDatabase");
-        }
-
         /// <summary>
         /// Aktualizauje kolekcję kont. Można ustawiać bezpośrednio do datacontextu.
         /// </summary>
@@ -437,12 +239,12 @@ namespace Engine
                 konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"], (decimal)item["kwota"], (string)item["opis"], (string)item["wlasciciel"], (decimal)item["oprocentowanie"]));
             }
             BankAccounts = konta;
-            }
+        }
 
         public ObservableCollection<BankAccount> GetBankAccounts()
-            {
+        {
             return BankAccounts;
-            }
+        }
         /// <summary>
         /// Zwracamy kolekcję sklepów. Można bezpośrednio bindować do datacontext
         /// </summary>
@@ -474,41 +276,14 @@ namespace Engine
             return 0;
         }
 
-        private double GetSelectedMonthSpend(DateTime data)
-        {
-            Dictionary<string, string> param = new Dictionary<string, string>
-            {
-                { "@currentDate", data.ToShortDateString() }
-            };
-            return Convert.ToDouble(SQLgetScalarWithParameters("select isnull(sum(suma),0) from paragony where YEAR(data) = year(@currentDate) and MONTH(data) = month(@currentDate) and del = 0", param));
-        }
-
-        private double GetSelectedMonthPlaned(DateTime data)
-        {
-            Dictionary<string, string> param = new Dictionary<string, string>
-            {
-                { "@currentDate", data.ToShortDateString() }
-            };
-            return System.Convert.ToDouble(SQLgetScalarWithParameters ("select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)",param));
-        }
-
-        public double GetSelectedMonthLeftToPlan( DateTime data)
+        public double GetSelectedMonthLeftToPlan(DateTime data)
         {
             Dictionary<string, string> param = new Dictionary<string, string>
             {
                 { "@currentDate", data.ToShortDateString() }
             };
             return Convert.ToDouble(SQLgetScalarWithParameters("select (select  isnull(sum(kwota), 0) from przychody where MONTH(data) = MONTH(@currentDate) and year(data) = year(@currentDate))" +
-            "- (select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)) ",param));
-        }
-
-        private double GetSelectedMonthSallary(DateTime providedDate)
-        {
-            Dictionary<string, string> param = new Dictionary<string, string>
-            {
-                { "@providedDate", providedDate.ToShortDateString() }
-            };
-            return Convert.ToDouble(SQLgetScalarWithParameters("select  isnull(sum(kwota),0) from przychody where MONTH(data) = MONTH(@providedDate) and year(data) = year(@providedDate)", param));
+            "- (select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)) ", param));
         }
 
         public void ModifyBankAccount(Dictionary<string, string> tmpDic)
@@ -539,9 +314,9 @@ namespace Engine
             Dictionary<string, string> param = new Dictionary<string, string>();
             if (month != 0)
             {
-                
+
                 param.Add("@miesiac", month.ToString());
-                param.Add("@year", year.ToString()); 
+                param.Add("@year", year.ToString());
                 sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
                     "where miesiac = @miesiac and rok = @year order by k.nazwa; ";
                 return GetData(sqlquery, param);
@@ -553,18 +328,242 @@ namespace Engine
                 return GetData(sqlquery);
             }
         }
+
+        private DataTable GetData(string sqlCommand)
+        {
+            DataTable table = new DataTable
+            {
+                Locale = System.Globalization.CultureInfo.InvariantCulture
+            };
+            using (SqlConnection _con = new SqlConnection(conString))
+            {
+                _con.Open();
+                SqlCommand command = new SqlCommand(sqlCommand, _con);
+                SqlDataAdapter adapter = new SqlDataAdapter
+                {
+                    SelectCommand = command
+                };
+
+                adapter.Fill(table);
+            }
+            return table;
+        }
+
+        private DataTable GetTable(string name)
+        {
+            string sqlCommand = "";
+
+            switch (name)
+            {
+                case "konta":
+                    sqlCommand = "SELECT nazwa, id, kwota, opis, wlasciciel, oprocentowanie FROM konto where del = 0 order by id;";
+                    break;
+                case "sklepy":
+                    sqlCommand = "select '' sklep, -1 id union SELECT sklep,id FROM sklepy order by sklep;";
+                    break;
+                case "kategorie":
+                    sqlCommand = "select '' nazwa, -1 id union SELECT nazwa,id FROM kategoria order by nazwa;";
+                    break;
+            }
+            return GetData(sqlCommand);
+        }
+
+        private DataTable GetAsoList(int shop)
+        {
+            Dictionary<string, int> dict = new Dictionary<string, int>
+            {
+                { "@id", shop }
+            };
+
+            string querry = "select '' as NAZWA, 0 id union  select a.NAZWA, a.id from ASORTYMENT a join ASORTYMENT_SKLEP sk on sk.id_aso = a.id " +
+                "join sklepy s on sk.id_sklep = s.id and s.ID = @id where a.del = 0 and sk.del = 0 order by nazwa";
+            return GetData(querry, dict);
+        }
+
+        private DataTable GetData<T>(string sqlCommand, Dictionary<string, T> param)
+        {
+            DataTable table = new DataTable
+            {
+                Locale = System.Globalization.CultureInfo.InvariantCulture
+            };
+            using (SqlConnection _con = new SqlConnection(conString))
+            {
+                _con.Open();
+                SqlCommand command = new SqlCommand(sqlCommand, _con);
+                SqlParameter par;// = new SqlParameter();
+                foreach (var item in param)
+                {
+                    par = new SqlParameter
+                    {
+                        ParameterName = item.Key,
+                        Value = item.Value
+                    };
+                    command.Parameters.Add(par);
+                }
+                SqlDataAdapter adapter = new SqlDataAdapter
+                {
+                    SelectCommand = command
+                };
+
+                adapter.Fill(table);
+            }
+            return table;
+        }
+        private void RecalculateInvoiceAndUpdateInvoiceCategories(int invoiceId)
+        {
+            SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", invoiceId));
+        }
+
+        private void UpdateBankAccount(int invoiceId)
+        {
+            using (SqlConnection _con = new SqlConnection(conString))
+            {
+                _con.Open();
+                SqlCommand com = new SqlCommand("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = @idPagaron", _con);
+                com.Parameters.AddWithValue("@idPagaron", invoiceId);
+                com.ExecuteNonQuery();
+            }
+        }
+
+        private void SaveInvoiceItemsInDatabase(Invoice invoice)
+        {
+            using (SqlConnection _con = new SqlConnection(conString))
+            {
+                _con.Open();
+                SqlCommand com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, rabat, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @rabat, @idAso, @opis)", _con);
+                SqlParameter par = new SqlParameter("@InvoiceId", SqlDbType.Int);
+                com.Parameters.Add(par);
+                par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal)
+                {
+                    Precision = 8,
+                    Scale = 2
+                };
+
+                com.Parameters.Add(par);
+                par = new SqlParameter("@ilosc", SqlDbType.Decimal)
+                {
+                    Precision = 6,
+                    Scale = 3
+                };
+                com.Parameters.Add(par);
+
+                par = new SqlParameter("@cena", SqlDbType.Money);
+                com.Parameters.Add(par);
+
+                par = new SqlParameter("@rabat", SqlDbType.Money);
+                com.Parameters.Add(par);
+
+                par = new SqlParameter("@idAso", SqlDbType.Int);
+                com.Parameters.Add(par);
+
+                par = new SqlParameter("@opis", SqlDbType.VarChar, 150);
+                com.Parameters.Add(par);
+                com.Prepare();
+
+                for (int x = 0; x < invoice.GetNumberOfItems(); x++)
+                {
+                    InvoiceDetails item = invoice.GetItem(x);
+                    PrepareInvoiceDetailsInsertQueryParameters(invoice, com, item);
+                    com.ExecuteNonQuery();
+                }
+            }
+        }
+
+        private void PrepareInvoiceDetailsInsertQueryParameters(Invoice invoice, SqlCommand com, InvoiceDetails item)
+        {
+            com.Parameters[0].Value = invoice.GetInvoiceId();
+            com.Parameters[1].Value = item.Price;
+            com.Parameters[2].Value = item.Quantity;
+            com.Parameters[3].Value = item.TotalPrice;
+            com.Parameters[4].Value = item.Discount;
+            com.Parameters[5].Value = item.GetIDAso();
+            com.Parameters[6].Value = item.Description;
+        }
+
+        private void SaveNewInvoiceInDatabase(Invoice invoice)
+        {
+            using (SqlConnection _con = new SqlConnection(conString))
+            {
+                _con.Open();
+                SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, ID_sklep, konto, suma, opis) values (@nrParagonu, @data,@idsklep,@konto, 0,'' );", _con);
+
+                SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50)
+                {
+                    Value = invoice.GetInvoiceNumber().ToUpper()
+                };
+                com.Parameters.Add(par);
+
+                par = new SqlParameter("@data", SqlDbType.Date)
+                {
+                    Value = invoice.GetDate()
+                };
+                com.Parameters.Add(par);
+
+                par = new SqlParameter("@idsklep", SqlDbType.VarChar, 150)
+                {
+                    Value = invoice.GetShopId()
+                };
+                com.Parameters.Add(par);
+
+                par = new SqlParameter("@konto", SqlDbType.Int)
+                {
+                    Value = invoice.GetAccount()
+                };
+                com.Parameters.Add(par);
+
+                com.Prepare();
+                com.ExecuteNonQuery();
+            }
+        }
+
+        private void Backup()
+        {
+            SQLexecuteNonQuerry("exec BackupDatabase");
+        }
+
+        private double GetSelectedMonthSpend(DateTime data)
+        {
+            Dictionary<string, string> param = new Dictionary<string, string>
+            {
+                { "@currentDate", data.ToShortDateString() }
+            };
+            return Convert.ToDouble(SQLgetScalarWithParameters("select isnull(sum(suma),0) from paragony where YEAR(data) = year(@currentDate) and MONTH(data) = month(@currentDate) and del = 0", param));
+        }
+
+        private double GetSelectedMonthPlaned(DateTime data)
+        {
+            Dictionary<string, string> param = new Dictionary<string, string>
+            {
+                { "@currentDate", data.ToShortDateString() }
+            };
+            return System.Convert.ToDouble(SQLgetScalarWithParameters("select isnull(sum(planed),0) from budzet where miesiac = MONTH(@currentDate) and rok = year(@currentDate)", param));
+        }
+
+        private double GetSelectedMonthSallary(DateTime providedDate)
+        {
+            Dictionary<string, string> param = new Dictionary<string, string>
+            {
+                { "@providedDate", providedDate.ToShortDateString() }
+            };
+            return Convert.ToDouble(SQLgetScalarWithParameters("select  isnull(sum(kwota),0) from przychody where MONTH(data) = MONTH(@providedDate) and year(data) = year(@providedDate)", param));
+        }
+
         private int SQLexecuteNonQuerry(string querry)
         {
             int rowsAffected = 0;
-            SqlCommand sql = new SqlCommand(querry, _con);
-            try
+            using (SqlConnection _con = new SqlConnection(conString))
             {
-                rowsAffected = sql.ExecuteNonQuery();
-            }
-            catch (System.Exception e)
-            {
-                System.Windows.MessageBox.Show(e.Message, "Non query execution error");
-                throw;
+                _con.Open();
+                SqlCommand sql = new SqlCommand(querry, _con);
+                try
+                {
+                    rowsAffected = sql.ExecuteNonQuery();
+                }
+                catch (System.Exception e)
+                {
+                    System.Windows.MessageBox.Show(e.Message, "Non query execution error");
+                    throw;
+                }
             }
             return rowsAffected;
         }
@@ -573,68 +572,76 @@ namespace Engine
         {
 
             int rowsAffected = 0;
-            SqlCommand command = new SqlCommand(querry, _con)
+            using (SqlConnection _con = new SqlConnection(conString))
             {
-                CommandType = CommandType.StoredProcedure
-            };
-
-
-            //Console.WriteLine(querry);
-            foreach (var item in param)
-            {
-                SqlParameter par = new SqlParameter
+                _con.Open();
+                SqlCommand command = new SqlCommand(querry, _con)
                 {
-                    ParameterName = item.Key,
-                    Value = item.Value
+                    CommandType = CommandType.StoredProcedure
                 };
-                command.Parameters.Add(par);
-            }
 
-            try
-            {
-                rowsAffected = command.ExecuteNonQuery();
-            }
-            catch (System.Exception)
-            {
 
-                throw;
+                //Console.WriteLine(querry);
+                foreach (var item in param)
+                {
+                    SqlParameter par = new SqlParameter
+                    {
+                        ParameterName = item.Key,
+                        Value = item.Value
+                    };
+                    command.Parameters.Add(par);
+                }
+
+                try
+                {
+                    rowsAffected = command.ExecuteNonQuery();
+                }
+                catch (System.Exception)
+                {
+
+                    throw;
+                }
             }
             return 0;
         }
 
         private string SQLgetScalarWithParameters(string querry, Dictionary<string, string> param)
         {
-            SqlCommand command = new SqlCommand(querry, _con);
-            SqlParameter par;
-            foreach (var item in param)
-            {
-                par = new SqlParameter
-                {
-                    ParameterName = item.Key,
-                    Value = item.Value
-                };
-                command.Parameters.Add(par);
-            }
-
             string output = "";
-            try
+            using (SqlConnection _con = new SqlConnection(conString))
             {
-                output = command.ExecuteScalar().ToString();
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar with parameters error");
-                throw;
+                _con.Open();
+                SqlCommand command = new SqlCommand(querry, _con);
+                SqlParameter par;
+                foreach (var item in param)
+                {
+                    par = new SqlParameter
+                    {
+                        ParameterName = item.Key,
+                        Value = item.Value
+                    };
+                    command.Parameters.Add(par);
+                }
+
+                try
+                {
+                    output = command.ExecuteScalar().ToString();
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar with parameters error");
+                    throw;
+                }
             }
             return output;
         }
 
-        private string SQLgetScalar(string querry)
+        private string SQLgetScalar(string querry, SqlConnection conn)
         {
             string output = "";
             try
             {
-                SqlCommand sql = new SqlCommand(querry, _con);
+                SqlCommand sql = new SqlCommand(querry, conn);
 
                 output = sql.ExecuteScalar().ToString();
 
@@ -644,6 +651,30 @@ namespace Engine
                 System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar error");
                 //Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
                 throw;
+            }
+            return output;
+        }
+
+        private string SQLgetScalar(string querry)
+        {
+
+            string output = "";
+            using (SqlConnection _con = new SqlConnection(conString))
+            {
+                _con.Open();
+                try
+                {
+                    SqlCommand sql = new SqlCommand(querry, _con);
+
+                    output = sql.ExecuteScalar().ToString();
+
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar error");
+                    //Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
+                    throw;
+                }
             }
             return output;
         }

@@ -15,10 +15,11 @@ namespace My_Finance_app
         private void confirmLogin_Click(object sender, RoutedEventArgs e)
         {
             //create instance to SqlEngine for selected database
-            SqlEngine sql = new SqlEngine(cb_db_name.Text);
+            SqlEngine sql = new SqlEngine(cb_db_name.Text, login.Text, pass.Password.ToString());
             ////check if login data are correct
             ///
-            bool isLogged = sql.ConnectSQLDatabase(login.Text, pass.Password.ToString());
+            bool isLogged = sql.TryToLoginIntoDatabase();
+
             if (isLogged)
             {
                 //if login data are correctthen we can create main window.
@@ -30,11 +31,7 @@ namespace My_Finance_app
             }
             else
             {
-                if (sql.Con)
-                {
-                    sql.Con = false;
-                }
-                pass.Clear();
+                               pass.Clear();
                 login.Clear();
 
                 MessageBox.Show("Niepoprawne dane logowania");

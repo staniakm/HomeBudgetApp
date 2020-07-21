@@ -28,7 +28,7 @@ namespace My_Finance_app
 
         private void MainWindow_Closed(object sender, EventArgs e)
         {
-            sqlEngine.CloseConnection();
+            Console.WriteLine("Closing applicaton");
         }
 
         private void SetupAdditionalData()
