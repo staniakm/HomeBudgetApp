@@ -10,7 +10,6 @@ namespace Engine
     {
         private readonly string conString;
         private readonly string database;
-        public string _spid { get; private set; }
         public string id;
 
         public SqlEngine(string database, string user, string pass)
@@ -28,7 +27,7 @@ namespace Engine
                 try
                 {
                     _con.Open();
-                    _spid = SQLgetScalar("select @@SPID", _con);
+                    
                     connected = true;
                 }
                 catch (Exception ex)
@@ -129,23 +128,23 @@ namespace Engine
             return ShopAso;
         }
 
-        public DataTable PrepareReport(ReportType.Type reportId)
+        public DataTable PrepareReport(ReportType.Type reportId, Dictionary<int, Tuple<string, string>> reportSettings)
         {
             DataTable dt = null;
 
             switch (reportId)
             {
                 case ReportType.Type.STANDARD:
-                    dt = GetData("exec generuj_zestawienie_2");
+                    dt = GetDataWithSettings("exec generuj_zestawienie_2", reportSettings);
                     break;
                 case ReportType.Type.CATEGORY:
-                    dt = GetData("exec generuj_zestawienie_podzial_na_kategorie");
+                    dt = GetDataWithSettings("exec generuj_zestawienie_podzial_na_kategorie", reportSettings);
                     break;
                 case ReportType.Type.CATEGORY_AND_ACCOUNT:
-                    dt = GetData("exec generuj_zestawienie_podzial_na_kategorie_konto");
+                    dt = GetDataWithSettings("exec generuj_zestawienie_podzial_na_kategorie_konto", reportSettings);
                     break;
                 case ReportType.Type.INVOICE_LIST:
-                    dt = GetData("exec show_invoice_list");
+                    dt = GetDataWithSettings("exec show_invoice_list", reportSettings);
                     break;
             }
             return dt;
@@ -213,19 +212,7 @@ namespace Engine
             return SQLexecuteNonQuerry(string.Format("if not exists(select 1 from sklepy where sklep = '{0}') insert into sklepy(sklep) select '{0}'", shopName));
         }
 
-        public void ReportSettings(Dictionary<int, Tuple<string, string>> dic)
-        {
-            string querry = string.Format("delete from rapOrg where sesja = {0};\n", _spid);
 
-            foreach (KeyValuePair<int, Tuple<string, string>> entry in dic)
-            {
-                querry += string.Format("insert into rapOrg select '{0}', '{1}', {2} ,{3};\n", entry.Value.Item1, entry.Value.Item2, entry.Key, _spid);
-            }
-
-            //Console.WriteLine(querry);
-            SQLexecuteNonQuerry(querry);
-
-        }
 
         /// <summary>
         /// Aktualizauje kolekcję kont. Można ustawiać bezpośrednio do datacontextu.
@@ -324,6 +311,42 @@ namespace Engine
                     "where miesiac = month(getdate()) order by k.nazwa; ";
                 return GetData(sqlquery);
             }
+        }
+
+
+        private DataTable GetDataWithSettings(string sqlCommand, Dictionary<int, Tuple<string, string>> reportSettings)
+        {
+            DataTable table = new DataTable
+            {
+                Locale = System.Globalization.CultureInfo.InvariantCulture
+            };
+            using (SqlConnection _con = new SqlConnection(conString))
+            {
+                _con.Open();
+                ReportSettings(reportSettings, _con);
+                SqlCommand command = new SqlCommand(sqlCommand, _con);
+                SqlDataAdapter adapter = new SqlDataAdapter
+                {
+                    SelectCommand = command
+                };
+
+                adapter.Fill(table);
+            }
+            return table;
+        }
+
+        private void ReportSettings(Dictionary<int, Tuple<string, string>> dic, SqlConnection _con)
+        {
+            string _spid = SQLgetScalar("select @@SPID", _con);
+            string querry = string.Format("delete from rapOrg where sesja = {0};\n", _spid);
+
+            foreach (KeyValuePair<int, Tuple<string, string>> entry in dic)
+            {
+                querry += string.Format("insert into rapOrg select '{0}', '{1}', {2} ,{3};\n", entry.Value.Item1, entry.Value.Item2, entry.Key, _spid);
+            }
+
+            SQLexecuteNonQuerry(querry, _con);
+
         }
 
         private DataTable GetData(string sqlCommand)

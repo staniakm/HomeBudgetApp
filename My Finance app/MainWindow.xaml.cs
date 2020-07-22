@@ -69,7 +69,8 @@ namespace My_Finance_app
 
         private void PrepareReportDetails(ReportType.Type reportType)
         {
-            dg_reports.ItemsSource = sqlEngine.PrepareReport(reportType).DefaultView;
+            Dictionary<int, Tuple<string, string>> reportSettings = PrepareReportSettings();
+            dg_reports.ItemsSource = sqlEngine.PrepareReport(reportType, reportSettings).DefaultView;
         }
 
         public void LoadCategories()
@@ -321,7 +322,7 @@ namespace My_Finance_app
         /// </summary>
         private void GenerateReport(object sender, RoutedEventArgs e)
         {
-            PrepareReportSettings();
+            
 
             switch (cb_report_type.Text.ToUpper())
             {
@@ -343,7 +344,7 @@ namespace My_Finance_app
         }
 
 
-        private void PrepareReportSettings()
+        private Dictionary<int, Tuple<string, string>> PrepareReportSettings()
         {
             var settings = new Dictionary<int, Tuple<string, string>>();
 
@@ -365,7 +366,8 @@ namespace My_Finance_app
             {
                 settings.Add(3, new Tuple<string, string>(cb_report_shop_collection.SelectedValue.ToString(), ""));
             }
-            sqlEngine.ReportSettings(settings);
+            return settings;
+            
         }
 
         public void GetItemsByCategory()
