@@ -29,6 +29,7 @@ namespace My_Finance_app
         private void MainWindow_Closed(object sender, EventArgs e)
         {
             Console.WriteLine("Closing applicaton");
+            Console.WriteLine("Closing applicaton");
         }
 
         private void SetupAdditionalData()
@@ -39,7 +40,7 @@ namespace My_Finance_app
 
             FillComboboxesWithData();
 
-            grid_konta.DataContext = sqlEngine.GetBankAccounts();
+            grid_konta.DataContext = sqlEngine.GetBankAccountsCollection();
 
             LoadGrids();
 
@@ -62,9 +63,8 @@ namespace My_Finance_app
 
         private void FillComboboxesWithData()
         {
-            sqlEngine.ReloadBankAccountsCollection();
             cb_shop.DataContext = sqlEngine.GetShopsCollection();
-            cb_bankAccount.DataContext = sqlEngine.GetBankAccounts();
+            cb_bankAccount.DataContext = sqlEngine.GetBankAccountsCollection();
         }
 
         private void PrepareReportDetails(ReportType.Type reportType)
@@ -449,8 +449,8 @@ namespace My_Finance_app
                 selectedAccount = konta_cb_konto.Text;
             }
             //reload account collection
-            sqlEngine.ReloadBankAccountsCollection();
-            grid_konta.DataContext = sqlEngine.GetBankAccounts();
+            sqlEngine.GetBankAccountsCollection();
+            grid_konta.DataContext = sqlEngine.GetBankAccountsCollection();
             //reset selected account
             konta_cb_konto.Text = selectedAccount;
         }

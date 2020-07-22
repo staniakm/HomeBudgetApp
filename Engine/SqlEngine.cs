@@ -12,7 +12,6 @@ namespace Engine
         private readonly string database;
         public string _spid { get; private set; }
         public string id;
-        private ObservableCollection<BankAccount> BankAccounts { get; set; }
 
         public SqlEngine(string database, string user, string pass)
         {
@@ -181,24 +180,26 @@ namespace Engine
 
         public void SaveInvoiceInDatabase(Invoice invoice)
         {
-
-            invoice.SetInvoiceId(int.Parse(SQLgetScalar("exec dbo.getNextIdForParagon")));
-
-            try
+            using (SqlConnection _con = new SqlConnection(conString))
             {
-                SaveNewInvoiceInDatabase(invoice);
+                _con.Open();
 
-                SaveInvoiceItemsInDatabase(invoice);
+                invoice.SetInvoiceId(int.Parse(SQLgetScalar("exec dbo.getNextIdForParagon", _con)));
 
-                RecalculateInvoiceAndUpdateInvoiceCategories(invoice.GetInvoiceId());
+                try
+                {
+                    SaveNewInvoiceInDatabase(invoice, _con);
 
-                UpdateBankAccount(invoice.GetInvoiceId());
+                    SaveInvoiceItemsInDatabase(invoice, _con);
 
-                ReloadBankAccountsCollection();
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(ex.Message.ToString(), "Error during saving process", System.Windows.MessageBoxButton.OK);
+                    RecalculateInvoiceAndUpdateInvoiceCategories(invoice.GetInvoiceId(), _con);
+
+                    UpdateBankAccount(invoice.GetInvoiceId(), _con);
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show(ex.Message.ToString(), "Error during saving process", System.Windows.MessageBoxButton.OK);
+                }
             }
         }
 
@@ -230,21 +231,17 @@ namespace Engine
         /// Aktualizauje kolekcję kont. Można ustawiać bezpośrednio do datacontextu.
         /// </summary>
         /// <returns></returns>
-        public void ReloadBankAccountsCollection()
+        public ObservableCollection<BankAccount> GetBankAccountsCollection()
         {
             ObservableCollection<BankAccount> konta = new ObservableCollection<BankAccount>();
-            DataTable dt = GetTable("konta");
+            DataTable dt = GetTableByName("konta");
             foreach (DataRow item in dt.Rows)
             {
                 konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"], (decimal)item["kwota"], (string)item["opis"], (string)item["wlasciciel"], (decimal)item["oprocentowanie"]));
             }
-            BankAccounts = konta;
+            return konta;
         }
 
-        public ObservableCollection<BankAccount> GetBankAccounts()
-        {
-            return BankAccounts;
-        }
         /// <summary>
         /// Zwracamy kolekcję sklepów. Można bezpośrednio bindować do datacontext
         /// </summary>
@@ -252,7 +249,7 @@ namespace Engine
         {
             ObservableCollection<Shop> sklepy = new ObservableCollection<Shop>();
 
-            DataTable dt = GetTable("sklepy");
+            DataTable dt = GetTableByName("sklepy");
             foreach (DataRow item in dt.Rows)
             {
                 sklepy.Add(new Shop((int)item["id"], (string)item["sklep"]));
@@ -298,7 +295,7 @@ namespace Engine
         {
             ObservableCollection<Category> kategorie = new ObservableCollection<Category>();
 
-            DataTable dt = GetTable("kategorie");
+            DataTable dt = GetTableByName("kategorie");
             foreach (DataRow item in dt.Rows)
             {
                 kategorie.Add(new Category((int)item["id"], (string)item["nazwa"]));
@@ -349,7 +346,7 @@ namespace Engine
             return table;
         }
 
-        private DataTable GetTable(string name)
+        private DataTable GetTableByName(string name)
         {
             string sqlCommand = "";
 
@@ -409,27 +406,20 @@ namespace Engine
             }
             return table;
         }
-        private void RecalculateInvoiceAndUpdateInvoiceCategories(int invoiceId)
+        private void RecalculateInvoiceAndUpdateInvoiceCategories(int invoiceId, SqlConnection _con)
         {
-            SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", invoiceId));
+            SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", invoiceId), _con);
         }
 
-        private void UpdateBankAccount(int invoiceId)
+        private void UpdateBankAccount(int invoiceId, SqlConnection _con)
         {
-            using (SqlConnection _con = new SqlConnection(conString))
-            {
-                _con.Open();
                 SqlCommand com = new SqlCommand("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = @idPagaron", _con);
                 com.Parameters.AddWithValue("@idPagaron", invoiceId);
                 com.ExecuteNonQuery();
-            }
         }
 
-        private void SaveInvoiceItemsInDatabase(Invoice invoice)
+        private void SaveInvoiceItemsInDatabase(Invoice invoice, SqlConnection _con)
         {
-            using (SqlConnection _con = new SqlConnection(conString))
-            {
-                _con.Open();
                 SqlCommand com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, rabat, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @rabat, @idAso, @opis)", _con);
                 SqlParameter par = new SqlParameter("@InvoiceId", SqlDbType.Int);
                 com.Parameters.Add(par);
@@ -466,7 +456,6 @@ namespace Engine
                     PrepareInvoiceDetailsInsertQueryParameters(invoice, com, item);
                     com.ExecuteNonQuery();
                 }
-            }
         }
 
         private void PrepareInvoiceDetailsInsertQueryParameters(Invoice invoice, SqlCommand com, InvoiceDetails item)
@@ -480,11 +469,8 @@ namespace Engine
             com.Parameters[6].Value = item.Description;
         }
 
-        private void SaveNewInvoiceInDatabase(Invoice invoice)
+        private void SaveNewInvoiceInDatabase(Invoice invoice, SqlConnection _con)
         {
-            using (SqlConnection _con = new SqlConnection(conString))
-            {
-                _con.Open();
                 SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, ID_sklep, konto, suma, opis) values (@nrParagonu, @data,@idsklep,@konto, 0,'' );", _con);
 
                 SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50)
@@ -513,7 +499,6 @@ namespace Engine
 
                 com.Prepare();
                 com.ExecuteNonQuery();
-            }
         }
 
         private void Backup()
@@ -565,6 +550,21 @@ namespace Engine
                     throw;
                 }
             }
+            return rowsAffected;
+        }
+        private int SQLexecuteNonQuerry(string querry, SqlConnection _con)
+        {
+            int rowsAffected = 0;
+                SqlCommand sql = new SqlCommand(querry, _con);
+                try
+                {
+                    rowsAffected = sql.ExecuteNonQuery();
+                }
+                catch (System.Exception e)
+                {
+                    System.Windows.MessageBox.Show(e.Message, "Non query execution error");
+                    throw;
+                }
             return rowsAffected;
         }
 
@@ -651,30 +651,6 @@ namespace Engine
                 System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar error");
                 //Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
                 throw;
-            }
-            return output;
-        }
-
-        private string SQLgetScalar(string querry)
-        {
-
-            string output = "";
-            using (SqlConnection _con = new SqlConnection(conString))
-            {
-                _con.Open();
-                try
-                {
-                    SqlCommand sql = new SqlCommand(querry, _con);
-
-                    output = sql.ExecuteScalar().ToString();
-
-                }
-                catch (Exception ex)
-                {
-                    System.Windows.MessageBox.Show(ex.Message.ToString(), "SQL scalar error");
-                    //Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
-                    throw;
-                }
             }
             return output;
         }
