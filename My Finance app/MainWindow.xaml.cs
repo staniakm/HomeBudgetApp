@@ -16,7 +16,7 @@ namespace My_Finance_app
         private DateTime selectedDate = DateTime.Now;
         private readonly SqlEngine sqlEngine;
         private Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
-        private InvoiceService invoiceService = new InvoiceService();
+        private readonly InvoiceService invoiceService = new InvoiceService();
 
         public MainWindow(SqlEngine sqlEngine)
         {
@@ -491,4 +491,4 @@ namespace My_Finance_app
         }
 
     }
-}//ostani
+}

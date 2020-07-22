@@ -27,7 +27,6 @@ namespace Engine
                 try
                 {
                     _con.Open();
-                    
                     connected = true;
                 }
                 catch (Exception ex)
@@ -50,44 +49,47 @@ namespace Engine
             using (SqlConnection _con = new SqlConnection(conString))
             {
                 _con.Open();
-                SqlCommand com = new SqlCommand("insert into przychody(kwota, opis, konto, data) values (@kwota, @opis ,@konto, @data);", _con);
-                SqlParameter par = new SqlParameter("@kwota", SqlDbType.Money)
+                using (SqlCommand com = new SqlCommand("insert into przychody(kwota, opis, konto, data) values (@kwota, @opis ,@konto, @data);", _con))
                 {
-                    Value = moneyAmount
-                };
-                com.Parameters.Add(par);
-                par = new SqlParameter("@opis", SqlDbType.VarChar, 100)
-                {
-                    Value = description
-                };
-                com.Parameters.Add(par);
-                par = new SqlParameter("@konto", SqlDbType.Int)
-                {
-                    Value = accountId
-                };
-                com.Parameters.Add(par);
-                par = new SqlParameter("@data", SqlDbType.VarChar, 10)
-                {
-                    Value = date
-                };
-                com.Parameters.Add(par);
-                com.Prepare();
-                com.ExecuteNonQuery();
-
+                    SqlParameter par = new SqlParameter("@kwota", SqlDbType.Money)
+                    {
+                        Value = moneyAmount
+                    };
+                    com.Parameters.Add(par);
+                    par = new SqlParameter("@opis", SqlDbType.VarChar, 100)
+                    {
+                        Value = description
+                    };
+                    com.Parameters.Add(par);
+                    par = new SqlParameter("@konto", SqlDbType.Int)
+                    {
+                        Value = accountId
+                    };
+                    com.Parameters.Add(par);
+                    par = new SqlParameter("@data", SqlDbType.VarChar, 10)
+                    {
+                        Value = date
+                    };
+                    com.Parameters.Add(par);
+                    com.Prepare();
+                    com.ExecuteNonQuery();
+                }
                 string query = "update konto set kwota = kwota + @kwota where ID = @konto";
-                com = new SqlCommand(query, _con);
-                par = new SqlParameter("@kwota", SqlDbType.Money)
+                using (SqlCommand com = new SqlCommand(query, _con))
                 {
-                    Value = moneyAmount
-                };
-                com.Parameters.Add(par);
-                par = new SqlParameter("@konto", SqlDbType.Int)
-                {
-                    Value = accountId
-                };
-                com.Parameters.Add(par);
-                com.Prepare();
-                com.ExecuteNonQuery();
+                    SqlParameter par = new SqlParameter("@kwota", SqlDbType.Money)
+                    {
+                        Value = moneyAmount
+                    };
+                    com.Parameters.Add(par);
+                    par = new SqlParameter("@konto", SqlDbType.Int)
+                    {
+                        Value = accountId
+                    };
+                    com.Parameters.Add(par);
+                    com.Prepare();
+                    com.ExecuteNonQuery();
+                }
             }
 
         }
@@ -436,49 +438,49 @@ namespace Engine
 
         private void UpdateBankAccount(int invoiceId, SqlConnection _con)
         {
-                SqlCommand com = new SqlCommand("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = @idPagaron", _con);
-                com.Parameters.AddWithValue("@idPagaron", invoiceId);
-                com.ExecuteNonQuery();
+            SqlCommand com = new SqlCommand("update k set k.kwota = k.kwota-p.suma from paragony p join konto k on k.ID = p.konto where p.id = @idPagaron", _con);
+            com.Parameters.AddWithValue("@idPagaron", invoiceId);
+            com.ExecuteNonQuery();
         }
 
         private void SaveInvoiceItemsInDatabase(Invoice invoice, SqlConnection _con)
         {
-                SqlCommand com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, rabat, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @rabat, @idAso, @opis)", _con);
-                SqlParameter par = new SqlParameter("@InvoiceId", SqlDbType.Int);
-                com.Parameters.Add(par);
-                par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal)
-                {
-                    Precision = 8,
-                    Scale = 2
-                };
+            SqlCommand com = new SqlCommand("insert into paragony_szczegoly(id_paragonu, cena_za_jednostke, ilosc, cena, rabat, ID_ASO, opis) values (@InvoiceId, @cenaJednostkowa, @ilosc, @cena, @rabat, @idAso, @opis)", _con);
+            SqlParameter par = new SqlParameter("@InvoiceId", SqlDbType.Int);
+            com.Parameters.Add(par);
+            par = new SqlParameter("@cenaJednostkowa", SqlDbType.Decimal)
+            {
+                Precision = 8,
+                Scale = 2
+            };
 
-                com.Parameters.Add(par);
-                par = new SqlParameter("@ilosc", SqlDbType.Decimal)
-                {
-                    Precision = 6,
-                    Scale = 3
-                };
-                com.Parameters.Add(par);
+            com.Parameters.Add(par);
+            par = new SqlParameter("@ilosc", SqlDbType.Decimal)
+            {
+                Precision = 6,
+                Scale = 3
+            };
+            com.Parameters.Add(par);
 
-                par = new SqlParameter("@cena", SqlDbType.Money);
-                com.Parameters.Add(par);
+            par = new SqlParameter("@cena", SqlDbType.Money);
+            com.Parameters.Add(par);
 
-                par = new SqlParameter("@rabat", SqlDbType.Money);
-                com.Parameters.Add(par);
+            par = new SqlParameter("@rabat", SqlDbType.Money);
+            com.Parameters.Add(par);
 
-                par = new SqlParameter("@idAso", SqlDbType.Int);
-                com.Parameters.Add(par);
+            par = new SqlParameter("@idAso", SqlDbType.Int);
+            com.Parameters.Add(par);
 
-                par = new SqlParameter("@opis", SqlDbType.VarChar, 150);
-                com.Parameters.Add(par);
-                com.Prepare();
+            par = new SqlParameter("@opis", SqlDbType.VarChar, 150);
+            com.Parameters.Add(par);
+            com.Prepare();
 
-                for (int x = 0; x < invoice.GetNumberOfItems(); x++)
-                {
-                    InvoiceDetails item = invoice.GetItem(x);
-                    PrepareInvoiceDetailsInsertQueryParameters(invoice, com, item);
-                    com.ExecuteNonQuery();
-                }
+            for (int x = 0; x < invoice.GetNumberOfItems(); x++)
+            {
+                InvoiceDetails item = invoice.GetItem(x);
+                PrepareInvoiceDetailsInsertQueryParameters(invoice, com, item);
+                com.ExecuteNonQuery();
+            }
         }
 
         private void PrepareInvoiceDetailsInsertQueryParameters(Invoice invoice, SqlCommand com, InvoiceDetails item)
@@ -494,34 +496,34 @@ namespace Engine
 
         private void SaveNewInvoiceInDatabase(Invoice invoice, SqlConnection _con)
         {
-                SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, ID_sklep, konto, suma, opis) values (@nrParagonu, @data,@idsklep,@konto, 0,'' );", _con);
+            SqlCommand com = new SqlCommand("insert into paragony(nr_paragonu, data, ID_sklep, konto, suma, opis) values (@nrParagonu, @data,@idsklep,@konto, 0,'' );", _con);
 
-                SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50)
-                {
-                    Value = invoice.GetInvoiceNumber().ToUpper()
-                };
-                com.Parameters.Add(par);
+            SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50)
+            {
+                Value = invoice.GetInvoiceNumber().ToUpper()
+            };
+            com.Parameters.Add(par);
 
-                par = new SqlParameter("@data", SqlDbType.Date)
-                {
-                    Value = invoice.GetDate()
-                };
-                com.Parameters.Add(par);
+            par = new SqlParameter("@data", SqlDbType.Date)
+            {
+                Value = invoice.GetDate()
+            };
+            com.Parameters.Add(par);
 
-                par = new SqlParameter("@idsklep", SqlDbType.VarChar, 150)
-                {
-                    Value = invoice.GetShopId()
-                };
-                com.Parameters.Add(par);
+            par = new SqlParameter("@idsklep", SqlDbType.VarChar, 150)
+            {
+                Value = invoice.GetShopId()
+            };
+            com.Parameters.Add(par);
 
-                par = new SqlParameter("@konto", SqlDbType.Int)
-                {
-                    Value = invoice.GetAccount()
-                };
-                com.Parameters.Add(par);
+            par = new SqlParameter("@konto", SqlDbType.Int)
+            {
+                Value = invoice.GetAccount()
+            };
+            com.Parameters.Add(par);
 
-                com.Prepare();
-                com.ExecuteNonQuery();
+            com.Prepare();
+            com.ExecuteNonQuery();
         }
 
         private void Backup()
@@ -578,16 +580,16 @@ namespace Engine
         private int SQLexecuteNonQuerry(string querry, SqlConnection _con)
         {
             int rowsAffected = 0;
-                SqlCommand sql = new SqlCommand(querry, _con);
-                try
-                {
-                    rowsAffected = sql.ExecuteNonQuery();
-                }
-                catch (System.Exception e)
-                {
-                    System.Windows.MessageBox.Show(e.Message, "Non query execution error");
-                    throw;
-                }
+            SqlCommand sql = new SqlCommand(querry, _con);
+            try
+            {
+                rowsAffected = sql.ExecuteNonQuery();
+            }
+            catch (System.Exception e)
+            {
+                System.Windows.MessageBox.Show(e.Message, "Non query execution error");
+                throw;
+            }
             return rowsAffected;
         }
 
