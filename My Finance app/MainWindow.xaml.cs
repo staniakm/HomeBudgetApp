@@ -14,21 +14,32 @@ namespace My_Finance_app
     public partial class MainWindow : Window
     {
         private DateTime selectedDate = DateTime.Now;
-        private readonly SqlEngine sqlEngine;
+        private readonly ShopService shopService;
+        private readonly BankAccountService bankAccountService;
+        private readonly InvoiceService invoiceService;
+        private readonly ReportService reportService;
+        private readonly CategoryService categoryService;
+        private readonly BudgetService budgetService;
         private Dictionary<string, Grid> grids = new Dictionary<string, Grid>();
-        private readonly InvoiceService invoiceService = new InvoiceService();
+
 
         public MainWindow(SqlEngine sqlEngine)
         {
-            this.sqlEngine = sqlEngine;
+            shopService = new ShopService(sqlEngine);
+            bankAccountService = new BankAccountService(sqlEngine);
+            invoiceService = new InvoiceService(sqlEngine);
+            reportService = new ReportService(sqlEngine);
+            categoryService = new CategoryService(sqlEngine);
+            budgetService = new BudgetService(sqlEngine);
+
             InitializeComponent();
             SetupAdditionalData();
             this.Closed += new EventHandler(MainWindow_Closed);
+
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
         {
-            Console.WriteLine("Closing applicaton");
             Console.WriteLine("Closing applicaton");
         }
 
@@ -40,13 +51,13 @@ namespace My_Finance_app
 
             FillComboboxesWithData();
 
-            grid_konta.DataContext = sqlEngine.GetBankAccountsCollection();
+            grid_konta.DataContext = bankAccountService.GetBankAccounts();
 
             LoadGrids();
 
             UpdateControlsState(true);
 
-            sqlEngine.AddAutomaticBills();
+            invoiceService.AddAutomaticInvoices();
         }
 
         private void LoadGrids()
@@ -63,22 +74,22 @@ namespace My_Finance_app
 
         private void FillComboboxesWithData()
         {
-            cb_shop.DataContext = sqlEngine.GetShopsCollection();
-            cb_bankAccount.DataContext = sqlEngine.GetBankAccountsCollection();
+            cb_shop.DataContext = shopService.GetShopsCollection();
+            cb_bankAccount.DataContext = bankAccountService.GetBankAccounts();
         }
 
         private void PrepareReportDetails(ReportType.Type reportType)
         {
             Dictionary<int, Tuple<string, string>> reportSettings = PrepareReportSettings();
-            dg_reports.ItemsSource = sqlEngine.PrepareReport(reportType, reportSettings).DefaultView;
+            dg_reports.ItemsSource = reportService.PrepareReport(reportType, reportSettings);
         }
 
         public void LoadCategories()
         {
             string selectedCategory = cb_kategoria.Text.Length == 0 ? "" : cb_kategoria.Text;
-            
-                cb_kategoria.DataContext = sqlEngine.GetCategoryCollection();
-                cb_kategoria.Text = selectedCategory;
+
+            cb_kategoria.DataContext = categoryService.GetCategoryCollection();
+            cb_kategoria.Text = selectedCategory;
         }
 
         /// <summary>
@@ -87,16 +98,16 @@ namespace My_Finance_app
         /// </summary>
         private void FillComboboxWithProductsForSelectedShop(int shopId)
         {
-            cb_product.DataContext = sqlEngine.GetProductsInStore(shopId);
+            cb_product.DataContext = shopService.GetProductsInStore(shopId);
         }
 
         /// <summary>
         /// Create or cancel new bill.
         /// </summary>
         /// 
-        private void InvoiceOperation (object sender, RoutedEventArgs e)
+        private void InvoiceOperation(object sender, RoutedEventArgs e)
         {
-            if (invoiceService.invoiceExists() )
+            if (invoiceService.InvoiceExists())
             {
                 CancelCurrentInvoice();
             }
@@ -141,15 +152,15 @@ namespace My_Finance_app
 
             UpdateControlsState(true);
             bt_invoiceOperation.Content = "Dodaj paragon";
-            
+
         }
 
         private void CreateShopIfNotExists()
         {
-            if (sqlEngine.CreateNewShopIfNotExists(cb_shop.Text.ToUpper()) > 0)
+            if (shopService.CreateNewShopIfNotExists(cb_shop.Text.ToUpper()) > 0)
             {
                 string SelectedShop = cb_shop.Text.ToUpper();
-                cb_shop.DataContext = sqlEngine.GetShopsCollection();
+                cb_shop.DataContext = shopService.GetShopsCollection();
                 cb_shop.Text = SelectedShop;
             }
         }
@@ -192,9 +203,9 @@ namespace My_Finance_app
                 {
                     discount = CalculateDiscount(tb_discount.Text);
                 }
-                
+
                 invoiceService.addInvoiceItem(productId, productName, price, quantity, description, discount);
-                
+
                 ClearInvoiceItemForm();
             }
 
@@ -203,12 +214,13 @@ namespace My_Finance_app
         private void CreateNewProduct(int shopId)
         {
             string productName = cb_product.Text.ToUpper();
-            sqlEngine.AddAsoToShop(productName, shopId);
+            shopService.AddAsoToShop(productName, shopId);
+
             FillComboboxWithProductsForSelectedShop(shopId);
             cb_product.Text = productName;
         }
 
-        private decimal CalculateDiscount(string discount)
+        private static decimal CalculateDiscount(string discount)
         {
             decimal discountAmount = decimal.Parse(discount.Replace(".", ","));
             if (discountAmount != 0)
@@ -254,12 +266,12 @@ namespace My_Finance_app
         /// <param name="e"></param>
         private void Bt_SaveInvoiceInDatabase(object sender, RoutedEventArgs e)
         {
-            sqlEngine.SaveInvoiceInDatabase(invoiceService.GetInvoice());
+            invoiceService.SaveInvoice();
 
             UpdateControlsState(true);
             dg_paragony.ItemsSource = null;
             invoiceService.Clear();
-            
+
             bt_invoiceOperation.Content = "Dodaj paragon";
             //l_totalPrice.Content = 0.00;
         }
@@ -299,8 +311,8 @@ namespace My_Finance_app
         {
             dp_report_start_date.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             dp_report_end_date.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1);
-            cb_report_category_collection.DataContext = sqlEngine.GetCategoryCollection();
-            cb_report_shop_collection.DataContext = sqlEngine.GetShopsCollection();
+            cb_report_category_collection.DataContext = categoryService.GetCategoryCollection();
+            cb_report_shop_collection.DataContext = shopService.GetShopsCollection();
         }
 
         private void ShowGrid(string v)
@@ -312,17 +324,12 @@ namespace My_Finance_app
             grids[v].Visibility = Visibility.Visible;
         }
 
-        private void PrintConsole(string s)
-        {
-            Console.WriteLine(s);
-        }
-
         /// <summary>
         /// Create session settings for specific report.
         /// </summary>
         private void GenerateReport(object sender, RoutedEventArgs e)
         {
-            
+
 
             switch (cb_report_type.Text.ToUpper())
             {
@@ -367,12 +374,12 @@ namespace My_Finance_app
                 settings.Add(3, new Tuple<string, string>(cb_report_shop_collection.SelectedValue.ToString(), ""));
             }
             return settings;
-            
+
         }
 
         public void GetItemsByCategory()
         {
-            dg_asortyment.DataContext = sqlEngine.GetItemsByCategory(cb_kategoria.Text);
+            dg_asortyment.DataContext = categoryService.GetItemsByCategory(cb_kategoria.Text);
         }
 
         private void EditItemCategory(object sender, RoutedEventArgs e)
@@ -380,7 +387,7 @@ namespace My_Finance_app
             if (dg_asortyment.SelectedIndex > -1)
             {
                 DataRowView dr = (DataRowView)dg_asortyment.SelectedItem;
-                CategoryEditWindow cw = new CategoryEditWindow(dr, sqlEngine, this);
+                CategoryEditWindow cw = new CategoryEditWindow(dr, categoryService, this);
                 cw.ShowDialog();
             }
         }
@@ -390,7 +397,7 @@ namespace My_Finance_app
             if (dg_budzety.SelectedIndex > -1)
             {
                 DataRowView dr = (DataRowView)dg_budzety.SelectedItem;
-                BudgetEditWindow cw = new BudgetEditWindow(dr, sqlEngine, this);
+                BudgetEditWindow cw = new BudgetEditWindow(dr, budgetService, this);
                 cw.ShowDialog();
             }
         }
@@ -402,18 +409,15 @@ namespace My_Finance_app
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
-            double earned = sqlEngine.GetBudgetCalculations("earned", GetCurrentlySelectedDate());
-            double spend = sqlEngine.GetBudgetCalculations("spend", GetCurrentlySelectedDate());
-            double planned = sqlEngine.GetBudgetCalculations("planed", GetCurrentlySelectedDate());
-            double leftToPlan = sqlEngine.GetBudgetCalculations("left", GetCurrentlySelectedDate());
+            var budgetData = budgetService.GetBudgetData(GetCurrentlySelectedDate());
 
-            dg_budzety.DataContext = sqlEngine.GetBudgets(GetCurrentlySelectedDate());
+            dg_budzety.DataContext = budgetService.GetBudgets(GetCurrentlySelectedDate());
 
-            lb_przychodzy.Content = earned;
-            lb_wydatek.Content = spend;
-            lb_zaplanowane.Content = planned;
-            lb_pozostalo.Content = leftToPlan < 0 ? 0.0 : leftToPlan;
-            lb_oszczednosci.Content = earned - spend;
+            lb_przychodzy.Content = budgetData.Income;
+            lb_wydatek.Content = budgetData.Expenses;
+            lb_zaplanowane.Content = budgetData.Planned;
+            lb_pozostalo.Content = budgetData.LeftToPlan < 0 ? 0.0 : budgetData.LeftToPlan;
+            lb_oszczednosci.Content = budgetData.Savings;
 
         }
 
@@ -424,7 +428,7 @@ namespace My_Finance_app
 
         private void RecalculateBudget(object sender, RoutedEventArgs e)
         {
-            sqlEngine.RecalculateBudget(selectedDate);
+           budgetService.RecalculateBudget(selectedDate);
         }
 
         private void SaveAccount(object sender, RoutedEventArgs e)
@@ -440,7 +444,8 @@ namespace My_Finance_app
                 {"@id", (accountId.Text.Equals("")?null:accountId.Text)}
             };
             //save accout
-            sqlEngine.ModifyBankAccount(tmpDic);
+            bankAccountService.ModifyBankAccount(tmpDic);
+
             ReloadAccoutDetails(selectedAccount);
         }
 
@@ -451,8 +456,7 @@ namespace My_Finance_app
                 selectedAccount = konta_cb_konto.Text;
             }
             //reload account collection
-            sqlEngine.GetBankAccountsCollection();
-            grid_konta.DataContext = sqlEngine.GetBankAccountsCollection();
+            grid_konta.DataContext = bankAccountService.GetBankAccounts();
             //reset selected account
             konta_cb_konto.Text = selectedAccount;
         }
@@ -475,7 +479,7 @@ namespace My_Finance_app
         {
             if (konta_cb_konto.Text != "")
             {
-                SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, sqlEngine, this);
+                SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, budgetService, this);
                 sw.ShowDialog();
             }
         }

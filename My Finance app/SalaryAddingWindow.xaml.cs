@@ -1,4 +1,5 @@
 ﻿using Engine;
+using Engine.service;
 using System;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -12,16 +13,21 @@ namespace My_Finance_app
     /// </summary>
     public partial class SalaryAddingWindow : Window
     {
-        private SqlEngine _sql;
-        private int accountID;
-        private MainWindow mw;
-        public SalaryAddingWindow(int accountID, SqlEngine sql, MainWindow mainWindow)
+        private readonly BudgetService budgetService;
+        private readonly int accountID;
+        private readonly MainWindow mw;
+        public SalaryAddingWindow(int accountID, BudgetService budgetService, MainWindow mainWindow)
         {
-            this._sql = sql;
+            this.budgetService = budgetService;
             this.accountID = accountID;
             this.mw = mainWindow;
             InitializeComponent();
-            salary_description.DataContext = _sql.GetSallaryDescriptions();
+            InitializeData();
+        }
+
+        private void InitializeData()
+        {
+            salary_description.DataContext = budgetService.GetSallaryDescriptions();
             income_date.SelectedDate = DateTime.Now;
             System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
         }
@@ -33,7 +39,7 @@ namespace My_Finance_app
             {
                 decimal moneyAmount = decimal.Parse(sallary_amount.Text.Replace(".", ","));
                 DateTime date = (DateTime)income_date.SelectedDate;
-                _sql.AddNewSallary(this.accountID, description, moneyAmount, date);
+                budgetService.AddNewSallary(this.accountID, description, moneyAmount, date);
                 mw.ReloadAccoutDetails("");
                 this.Close();
             }

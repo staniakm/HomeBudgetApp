@@ -1,4 +1,5 @@
 ﻿using Engine;
+using Engine.service;
 using System.Data;
 using System.Windows;
 namespace My_Finance_app
@@ -8,10 +9,11 @@ namespace My_Finance_app
     /// </summary>
     public partial class CategoryEditWindow : Window
     {
-        SqlEngine SQL;
-        MainWindow mw;
-        int productId;
-        public CategoryEditWindow(DataRowView id, SqlEngine sqlEngine, MainWindow mw)
+        private readonly CategoryService categoryService;
+        private MainWindow mw;
+        private readonly int productId;
+
+        public CategoryEditWindow(DataRowView id, CategoryService categoryService, MainWindow mw)
         {
             InitializeComponent();
             this.Top = SystemParameters.PrimaryScreenHeight/2;
@@ -22,7 +24,7 @@ namespace My_Finance_app
             lb_product_name.Text= id["Nazwa"].ToString();
             lb_id_kat.Content = id["id_kat"];
             lb_nazwa_kat.Content = id["Nazwa kategorii"];
-            SQL = sqlEngine;
+            this.categoryService = categoryService;
             this.mw = mw;
             LoadCategories();
             System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
@@ -31,7 +33,7 @@ namespace My_Finance_app
 
         private void LoadCategories()
         {
-            cb_newCategory.DataContext = SQL.GetCategoryCollection();
+            cb_newCategory.DataContext = categoryService.GetCategoryCollection();
         }
         private void bt_zatwierdz_Click(object sender, RoutedEventArgs e)
         {
@@ -39,7 +41,7 @@ namespace My_Finance_app
             string newCategoryName = cb_newCategory.Text;
             int newCategoryId = (cb_newCategory.SelectedValue == null)?-1:int.Parse(cb_newCategory.SelectedValue.ToString());
 
-            SQL.UpdateItemCategory(productId,newCategoryName,newCategoryId,newProductName);
+            categoryService.UpdateItemCategory(productId,newCategoryName,newCategoryId,newProductName);
 
             mw.LoadCategories();
             mw.GetItemsByCategory();
