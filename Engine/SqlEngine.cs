@@ -12,11 +12,12 @@ namespace Engine
 
         public SqlEngine(string database, string user, string pass)
         {
+            
             string dbString = @"localhost\SQLEXPRESS";
             conString = string.Format("Data Source={0}; Initial Catalog={1}; Integrated Security=false;" +
                     "Connection Timeout=10; user id={2}; password={3}", dbString, database, user, pass);
         }
-        public bool TryToLoginIntoDatabase()
+        public bool TryLogin()
         {
             bool connected = false;
             using (SqlConnection _con = new SqlConnection(conString))
@@ -28,7 +29,7 @@ namespace Engine
                 }
                 catch (Exception ex)
                 {
-                    System.Windows.MessageBox.Show(ex.Message, "Connection error");
+                    Console.WriteLine(ex.Message);
                     connected = false;
                 }
             }

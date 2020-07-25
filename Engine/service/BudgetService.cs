@@ -25,7 +25,7 @@ namespace Engine.service
         public BudgetData GetBudgetData(DateTime dateTime)
         {
             var budgetData = new BudgetData(
-            
+
                  sqlEngine.GetBudgetCalculations("earned", dateTime),
                 sqlEngine.GetBudgetCalculations("spend", dateTime),
                 sqlEngine.GetBudgetCalculations("planed", dateTime),

@@ -25,7 +25,7 @@
                 <PasswordBox x:Name="pass" Width="220" HorizontalContentAlignment="Center"/>
             </TabPanel>
             <TabPanel Margin="5,5,5,5">
-                <Button Margin="50,0,-160,0" x:Name="confirmLogin" Content="OK" Click="confirmLogin_Click"/>
+                <Button Margin="50,0,-160,0" x:Name="confirmLogin" Content="OK" Click="ConfirmLogin_Click"/>
             </TabPanel>
         </StackPanel>
     </Grid>

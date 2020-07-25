@@ -409,6 +409,12 @@ namespace My_Finance_app
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
+            UpdateBudgetData();
+
+        }
+
+        private void UpdateBudgetData()
+        {
             var budgetData = budgetService.GetBudgetData(GetCurrentlySelectedDate());
 
             dg_budzety.DataContext = budgetService.GetBudgets(GetCurrentlySelectedDate());
@@ -418,7 +424,6 @@ namespace My_Finance_app
             lb_zaplanowane.Content = budgetData.Planned;
             lb_pozostalo.Content = budgetData.LeftToPlan < 0 ? 0.0 : budgetData.LeftToPlan;
             lb_oszczednosci.Content = budgetData.Savings;
-
         }
 
         public DateTime GetCurrentlySelectedDate()
@@ -465,14 +470,14 @@ namespace My_Finance_app
         {
             selectedDate = selectedDate.AddMonths(-1);
             lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
-            LoadBudget(null, null);
+            UpdateBudgetData();
         }
 
         private void SetNextMonth(object sender, RoutedEventArgs e)
         {
             selectedDate = selectedDate.AddMonths(1);
             lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
-            LoadBudget(null, null);
+            UpdateBudgetData();
         }
 
         private void AddNewIncome(object sender, RoutedEventArgs e)
