@@ -1,4 +1,5 @@
 ﻿using Engine;
+using Engine.service;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -22,10 +23,11 @@ namespace My_Finance_app
     /// </summary>
     public partial class BudgetEditWindow : Window
     {
-        SqlEngine SQL;
-        MainWindow mw;
+        //private readonly SqlEngine SQL;
+        private readonly BudgetService budgetService;
+        private MainWindow mw;
         private int databaseBudgetRowID;
-        public BudgetEditWindow(DataRowView id, SqlEngine sqlEngine, MainWindow mw)
+        public BudgetEditWindow(DataRowView id, BudgetService budgetService, MainWindow mw)
         {
             InitializeComponent();
             this.Top = SystemParameters.PrimaryScreenHeight / 2;
@@ -36,7 +38,7 @@ namespace My_Finance_app
             lb_planed.Text = id[3].ToString();
             lb_used.Content = id[4];
             lb_percent_used.Content = id[5];
-            SQL = sqlEngine;
+            this.budgetService = budgetService;
             this.mw = mw;
             
             System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
@@ -48,7 +50,7 @@ namespace My_Finance_app
             string newValue = lb_planed.Text.Replace(",",".");
             //try
             //{
-                SQL.UpdatePlannedBudget(databaseBudgetRowID, newValue, mw.GetCurrentlySelectedDate());
+                budgetService.UpdatePlannedBudget(databaseBudgetRowID, newValue, mw.GetCurrentlySelectedDate());
             //}
             //catch (Exception)
             //{

@@ -9,17 +9,15 @@ namespace Engine
     public class SqlEngine
     {
         private readonly string conString;
-        private readonly string database;
-        public string id;
 
         public SqlEngine(string database, string user, string pass)
         {
+            
             string dbString = @"localhost\SQLEXPRESS";
             conString = string.Format("Data Source={0}; Initial Catalog={1}; Integrated Security=false;" +
                     "Connection Timeout=10; user id={2}; password={3}", dbString, database, user, pass);
-            this.database = database;
         }
-        public bool TryToLoginIntoDatabase()
+        public bool TryLogin()
         {
             bool connected = false;
             using (SqlConnection _con = new SqlConnection(conString))
@@ -31,7 +29,7 @@ namespace Engine
                 }
                 catch (Exception ex)
                 {
-                    System.Windows.MessageBox.Show(ex.Message, "Connection error");
+                    Console.WriteLine(ex.Message);
                     connected = false;
                 }
             }
@@ -94,7 +92,7 @@ namespace Engine
 
         }
 
-        public void AddAutomaticBills() => SQLexecuteNonQuerry("EXEC dodaj_rachunki");
+        public void AddAutomaticInvoices() => SQLexecuteNonQuerry("EXEC dodaj_rachunki");
 
         public void UpdateItemCategory(int productId, string newCategoryName, int newCategoryId, string newProductName)
         {
@@ -130,41 +128,23 @@ namespace Engine
             return ShopAso;
         }
 
-        public DataTable PrepareReport(ReportType.Type reportId, Dictionary<int, Tuple<string, string>> reportSettings)
+        public DataTable PrepareReport(string sqlCommand, Dictionary<int, Tuple<string, string>> reportSettings)
         {
-            DataTable dt = null;
-
-            switch (reportId)
-            {
-                case ReportType.Type.STANDARD:
-                    dt = GetDataWithSettings("exec generuj_zestawienie_2", reportSettings);
-                    break;
-                case ReportType.Type.CATEGORY:
-                    dt = GetDataWithSettings("exec generuj_zestawienie_podzial_na_kategorie", reportSettings);
-                    break;
-                case ReportType.Type.CATEGORY_AND_ACCOUNT:
-                    dt = GetDataWithSettings("exec generuj_zestawienie_podzial_na_kategorie_konto", reportSettings);
-                    break;
-                case ReportType.Type.INVOICE_LIST:
-                    dt = GetDataWithSettings("exec show_invoice_list", reportSettings);
-                    break;
-            }
-            return dt;
+            return GetDataWithSettings(sqlCommand, reportSettings);
         }
 
         public DataTable GetItemsByCategory(string categoryName)
         {
-            string sqlquery = "";
             Dictionary<string, string> param = new Dictionary<string, string>();
             if (categoryName != "")
             {
                 param.Add("@category", categoryName);
-                sqlquery = "Select a.[id],a.[NAZWA],a.[id_kat], k.nazwa [Nazwa kategorii] From [dbo].[ASORTYMENT] a	Join kategoria k on a.id_kat = k.id where del = 0 and k.nazwa = @category order by a.nazwa;";
+                var sqlquery = "Select a.[id],a.[NAZWA],a.[id_kat], k.nazwa [Nazwa kategorii] From [dbo].[ASORTYMENT] a	Join kategoria k on a.id_kat = k.id where del = 0 and k.nazwa = @category order by a.nazwa;";
                 return GetData(sqlquery, param);
             }
             else
             {
-                sqlquery = "Select a.[id],a.[NAZWA],a.[id_kat], k.nazwa  [Nazwa kategorii]From [dbo].[ASORTYMENT] a	Join kategoria k on a.id_kat = k.id and del = 0 order by a.nazwa;";
+                var sqlquery = "Select a.[id],a.[NAZWA],a.[id_kat], k.nazwa  [Nazwa kategorii]From [dbo].[ASORTYMENT] a	Join kategoria k on a.id_kat = k.id and del = 0 order by a.nazwa;";
                 return GetData(sqlquery);
             }
         }
@@ -292,7 +272,7 @@ namespace Engine
             return kategorie;
         }
 
-        public object GetBudgets(DateTime date)
+        public DataTable GetBudgets(DateTime date)
         {
             int month = date.Month;
             int year = date.Year;

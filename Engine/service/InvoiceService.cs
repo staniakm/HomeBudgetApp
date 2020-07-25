@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,17 +9,21 @@ using System.Threading.Tasks;
 namespace Engine.service
 {
 
-
-
     public class InvoiceService
     {
         private Invoice invoice;
+        private SqlEngine sqlEngine;
 
         public InvoiceService()
         {
         }
 
-        public bool invoiceExists()
+        public InvoiceService(SqlEngine sqlEngine)
+        {
+            this.sqlEngine = sqlEngine;
+        }
+
+        public bool InvoiceExists()
         {
             return invoice != null;
         }
@@ -32,7 +37,7 @@ namespace Engine.service
             invoice.SetAccount(accountId);
         }
 
-        public IEnumerable GetInvoiceItems()
+        public ObservableCollection<InvoiceDetails> GetInvoiceItems()
         {
             return invoice.GetInvoiceItems();
         }
@@ -48,14 +53,19 @@ namespace Engine.service
             invoice = null;
         }
 
-        public Invoice GetInvoice()
-        {
-            return invoice;
-        }
-
         public void Clear()
         {
             cancelInvoice();
+        }
+
+        public void AddAutomaticInvoices()
+        {
+            sqlEngine.AddAutomaticInvoices();
+        }
+
+        public void SaveInvoice()
+        {
+            sqlEngine.SaveInvoiceInDatabase(invoice);
         }
     }
 }
