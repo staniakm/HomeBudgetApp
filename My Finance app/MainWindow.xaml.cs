@@ -148,7 +148,7 @@ namespace My_Finance_app
         private void CancelCurrentInvoice()
         {
             dg_paragony.ItemsSource = null;
-            invoiceService.cancelInvoice();
+            invoiceService.CancelInvoice();
 
             UpdateControlsState(true);
             bt_invoiceOperation.Content = "Dodaj paragon";
@@ -190,10 +190,12 @@ namespace My_Finance_app
             {
                 CreateNewProduct((int)cb_shop.SelectedValue);
             }
-            string productName = cb_product.Text;
+            //string productName = cb_product.Text;
             if (tb_price.Text.Trim() != "" && tb_quantity.Text.Trim() != "")
             {
-                int productId = (int)cb_product.SelectedValue;
+                var product = (Product) cb_product.SelectedItem;
+                Console.WriteLine(product.ToString());
+                
                 string description = tb_description.Text;
                 decimal discount = 0.0M;
                 decimal price = decimal.Parse(tb_price.Text.Replace(".", ","));
@@ -204,7 +206,7 @@ namespace My_Finance_app
                     discount = CalculateDiscount(tb_discount.Text);
                 }
 
-                invoiceService.addInvoiceItem(productId, productName, price, quantity, description, discount);
+                invoiceService.AddInvoiceItem(product , price, quantity, description, discount);
 
                 ClearInvoiceItemForm();
             }
@@ -482,7 +484,7 @@ namespace My_Finance_app
 
         private void AddNewIncome(object sender, RoutedEventArgs e)
         {
-            if (konta_cb_konto.Text != "")
+            if (konta_cb_konto.Text.Trim() != "")
             {
                 SalaryAddingWindow sw = new SalaryAddingWindow((int)konta_cb_konto.SelectedValue, budgetService, this);
                 sw.ShowDialog();

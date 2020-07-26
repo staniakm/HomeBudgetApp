@@ -116,14 +116,14 @@ namespace Engine
             SQLexecuteNonQuerryProcedure("dbo.addAsoToStore", dic);
         }
 
-        public ObservableCollection<Asortyment> GetProductsInStore(int shop)
+        public ObservableCollection<Product> GetProductsInStore(int shop)
         {
-            ObservableCollection<Asortyment> ShopAso = new ObservableCollection<Asortyment>();
+            ObservableCollection<Product> ShopAso = new ObservableCollection<Product>();
 
             DataTable dt = GetAsoList(shop);
             foreach (DataRow item in dt.Rows)
             {
-                ShopAso.Add(new Asortyment((int)item["id"], (string)item["NAZWA"]));
+                ShopAso.Add(new Product((int)item["id"], (string)item["NAZWA"]));
             }
             return ShopAso;
         }
@@ -455,9 +455,8 @@ namespace Engine
             com.Parameters.Add(par);
             com.Prepare();
 
-            for (int x = 0; x < invoice.GetNumberOfItems(); x++)
+            foreach (var item in invoice.GetInvoiceItems())
             {
-                InvoiceDetails item = invoice.GetItem(x);
                 PrepareInvoiceDetailsInsertQueryParameters(invoice, com, item);
                 com.ExecuteNonQuery();
             }
@@ -480,25 +479,25 @@ namespace Engine
 
             SqlParameter par = new SqlParameter("@nrParagonu", SqlDbType.VarChar, 50)
             {
-                Value = invoice.GetInvoiceNumber().ToUpper()
+                Value = invoice.InvoiceNumber.ToUpper()
             };
             com.Parameters.Add(par);
 
             par = new SqlParameter("@data", SqlDbType.Date)
             {
-                Value = invoice.GetDate()
+                Value = invoice.InvoiceDate
             };
             com.Parameters.Add(par);
 
             par = new SqlParameter("@idsklep", SqlDbType.VarChar, 150)
             {
-                Value = invoice.GetShopId()
+                Value = invoice.ShopId
             };
             com.Parameters.Add(par);
 
             par = new SqlParameter("@konto", SqlDbType.Int)
             {
-                Value = invoice.GetAccount()
+                Value = invoice.AccountId
             };
             com.Parameters.Add(par);
 

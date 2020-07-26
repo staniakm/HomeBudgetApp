@@ -22,7 +22,7 @@ namespace Engine.service
             return sqlEngine.GetShopsCollection();
         }
 
-        public ObservableCollection<Asortyment> GetProductsInStore(int shopId)
+        public ObservableCollection<Product> GetProductsInStore(int shopId)
         {
             return sqlEngine.GetProductsInStore(shopId);
         }
