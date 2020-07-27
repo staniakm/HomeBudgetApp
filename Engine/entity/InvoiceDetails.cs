@@ -5,12 +5,13 @@ namespace Engine
 {
     public class InvoiceDetails : INotifyPropertyChanged
     {
-        private readonly Product product;
         private decimal price;
         private decimal quantity;
         private decimal discount;
 
-        public string ProductName { get => product.Nazwa ; private set => product.Nazwa = value; }
+
+        public Product Product { get; private set; }
+        public string ProductName { get => Product.Name; }
         public decimal Price { get => price; set => SetPrice(value) ; }
         public decimal Quantity { get => quantity; set => SetQuantity(value); }
         public decimal Discount { get => discount; set => SetDiscount(value); }
@@ -21,7 +22,7 @@ namespace Engine
 
         public InvoiceDetails(Product product, decimal cena, decimal ilosc, string opis = "", decimal discount=0.0M)
         {
-            this.product = product;
+            Product = product;
             Quantity = ilosc;
             Price = cena;
             Discount = discount;
@@ -74,7 +75,7 @@ namespace Engine
 
         internal int GetIDAso()
         {
-            return product.ID;
+            return Product.ID;
         }
     }
 }

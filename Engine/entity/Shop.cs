@@ -4,12 +4,12 @@ namespace Engine
 {
      public class Shop {
         public int ID { get; private set; }
-        public string Nazwa { get; private set; }
+        public string Name { get; private set; }
 
-        public Shop(int id, string nazwa)
+        public Shop(int id, string name)
         {
             ID = id;
-            Nazwa = nazwa;
+            Name = name;
         }
 
     }

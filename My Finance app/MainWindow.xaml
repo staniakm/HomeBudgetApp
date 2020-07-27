@@ -38,7 +38,7 @@
             <StackPanel Orientation="Horizontal"></StackPanel>
             <Grid x:Name="gr_invoice" Margin="0,0,0,54">
                 <DatePicker x:Name="dp_date" HorizontalAlignment="Left" Margin="64,21,0,0" VerticalAlignment="Top" Width="128" DisplayDate="2017-01-01" FirstDayOfWeek="Monday" Cursor="None" TabIndex="1"/>
-                <ComboBox x:Name="cb_shop" HorizontalAlignment="Left" Margin="64,50,0,0" VerticalAlignment="Top" Width="128" IsEditable="True" TabIndex="2" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
+                <ComboBox x:Name="cb_shop" HorizontalAlignment="Left" Margin="64,50,0,0" VerticalAlignment="Top" Width="128" IsEditable="True" TabIndex="2" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
                 <TextBox x:Name="tb_nr_paragonu" HorizontalAlignment="Left" Height="23" Margin="64,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" TabIndex="3"/>
                 <ComboBox x:Name="cb_bankAccount" HorizontalAlignment="Left" Margin="64,105,0,0" VerticalAlignment="Top" Width="128" TabIndex="3" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
 
@@ -55,7 +55,7 @@
                 <Button x:Name="bt_ref" Content="Refresh" HorizontalAlignment="Center" VerticalAlignment="Top" Width="76" Click="RefreshDataGrid" IsEnabled="True" Height="22" Margin="10,168,28,0"/>
             </Grid>
             <Grid x:Name="gr_produkty" IsEnabled="False" Grid.Column="2">
-                <ComboBox x:Name="cb_product" HorizontalAlignment="Left" Margin="82,21,0,0" VerticalAlignment="Top" Width="250" IsEditable="True" TabIndex="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID" SelectedValue="{Binding ID}" />
+                <ComboBox x:Name="cb_product" HorizontalAlignment="Left" Margin="82,21,0,0" VerticalAlignment="Top" Width="250" IsEditable="True" TabIndex="5" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID" SelectedValue="{Binding ID}" />
                 <TextBox x:Name="tb_price" HorizontalAlignment="Left" Height="23" Margin="82,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="6" />
                 <TextBox x:Name="tb_quantity" HorizontalAlignment="Left" Height="23" Margin="179,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="7"/>
                 <TextBox x:Name="tb_discount" HorizontalAlignment="Left" Height="23" Margin="280,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="53" PreviewTextInput="NumberValidation" TabIndex="7"/>
@@ -140,9 +140,9 @@
                 <Label Content="Data do" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top"/>
                 <DatePicker x:Name="dp_report_end_date" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Top"/>
                 <Label Content="Kategoria" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top" />
-                <ComboBox x:Name="cb_report_category_collection" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
+                <ComboBox x:Name="cb_report_category_collection" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
                 <Label Content="Sklep" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="cb_report_shop_collection" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
+                <ComboBox x:Name="cb_report_shop_collection" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
             </StackPanel>
 
 
@@ -152,7 +152,7 @@
                 <ColumnDefinition Width="100*"/>
                 <ColumnDefinition Width="600*"/>
             </Grid.ColumnDefinitions>
-            <ComboBox x:Name="cb_kategoria" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10" IsEditable="True"/>
+            <ComboBox x:Name="cb_kategoria" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10" IsEditable="True"/>
             <Button x:Name="bt_zaladuj_produkty" Content="Załaduj" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,40,10,10" Click="LoadCategory"/>
             <Button x:Name="bt_edit_category" Click="EditItemCategory" Content="Edytuj" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,70,10,0"/>
 

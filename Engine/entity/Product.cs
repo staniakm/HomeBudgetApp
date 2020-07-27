@@ -6,13 +6,13 @@ namespace Engine
     public class Product
     {
 
-        public int ID { get; set; }
-        public string Nazwa { get; set; }
+        public int ID { get;  set; }
+        public string Name { get;  set; }
 
-        public Product(int id, string nazwa)
+        public Product(int id, string name)
         {
             ID = id;
-            Nazwa = nazwa;
+            Name = name;
         }
 
     }

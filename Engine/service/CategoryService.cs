@@ -24,7 +24,7 @@ namespace Engine.service
 
         public DataTable GetItemsByCategory(string text)
         {
-            return sqlEngine.GetItemsByCategory(text);
+            return sqlEngine.GetItemsByCategory(text.Trim());
         }
 
         public void UpdateItemCategory(int productId, string newCategoryName, int newCategoryId, string newProductName)

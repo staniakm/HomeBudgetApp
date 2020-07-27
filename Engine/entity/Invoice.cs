@@ -5,12 +5,9 @@ namespace Engine
 {
     public class Invoice
     {
-        private int invoiceId;
-        public DateTime date;
-        public string InvoiceNumber { get; private set; }
-        public string shop;
-        public int account;
         public ObservableCollection<InvoiceDetails> invoiceItems;
+
+        public string InvoiceNumber { get; private set; }
         public int AccountId { get; private set; }
         public DateTime InvoiceDate { get; private set; }
         public int ShopId { get; private set; }
@@ -22,19 +19,7 @@ namespace Engine
             AccountId = accountId;
             InvoiceDate = invoiceDate;
             InvoiceNumber = invoiceNumber;
-
         }
-
-        public int GetInvoiceId()
-        {
-            return invoiceId;
-        }
-
-        public void SetInvoiceId(int value)
-        {
-            invoiceId = value;
-        }
-
 
         public ObservableCollection<InvoiceDetails> GetInvoiceItems()
         {
