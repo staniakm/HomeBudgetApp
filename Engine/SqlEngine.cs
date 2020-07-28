@@ -83,7 +83,7 @@ namespace Engine
 
         }
 
-        public void AddAutomaticInvoices() => SQLexecuteNonQuerry("EXEC dodaj_rachunki");
+        public void AddAutomaticInvoices() => SQLexecuteNonQuerry("EXEC dbo.auto_invoice");
 
         public void UpdateItemCategory(int productId, string newCategoryName, int newCategoryId, string newProductName)
         {
@@ -160,7 +160,7 @@ namespace Engine
                 _con.Open();
                 try
                 {
-
+                    //todo do in transaction
                     var invoiceId = SaveNewInvoiceInDatabase(invoice, _con);
 
                     SaveInvoiceItemsInDatabase(invoice, invoiceId, _con);
@@ -213,7 +213,7 @@ namespace Engine
             DataTable dt = GetTableByName("sklepy");
             foreach (DataRow item in dt.Rows)
             {
-                sklepy.Add(new Shop((int)item["id"], (string)item["sklep"]));
+                sklepy.Add(new Shop(item));
             }
             return sklepy;
         }
@@ -259,7 +259,7 @@ namespace Engine
             DataTable dt = GetTableByName("kategorie");
             foreach (DataRow item in dt.Rows)
             {
-                kategorie.Add(new Category((int)item["id"], (string)item["nazwa"]));
+                kategorie.Add(new Category(item));
             }
             return kategorie;
         }
@@ -268,20 +268,19 @@ namespace Engine
         {
             int month = date.Month;
             int year = date.Year;
-            string sqlquery = "";
             Dictionary<string, string> param = new Dictionary<string, string>();
             if (month != 0)
             {
 
                 param.Add("@miesiac", month.ToString());
                 param.Add("@year", year.ToString());
-                sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
+               var sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
                     "where miesiac = @miesiac and rok = @year order by k.nazwa; ";
                 return GetData(sqlquery, param);
             }
             else
             {
-                sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
+                var sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
                     "where miesiac = month(getdate()) order by k.nazwa; ";
                 return GetData(sqlquery);
             }
@@ -446,15 +445,15 @@ namespace Engine
             par = new SqlParameter("@opis", SqlDbType.VarChar, 150);
             com.Parameters.Add(par);
             com.Prepare();
-
+            //TO-DO execute all at once - bulk insert
             foreach (var item in invoice.GetInvoiceItems())
             {
-                PrepareInvoiceDetailsInsertQueryParameters(invoice, invoiceId, com, item);
+                PrepareInvoiceDetailsInsertQueryParameters(invoiceId, com, item);
                 com.ExecuteNonQuery();
             }
         }
 
-        private void PrepareInvoiceDetailsInsertQueryParameters(Invoice invoice, int invoiceId, SqlCommand com, InvoiceDetails item)
+        private void PrepareInvoiceDetailsInsertQueryParameters(int invoiceId, SqlCommand com, InvoiceDetails item)
         {
             com.Parameters[0].Value = invoiceId;
             com.Parameters[1].Value = item.Price;

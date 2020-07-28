@@ -1,4 +1,6 @@
-﻿namespace Engine
+﻿using System.Data;
+
+namespace Engine
 {
     public class Category
     {
@@ -8,6 +10,12 @@
         {
             ID = iD;
             Name = name;
+        }
+
+        public Category(DataRow item)
+        {
+            ID = (int)item["id"];
+            Name = (string)item["nazwa"];
         }
     }
 }
