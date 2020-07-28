@@ -1,0 +1,39 @@
+﻿<Page x:Class="My_Finance_app.BudgetPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:My_Finance_app"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="BudgetPage">
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="170*"/>
+            <ColumnDefinition Width="600*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Background="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+            <StackPanel Orientation="Horizontal">
+                <Button Click="SetPreviousMonth" Content='&lt;&lt;' Width="30" Margin="10,5,0,5" />
+                <Label x:Name="lb_selectedMonth" Content="" Margin="5,5,0,5" Width="85" HorizontalContentAlignment="Center"/>
+                <Button Click="SetNextMonth" Content='&gt;&gt;' Width="30" Margin="5,5,0,5" HorizontalAlignment="Right" />
+            </StackPanel>
+            <Button x:Name="bt_przelicz_budzety" Content="Przelicz budżety" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,2,10,0" Click="RecalculateBudget"/>
+            <Button x:Name="bt_zaladuj_budzety" Content="Załaduj budżety" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,2,10,0" Click="LoadBudget"/>
+            <Button x:Name="bt_edit_budzet" Click="EditBudget" Content="Edytuj" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,2,10,0"/>
+            <Label  Content="Przychód:" Margin="10,5,40,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+            <Label x:Name="lb_przychodzy"  Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"  />
+            <Label  Content="Zaplanowane:" Margin="10,0,40,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+            <Label x:Name="lb_zaplanowane" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+            <Label  Content="Pozostało do zaplanowania:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+            <Label x:Name="lb_pozostalo" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+            <Label  Content="Dotychczas wydane:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+            <Label x:Name="lb_wydatek" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+            <Label  Content="Oszczędności:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+            <Label x:Name="lb_oszczednosci" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+        </StackPanel>
+        <DataGrid x:Name="dg_budzety" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}"/>
+
+    </Grid>
+</Page>

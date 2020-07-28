@@ -23,7 +23,7 @@
             <TextBox x:Name="lb_product_name" Height="25"/>
             <Label x:Name="lb_id_kat" Height="25"/>
             <Label x:Name="lb_nazwa_kat" Height="25"/>
-            <ComboBox x:Name="cb_newCategory" Height="25" Margin="5" IsEditable="True" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
+            <ComboBox x:Name="cb_newCategory" Height="25" Margin="5" IsEditable="True" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
             <Button x:Name="bt_zatwierdz" Height="25" Margin="5" Content="Zatwierdź" Click="bt_zatwierdz_Click"/>
         </StackPanel>
 

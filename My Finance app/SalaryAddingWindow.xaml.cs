@@ -1,5 +1,6 @@
 ﻿using Engine;
 using Engine.service;
+using My_Finance_app.pages;
 using System;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -15,8 +16,8 @@ namespace My_Finance_app
     {
         private readonly BudgetService budgetService;
         private readonly int accountID;
-        private readonly MainWindow mw;
-        public SalaryAddingWindow(int accountID, BudgetService budgetService, MainWindow mainWindow)
+        private readonly AccountPage mw;
+        public SalaryAddingWindow(int accountID, BudgetService budgetService, AccountPage mainWindow)
         {
             this.budgetService = budgetService;
             this.accountID = accountID;

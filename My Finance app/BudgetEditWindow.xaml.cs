@@ -25,9 +25,9 @@ namespace My_Finance_app
     {
         //private readonly SqlEngine SQL;
         private readonly BudgetService budgetService;
-        private MainWindow mw;
+        private BudgetPage mw;
         private int databaseBudgetRowID;
-        public BudgetEditWindow(DataRowView id, BudgetService budgetService, MainWindow mw)
+        public BudgetEditWindow(DataRowView id, BudgetService budgetService, BudgetPage mw)
         {
             InitializeComponent();
             this.Top = SystemParameters.PrimaryScreenHeight / 2;
