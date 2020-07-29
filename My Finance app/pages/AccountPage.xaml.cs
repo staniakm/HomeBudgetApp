@@ -13,8 +13,8 @@ namespace MyFinanceApp.pages
     /// </summary>
     public partial class AccountPage : Page
     {
-        private BankAccountService bankAccountService;
-        private BudgetService budgetService;
+        private readonly BankAccountService bankAccountService;
+        private readonly BudgetService budgetService;
 
         public AccountPage(BankAccountService bankAccountService, BudgetService budgetService)
         {

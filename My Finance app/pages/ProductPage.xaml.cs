@@ -10,7 +10,7 @@ namespace MyFinanceApp.pages
     /// </summary>
     public partial class ProductPage : Page
     {
-        private CategoryService categoryService;
+        private readonly CategoryService categoryService;
 
         public ProductPage(CategoryService categoryService)
         {

@@ -26,11 +26,6 @@ namespace MyFinanceApp.pages
         private readonly CategoryService categoryService;
         private readonly ShopService shopService;
 
-        public ReportPage()
-        {
-            
-        }
-
         public ReportPage(ReportService reportService, CategoryService categoryService, ShopService shopService)
         {
             InitializeComponent();

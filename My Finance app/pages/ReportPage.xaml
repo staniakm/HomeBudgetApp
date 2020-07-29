@@ -18,10 +18,10 @@
         <StackPanel x:Name="sp_ustawieniaRaportu_1">
             <Button x:Name="bt_generuj" Content="Generuj" HorizontalAlignment="Stretch" Margin="5,10,0,0" VerticalAlignment="Top" Click="GenerateReport"/>
             <ComboBox x:Name="cb_report_type" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,10,0,0" SelectedIndex="0">
-                <ComboBoxItem Content="Normalne" />
-                <ComboBoxItem Content="Kategorie"/>
-                <ComboBoxItem Content="Kategorie i konto"/>
-                <ComboBoxItem Content="Lista paragonów"/>
+                <ComboBoxItem x:Name="standard" Content="Normalne" />
+                <ComboBoxItem x:Name="category" Content="Kategorie"/>
+                <ComboBoxItem x:Name="categoryAndAccount" Content="Kategorie i konto"/>
+                <ComboBoxItem x:Name="invoiceList" Content="Lista paragonów"/>
             </ComboBox>
             <Label Content="Data od" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top" />
             <DatePicker x:Name="dp_report_start_date" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
