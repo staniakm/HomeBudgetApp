@@ -1,9 +1,9 @@
-﻿<Window x:Name="MyFinancial_app" x:Class="My_Finance_app.MainWindow"
+﻿<Window x:Name="MyFinancial_app" x:Class="MyFinanceApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:My_Finance_app"
+        xmlns:local="clr-namespace:MyFinanceApp"
          xmlns:eng ="clr-namespace:Engine;assembly=Engine"
         mc:Ignorable="d"
         Title="MyFinancial app" Height="451" Width="804">
@@ -14,244 +14,19 @@
     <Grid x:Name="grid_main" Margin="0,0,0,0">
         <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" >
             <Menu DockPanel.Dock="Top">
-                <MenuItem Header="Przełącz zakładkę" >
-                    <MenuItem x:Name="mi_Paragony" Header="Paragony" Click="MenuItems"/>
-                    <MenuItem x:Name="mi_Zestawienia" Header="Zestawienia">
-                        <MenuItem Header="Standardowe zestawienie" Click="MenuItems" />
+                <MenuItem Header="Menu" >
+                    <MenuItem x:Name="mi_invoice" Header="Paragony" Click="SwichPage"/>
+                    <MenuItem x:Name="mi_report" Header="Zestawienia">
+                        <MenuItem x:Name="mi_standardReport" Header="Standardowe zestawienie" Click="SwichPage" />
                     </MenuItem>
-                    <MenuItem x:Name="mi_Budzet" Header="Budżet" Click="MenuItems"/>
-                    <MenuItem x:Name="mi_Kategorie" Header="Asortyment" Click="MenuItems"/>
-                    <MenuItem x:Name="mi_Konta" Header="Konta" Click="MenuItems"/>
+                    <MenuItem x:Name="mi_budget" Header="Budżet" Click="SwichPage"/>
+                    <MenuItem x:Name="mi_product" Header="Asortyment" Click="SwichPage"/>
+                    <MenuItem x:Name="mi_account" Header="Konta" Click="SwichPage"/>
                 </MenuItem>
             </Menu>
         </DockPanel>
-        <Grid x:Name="grid_paragony" Visibility="Visible" Background="#FFB9B7B7" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="4*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="3*"></RowDefinition>
-                <RowDefinition Height="3*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <StackPanel Orientation="Horizontal"></StackPanel>
-            <Grid x:Name="gr_invoice" Margin="0,0,0,54">
-                <DatePicker x:Name="dp_date" HorizontalAlignment="Left" Margin="64,21,0,0" VerticalAlignment="Top" Width="128" DisplayDate="2017-01-01" FirstDayOfWeek="Monday" Cursor="None" TabIndex="1"/>
-                <ComboBox x:Name="cb_shop" HorizontalAlignment="Left" Margin="64,50,0,0" VerticalAlignment="Top" Width="128" IsEditable="True" TabIndex="2" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
-                <TextBox x:Name="tb_nr_paragonu" HorizontalAlignment="Left" Height="23" Margin="64,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" TabIndex="3"/>
-                <ComboBox x:Name="cb_bankAccount" HorizontalAlignment="Left" Margin="64,105,0,0" VerticalAlignment="Top" Width="128" TabIndex="3" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
-
-
-                <Label x:Name="label" Content="Data" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
-                <Label x:Name="label_Copy" Content="Sklep" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
-                <Label x:Name="label_Copy1" Content="Paragon" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
-                <Label x:Name="label_Copy2" Content="Konto" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.481,-0.444"/>
-            </Grid>
-            <Button x:Name="bt_invoiceOperation" Content="Dodaj paragon" HorizontalAlignment="Left" Margin="64,168,0,0" VerticalAlignment="Top" Width="128" Click="InvoiceOperation" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="4"/>
-
-            <Grid x:Name="gr_paragon" Grid.Column="1" IsEnabled="True">
-                <!--<Button x:Name="bt_CancelBill" Content="Anuluj paragon" Margin="0,141,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="100" Click="CancelCurrentInvoice" Height="22" RenderTransformOrigin="0.462,1.667" TabIndex="100"/>-->
-                <Button x:Name="bt_ref" Content="Refresh" HorizontalAlignment="Center" VerticalAlignment="Top" Width="76" Click="RefreshDataGrid" IsEnabled="True" Height="22" Margin="10,168,28,0"/>
-            </Grid>
-            <Grid x:Name="gr_produkty" IsEnabled="False" Grid.Column="2">
-                <ComboBox x:Name="cb_product" HorizontalAlignment="Left" Margin="82,21,0,0" VerticalAlignment="Top" Width="250" IsEditable="True" TabIndex="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID" SelectedValue="{Binding ID}" />
-                <TextBox x:Name="tb_price" HorizontalAlignment="Left" Height="23" Margin="82,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="6" />
-                <TextBox x:Name="tb_quantity" HorizontalAlignment="Left" Height="23" Margin="179,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" PreviewTextInput="NumberValidation" TabIndex="7"/>
-                <TextBox x:Name="tb_discount" HorizontalAlignment="Left" Height="23" Margin="280,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="53" PreviewTextInput="NumberValidation" TabIndex="7"/>
-                <TextBox x:Name="tb_description" HorizontalAlignment="Left" Height="23" Margin="82,78,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250" TabIndex="8"/>
-                <Button x:Name="bt_dodajProdukt" Content="Dodaj produkt" HorizontalAlignment="Left" Margin="240,106,0,0" VerticalAlignment="Top" Width="89" Click="Bt_AddNewItemToInvoice"  TabIndex="9"/>
-                <Button x:Name="bt_zapisDoBazy" Content="Zapisz w bazie" HorizontalAlignment="Left" Margin="241,168,0,0" VerticalAlignment="Top" Width="92" Click="Bt_SaveInvoiceInDatabase"  TabIndex="10" RenderTransformOrigin="1.669,3.523"/>
-                <Label  Content="Produkt" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" Width="58" Height="27" />
-                <Label Content="Cena" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top" Width="58" Height="27" />
-                <Label Content="Ilość" HorizontalAlignment="Left" Margin="145,46,0,0" VerticalAlignment="Top" Width="35" Height="27"/>
-                <Label Content="Rabat" HorizontalAlignment="Left" Margin="240,46,0,0" VerticalAlignment="Top" Width="40" Height="27"/>
-                <Label Content="Opis" HorizontalAlignment="Left" Margin="10,78,0,0" VerticalAlignment="Top" Width="58" Height="27" />
-                <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="82,106,0,0" VerticalAlignment="Top" Width="120" IsEditable="True"/>
-            </Grid>
-
-
-            <Grid Grid.Row="1" Grid.ColumnSpan="3">
-                <Grid Margin="10">
-                    <DataGrid x:Name="dg_paragony" AutoGenerateColumns="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding}">
-
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding ProductName}" Header="Produkt" IsReadOnly="True"/>
-
-                            <!--<DataGridTextColumn Binding="{Binding Price, Mode=TwoWay}" Header="Cena jednostkowa"/>-->
-                            <DataGridTemplateColumn Header="Cena jednostkowa" IsReadOnly="False">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding Price, Mode=TwoWay,UpdateSourceTrigger=LostFocus}" PreviewTextInput="CellNumberValidation" BorderThickness="0"></TextBox>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <!--<DataGridTextColumn Binding="{Binding Quantity, Mode=TwoWay}" Header="Ilość"/>-->
-                            <DataGridTemplateColumn Header="Ilość" IsReadOnly="False">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding Quantity, Mode=TwoWay,UpdateSourceTrigger=LostFocus}" PreviewTextInput="CellNumberValidation" BorderThickness="0"></TextBox>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <!--<DataGridTextColumn Binding="{Binding Discount, Mode=TwoWay}" Header="Rabat"/>-->
-                            <DataGridTemplateColumn Header="Rabat" IsReadOnly="False">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding Discount, Mode=TwoWay,UpdateSourceTrigger=LostFocus}" PreviewTextInput="CellNumberValidation" BorderThickness="0"></TextBox>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-
-                            <DataGridTextColumn Binding="{Binding TotalPrice, UpdateSourceTrigger=PropertyChanged}" Header="Cena" IsReadOnly="True"/>
-                            <DataGridTextColumn Binding="{Binding Description}" Header="Opis"/>
-                            <!--<DataGridTextColumn Binding="{Binding Description}" Header="Kategoria" IsReadOnly="True" />-->
-
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-                <!--<Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="127*"/>
-                    <ColumnDefinition Width="260*"/>
-                    <ColumnDefinition Width="0*"/>
-                    <ColumnDefinition Width="0*"/>
-                </Grid.ColumnDefinitions>-->
-            </Grid>
-            <Label Content="Suma:" Grid.Column="2" HorizontalAlignment="Left" Margin="10,169,0,0" VerticalAlignment="Top" Width="48"/>
-            <Label x:Name="l_totalPrice" Content="{Binding TotalPrice, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" HorizontalAlignment="Left" Margin="58,169,0,0" VerticalAlignment="Top"/>
-        </Grid>
-        <Grid x:Name="grid_zestawienie" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="12*"/>
-            </Grid.ColumnDefinitions>
-            <DataGrid x:Name="dg_reports" Grid.Column="1" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsReadOnly="True"/>
-
-            <StackPanel x:Name="sp_ustawieniaRaportu_1">
-                <Button x:Name="bt_generuj" Content="Generuj" HorizontalAlignment="Stretch" Margin="5,10,0,0" VerticalAlignment="Top" Click="GenerateReport"/>
-                <ComboBox x:Name="cb_report_type" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,10,0,0" SelectedIndex="0">
-                    <ComboBoxItem Content="Normalne" />
-                    <ComboBoxItem Content="Kategorie"/>
-                    <ComboBoxItem Content="Kategorie i konto"/>
-                    <ComboBoxItem Content="Lista paragonów"/>
-                </ComboBox>
-                <Label Content="Data od" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top" />
-                <DatePicker x:Name="dp_report_start_date" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-                <Label Content="Data do" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top"/>
-                <DatePicker x:Name="dp_report_end_date" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Top"/>
-                <Label Content="Kategoria" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top" />
-                <ComboBox x:Name="cb_report_category_collection" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
-                <Label Content="Sklep" HorizontalAlignment="Stretch" Margin="5,10,5,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="cb_report_shop_collection" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
-            </StackPanel>
-
-
-        </Grid>
-        <Grid x:Name="grid_asortyment" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100*"/>
-                <ColumnDefinition Width="600*"/>
-            </Grid.ColumnDefinitions>
-            <ComboBox x:Name="cb_kategoria" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10" IsEditable="True"/>
-            <Button x:Name="bt_zaladuj_produkty" Content="Załaduj" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,40,10,10" Click="LoadCategory"/>
-            <Button x:Name="bt_edit_category" Click="EditItemCategory" Content="Edytuj" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,70,10,0"/>
-
-            <DataGrid x:Name="dg_asortyment" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}" >
-                <!--<DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Path=nazwa}" IsReadOnly="True" />
-                </DataGrid.Columns>-->
-            </DataGrid>
-        </Grid>
-        <Grid x:Name="grid_wykresy" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100*"/>
-                <ColumnDefinition Width="600*"/>
-            </Grid.ColumnDefinitions>
-
-        </Grid>
-        <Grid x:Name="grid_budzet" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="170*"/>
-                <ColumnDefinition Width="600*"/>
-            </Grid.ColumnDefinitions>
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Button Click="SetPreviousMonth" Content='&lt;&lt;' Width="30" Margin="10,5,0,5" />
-                    <Label x:Name="lb_selectedMonth" Content="" Margin="5,5,0,5" Width="85" HorizontalContentAlignment="Center"/>
-                    <Button Click="SetNextMonth" Content='&gt;&gt;' Width="30" Margin="5,5,0,5" HorizontalAlignment="Right" />
-                </StackPanel>
-                <Button x:Name="bt_przelicz_budzety" Content="Przelicz budżety" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,2,10,0" Click="RecalculateBudget"/>
-                <Button x:Name="bt_zaladuj_budzety" Content="Załaduj budżety" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,2,10,0" Click="LoadBudget"/>
-                <Button x:Name="bt_edit_budzet" Click="EditBudget" Content="Edytuj" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,2,10,0"/>
-                <Label  Content="Przychód:" Margin="10,5,40,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-                <Label x:Name="lb_przychodzy"  Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"  />
-                <Label  Content="Zaplanowane:" Margin="10,0,40,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-                <Label x:Name="lb_zaplanowane" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-                <Label  Content="Pozostało do zaplanowania:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-                <Label x:Name="lb_pozostalo" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-                <Label  Content="Dotychczas wydane:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-                <Label x:Name="lb_wydatek" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-                <Label  Content="Oszczędności:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-                <Label x:Name="lb_oszczednosci" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-            </StackPanel>
-            <DataGrid x:Name="dg_budzety" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}"/>
-
-        </Grid>
-        <Grid x:Name="grid_konta" Background="#FFB9B7B7" Visibility="Hidden" Margin="0,20,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="159*"/>
-                <ColumnDefinition Width="323*"/>
-                <ColumnDefinition Width="314*"/>
-            </Grid.ColumnDefinitions>
-            <StackPanel>
-                <Label Content="Edycja kont"/>
-                <ComboBox x:Name="konta_cb_konto" VerticalAlignment="Center" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID" HorizontalAlignment="Stretch" Margin="5"/>
-                <Button x:Name="br_zapisz_konto" Content="Zapisz" Margin="5" HorizontalAlignment="Stretch" Click="SaveAccount"/>
-                <Button x:Name="br_dodajPrzychod" Content="Dodaj przychod" Margin="5" HorizontalAlignment="Stretch" Click="AddNewIncome"/>
-                <Button x:Name="bt_nowe_konto" Content="Nowe" Margin="5,50,5,0" Click="AddNewUserAccount"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1" Grid.ColumnSpan="2">
-                <TabPanel Margin="5">
-                    <Label Width="100" Content="ID"/>
-                    <TextBox x:Name="accountId" Width="150" IsEnabled="False" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.ID, Mode=OneWay}" />
-                </TabPanel>
-                <TabPanel Margin="5">
-                    <Label Width="100" Content="Nazwa"/>
-                    <TextBox x:Name="accountName" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Name, Mode=OneWay}" />
-                </TabPanel>
-                <TabPanel Margin="5">
-                    <Label Content="Kwota" Width="100"/>
-                    <TextBox x:Name="accountMoneyAmount" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Value, Mode=OneWay}"  PreviewTextInput="NumberValidation"/>
-                </TabPanel>
-                <TabPanel Margin="5" Height="60">
-                    <Label Content="Opis" Width="100"/>
-                    <TextBox x:Name="accountDescription" Height="60" TextWrapping="Wrap" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Opis, Mode=OneWay}" />
-                </TabPanel>
-                <TabPanel Margin="5">
-                    <Label Content="Właściciel" Width="100"/>
-                    <TextBox x:Name="accountOwner" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Owner, Mode=OneWay}" />
-                </TabPanel>
-                <TabPanel Margin="5">
-                    <Label Content="Oprocentowanie" Width="100"/>
-                    <TextBox x:Name="konto_procent" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Oprocentowanie, Mode=OneWay}"  PreviewTextInput="NumberValidation"/>
-                </TabPanel>
-            </StackPanel>
-
-            <!--<Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100*"/>
-                <ColumnDefinition Width="600*"/>
-            </Grid.ColumnDefinitions>
-            <ComboBox x:Name="cb_konto" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10" IsEditable="True"/>
-            <Button x:Name="bt_zaladuj_produkty" Content="Załaduj" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,40,10,10" Click="LoadCategory"/>
-            <Button x:Name="bt_edit_category" Click="bt_edit_category_Click" Content="Edytuj" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,70,10,0"/>-->
-
-            <!--<DataGrid x:Name="dg_asortyment" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}" >
-                -->
-            <!--<DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Path=nazwa}" IsReadOnly="True" />
-                </DataGrid.Columns>-->
-            <!--
-            </DataGrid>-->
+        <Grid x:Name="pages" Background="AliceBlue" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Frame x:Name="Main" NavigationUIVisibility="Hidden"/>
         </Grid>
     </Grid>
 

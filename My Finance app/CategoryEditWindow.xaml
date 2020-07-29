@@ -1,9 +1,9 @@
-﻿<Window x:Class="My_Finance_app.CategoryEditWindow"
+﻿<Window x:Class="MyFinanceApp.CategoryEditWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:My_Finance_app"
+        xmlns:local="clr-namespace:MyFinanceApp"
         mc:Ignorable="d"
         Title="CategoryEditWindow" Height="208" Width="316" WindowStartupLocation="Manual">
     <Grid>
@@ -23,7 +23,7 @@
             <TextBox x:Name="lb_product_name" Height="25"/>
             <Label x:Name="lb_id_kat" Height="25"/>
             <Label x:Name="lb_nazwa_kat" Height="25"/>
-            <ComboBox x:Name="cb_newCategory" Height="25" Margin="5" IsEditable="True" ItemsSource="{Binding}" DisplayMemberPath="Nazwa" SelectedValuePath="ID"/>
+            <ComboBox x:Name="cb_newCategory" Height="25" Margin="5" IsEditable="True" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="ID"/>
             <Button x:Name="bt_zatwierdz" Height="25" Margin="5" Content="Zatwierdź" Click="bt_zatwierdz_Click"/>
         </StackPanel>
 

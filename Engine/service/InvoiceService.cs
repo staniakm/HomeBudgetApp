@@ -30,11 +30,11 @@ namespace Engine.service
 
         public void CreateNewInvoice(int shopId, int accountId, DateTime invoiceDate, string invoiceNumber)
         {
-            invoice = new Invoice();
-            invoice.SetDate(invoiceDate);
-            invoice.SetInvoiceNumber(invoiceNumber);
-            invoice.SetShopId(shopId);
-            invoice.SetAccount(accountId);
+            invoice = new Invoice(shopId, accountId, invoiceDate, invoiceNumber);
+            //invoice.SetDate(invoiceDate);
+            //invoice.SetInvoiceNumber(invoiceNumber);
+            //invoice.SetShopId(shopId);
+            //invoice.SetAccount(accountId);
         }
 
         public ObservableCollection<InvoiceDetails> GetInvoiceItems()
@@ -42,20 +42,20 @@ namespace Engine.service
             return invoice.GetInvoiceItems();
         }
 
-        public void addInvoiceItem(int productId, string productName, decimal price, decimal quantity, string description, decimal discount)
+        public void AddInvoiceItem(Product product, decimal price, decimal quantity, string description, decimal discount)
         {
-            InvoiceDetails invoiceDetails = new InvoiceDetails(productId, productName, price, quantity, description, discount);
+            InvoiceDetails invoiceDetails = new InvoiceDetails(product, price, quantity, description, discount);
             invoice.AddInvoiceItem(invoiceDetails);
         }
 
-        public void cancelInvoice()
+        public void CancelInvoice()
         {
             invoice = null;
         }
 
         public void Clear()
         {
-            cancelInvoice();
+            CancelInvoice();
         }
 
         public void AddAutomaticInvoices()

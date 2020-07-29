@@ -1,22 +1,12 @@
-﻿using Engine;
-using Engine.service;
+﻿using Engine.service;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
-namespace My_Finance_app
+namespace MyFinanceApp
 {
     /// <summary>
     /// Interaction logic for BudgetEditWindow.xaml
@@ -25,11 +15,13 @@ namespace My_Finance_app
     {
         //private readonly SqlEngine SQL;
         private readonly BudgetService budgetService;
-        private MainWindow mw;
-        private int databaseBudgetRowID;
-        public BudgetEditWindow(DataRowView id, BudgetService budgetService, MainWindow mw)
+        private readonly int databaseBudgetRowID;
+        private readonly DateTime selectedDate;
+
+        public BudgetEditWindow(DataRowView id, BudgetService budgetService, DateTime dateTime)
         {
             InitializeComponent();
+            this.selectedDate = dateTime;
             this.Top = SystemParameters.PrimaryScreenHeight / 2;
             this.Left = SystemParameters.PrimaryScreenWidth / 2;
 
@@ -39,23 +31,15 @@ namespace My_Finance_app
             lb_used.Content = id[4];
             lb_percent_used.Content = id[5];
             this.budgetService = budgetService;
-            this.mw = mw;
-            
+
             System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
 
         }
 
         private void bt_zatwierdz_Click(object sender, RoutedEventArgs e)
         {
-            string newValue = lb_planed.Text.Replace(",",".");
-            //try
-            //{
-                budgetService.UpdatePlannedBudget(databaseBudgetRowID, newValue, mw.GetCurrentlySelectedDate());
-            //}
-            //catch (Exception)
-            //{
-            //    throw;
-            //}
+            string newValue = lb_planed.Text.Replace(",", ".");
+            budgetService.UpdatePlannedBudget(databaseBudgetRowID, newValue, selectedDate);
             this.Close();
         }
         private void NumberValidation(object sender, TextCompositionEventArgs e)

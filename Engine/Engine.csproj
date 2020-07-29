@@ -45,7 +45,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsoInStore.cs" />
+    <Compile Include="entity\Product.cs" />
     <Compile Include="entity\BankAccount.cs" />
     <Compile Include="entity\BudgetData.cs" />
     <Compile Include="entity\Category.cs" />

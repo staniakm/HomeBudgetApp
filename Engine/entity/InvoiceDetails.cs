@@ -5,27 +5,24 @@ namespace Engine
 {
     public class InvoiceDetails : INotifyPropertyChanged
     {
-        private int productId;
-        private string productName;
         private decimal price;
         private decimal quantity;
         private decimal discount;
-        private decimal totalPrice;
-        private string description;
 
-        public string ProductName { get => productName; set => productName = value; }
+
+        public Product Product { get; private set; }
+        public string ProductName { get => Product.Name; }
         public decimal Price { get => price; set => SetPrice(value) ; }
         public decimal Quantity { get => quantity; set => SetQuantity(value); }
         public decimal Discount { get => discount; set => SetDiscount(value); }
-        public decimal TotalPrice { get => totalPrice; set => totalPrice = value; }
-        public string Description { get => description; set => description = value; }
+        public decimal TotalPrice { get; set; }
+        public string Description { get; set; }
 
 
 
-        public InvoiceDetails(int idAso, string produkt, decimal cena, decimal ilosc, string opis = "", decimal discount=0.0M)
+        public InvoiceDetails(Product product, decimal cena, decimal ilosc, string opis = "", decimal discount=0.0M)
         {
-            SetIDAso(idAso);
-            ProductName =produkt;
+            Product = product;
             Quantity = ilosc;
             Price = cena;
             Discount = discount;
@@ -33,19 +30,9 @@ namespace Engine
             SetTotalPrice();
         }
 
-        public int GetIDAso()
-        {
-            return productId;
-        }
-
-        public void SetIDAso(int value)
-        {
-            productId = value;
-        }
-
         public void SetTotalPrice()
         {
-            totalPrice = (Math.Round(Price * Quantity, 2,MidpointRounding.AwayFromZero)) - Discount; 
+            TotalPrice = (Math.Round(Price * Quantity, 2,MidpointRounding.AwayFromZero)) - Discount; 
         }
 
         private void SetQuantity(decimal value)
@@ -84,6 +71,11 @@ namespace Engine
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             SetTotalPrice();
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("totalPrice"));
+        }
+
+        internal int GetIDAso()
+        {
+            return Product.ID;
         }
     }
 }

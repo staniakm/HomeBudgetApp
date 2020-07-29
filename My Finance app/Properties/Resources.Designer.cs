@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace My_Finance_app.Properties {
+namespace MyFinanceApp.Properties {
     using System;
     
     

@@ -1,8 +1,9 @@
 ﻿using Engine;
 using Engine.service;
+using MyFinanceApp.pages;
 using System.Data;
 using System.Windows;
-namespace My_Finance_app
+namespace MyFinanceApp
 {
     /// <summary>
     /// Interaction logic for CategoryEditWindow.xaml
@@ -10,10 +11,10 @@ namespace My_Finance_app
     public partial class CategoryEditWindow : Window
     {
         private readonly CategoryService categoryService;
-        private MainWindow mw;
+        private ProductPage mw;
         private readonly int productId;
 
-        public CategoryEditWindow(DataRowView id, CategoryService categoryService, MainWindow mw)
+        public CategoryEditWindow(DataRowView id, CategoryService categoryService, ProductPage mw)
         {
             InitializeComponent();
             this.Top = SystemParameters.PrimaryScreenHeight/2;
