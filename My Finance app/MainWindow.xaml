@@ -14,18 +14,18 @@
     <Grid x:Name="grid_main" Margin="0,0,0,0">
         <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" >
             <Menu DockPanel.Dock="Top">
-                <MenuItem Header="Przełącz zakładkę" >
-                    <MenuItem x:Name="mi_Paragony" Header="Paragony" Click="SwichPage"/>
-                    <MenuItem x:Name="mi_Zestawienia" Header="Zestawienia">
-                        <MenuItem Header="Standardowe zestawienie" Click="SwichPage" />
+                <MenuItem Header="Menu" >
+                    <MenuItem x:Name="mi_invoice" Header="Paragony" Click="SwichPage"/>
+                    <MenuItem x:Name="mi_report" Header="Zestawienia">
+                        <MenuItem x:Name="mi_standardReport" Header="Standardowe zestawienie" Click="SwichPage" />
                     </MenuItem>
-                    <MenuItem x:Name="mi_Budzet" Header="Budżet" Click="SwichPage"/>
-                    <MenuItem x:Name="mi_Kategorie" Header="Asortyment" Click="SwichPage"/>
-                    <MenuItem x:Name="mi_Konta" Header="Konta" Click="SwichPage"/>
+                    <MenuItem x:Name="mi_budget" Header="Budżet" Click="SwichPage"/>
+                    <MenuItem x:Name="mi_product" Header="Asortyment" Click="SwichPage"/>
+                    <MenuItem x:Name="mi_account" Header="Konta" Click="SwichPage"/>
                 </MenuItem>
             </Menu>
         </DockPanel>
-        <Grid x:Name="pages" Visibility="Visible" Background="AliceBlue" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid x:Name="pages" Background="AliceBlue" Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Frame x:Name="Main" NavigationUIVisibility="Hidden"/>
         </Grid>
     </Grid>

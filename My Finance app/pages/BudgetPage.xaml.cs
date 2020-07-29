@@ -1,19 +1,8 @@
 ﻿using Engine.service;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace My_Finance_app
 {
@@ -22,9 +11,8 @@ namespace My_Finance_app
     /// </summary>
     public partial class BudgetPage : Page
     {
-        private BudgetService budgetService;
+        private readonly BudgetService budgetService;
         private DateTime selectedDate = DateTime.Now;
-
 
         public BudgetPage(BudgetService budgetService)
         {
@@ -36,14 +24,14 @@ namespace My_Finance_app
         {
             selectedDate = selectedDate.AddMonths(-1);
             lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
-            UpdateBudgetData();
+            ReloadBudgetData();
         }
 
         private void SetNextMonth(object sender, RoutedEventArgs e)
         {
             selectedDate = selectedDate.AddMonths(1);
             lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
-            UpdateBudgetData();
+            ReloadBudgetData();
         }
 
         private void RecalculateBudget(object sender, RoutedEventArgs e)
@@ -56,18 +44,18 @@ namespace My_Finance_app
             if (dg_budzety.SelectedIndex > -1)
             {
                 DataRowView dr = (DataRowView)dg_budzety.SelectedItem;
-                BudgetEditWindow cw = new BudgetEditWindow(dr, budgetService, this);
+                BudgetEditWindow cw = new BudgetEditWindow(dr, budgetService, GetCurrentlySelectedDate());
                 cw.ShowDialog();
             }
         }
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
-            UpdateBudgetData();
+            ReloadBudgetData();
 
         }
 
-        private void UpdateBudgetData()
+        private void ReloadBudgetData()
         {
             var budgetData = budgetService.GetBudgetData(GetCurrentlySelectedDate());
 
@@ -80,7 +68,7 @@ namespace My_Finance_app
             lb_oszczednosci.Content = budgetData.Savings;
         }
 
-        public DateTime GetCurrentlySelectedDate()
+        private DateTime GetCurrentlySelectedDate()
         {
             return selectedDate;
         }

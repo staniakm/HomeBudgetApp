@@ -16,7 +16,6 @@ namespace My_Finance_app
         private readonly CategoryService categoryService;
         private readonly BudgetService budgetService;
 
-
         public MainWindow(SqlEngine sqlEngine)
         {
             shopService = new ShopService(sqlEngine);
@@ -40,21 +39,22 @@ namespace My_Finance_app
         private void SwichPage(object sender, RoutedEventArgs e)
         {
             MenuItem mi = e.Source as MenuItem;
-            switch (mi.Header.ToString())
+            
+            switch (mi.Name.ToString())
             {
-                case "Budżet":
+                case "mi_budget":
                     Main.Content = new BudgetPage(budgetService);
                     break;
-                case "Konta":
+                case "mi_account":
                     Main.Content = new AccountPage(bankAccountService, budgetService);
                     break;
-                case "Asortyment":
+                case "mi_product":
                     Main.Content = new ProductPage(categoryService);
                     break;
-                case "Standardowe zestawienie":
+                case "mi_standardReport":
                     Main.Content = new ReportPage(reportService, categoryService, shopService);
                     break;
-                case "Paragony":
+                case "mi_invoice":
                     Main.Content = new InvoicePage(invoiceService, shopService, bankAccountService);
                     break;
             }
