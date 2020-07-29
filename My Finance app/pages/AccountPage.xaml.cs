@@ -1,21 +1,12 @@
 ﻿using Engine.service;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace My_Finance_app.pages
+namespace MyFinanceApp.pages
 {
     /// <summary>
     /// Logika interakcji dla klasy AccountPage.xaml
@@ -30,7 +21,11 @@ namespace My_Finance_app.pages
             InitializeComponent();
             this.bankAccountService = bankAccountService;
             this.budgetService = budgetService;
+            LoadData();
+        }
 
+        private void LoadData()
+        {
             grid_konta.DataContext = bankAccountService.GetBankAccounts();
         }
 

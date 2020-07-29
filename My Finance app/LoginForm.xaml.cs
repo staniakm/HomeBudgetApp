@@ -1,6 +1,6 @@
 ﻿using Engine;
 using System.Windows;
-namespace My_Finance_app
+namespace MyFinanceApp
 {
     /// <summary>
     /// Interaction logic for LoginForm.xaml

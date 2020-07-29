@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace My_Finance_app
+namespace MyFinanceApp
 {
     /// <summary>
     /// Interaction logic for App.xaml

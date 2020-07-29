@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace My_Finance_app
+namespace MyFinanceApp
 {
     /// <summary>
     /// Interaction logic for BudgetEditWindow.xaml

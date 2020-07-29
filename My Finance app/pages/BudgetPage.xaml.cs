@@ -4,7 +4,7 @@ using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace My_Finance_app
+namespace MyFinanceApp
 {
     /// <summary>
     /// Logika interakcji dla klasy BudgetPage.xaml

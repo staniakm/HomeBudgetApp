@@ -1,7 +1,7 @@
-﻿<Application x:Class="My_Finance_app.App"
+﻿<Application x:Class="MyFinanceApp.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:My_Finance_app"
+             xmlns:local="clr-namespace:MyFinanceApp"
              StartupUri="LoginForm.xaml">
     <Application.Resources>
          

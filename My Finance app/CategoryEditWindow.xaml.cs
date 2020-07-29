@@ -1,9 +1,9 @@
 ﻿using Engine;
 using Engine.service;
-using My_Finance_app.pages;
+using MyFinanceApp.pages;
 using System.Data;
 using System.Windows;
-namespace My_Finance_app
+namespace MyFinanceApp
 {
     /// <summary>
     /// Interaction logic for CategoryEditWindow.xaml

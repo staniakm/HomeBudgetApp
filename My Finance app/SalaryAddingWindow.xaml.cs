@@ -1,13 +1,13 @@
 ﻿using Engine;
 using Engine.service;
-using My_Finance_app.pages;
+using MyFinanceApp.pages;
 using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace My_Finance_app
+namespace MyFinanceApp
 {
     /// <summary>
     /// Interaction logic for SalaryAddingWindow.xaml

@@ -1,11 +1,11 @@
 ﻿using Engine;
 using Engine.service;
-using My_Finance_app.pages;
+using MyFinanceApp.pages;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace My_Finance_app
+namespace MyFinanceApp
 {
     public partial class MainWindow : Window
     {
