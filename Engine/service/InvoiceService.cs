@@ -12,7 +12,7 @@ namespace Engine.service
     public class InvoiceService
     {
         private Invoice invoice;
-        private SqlEngine sqlEngine;
+        private readonly SqlEngine sqlEngine;
 
         public InvoiceService()
         {
@@ -48,14 +48,10 @@ namespace Engine.service
             invoice.AddInvoiceItem(invoiceDetails);
         }
 
-        public void CancelInvoice()
+
+        public void ClearInvoice()
         {
             invoice = null;
-        }
-
-        public void Clear()
-        {
-            CancelInvoice();
         }
 
         public void AddAutomaticInvoices()
@@ -66,6 +62,12 @@ namespace Engine.service
         public void SaveInvoice()
         {
             sqlEngine.SaveInvoiceInDatabase(invoice);
+            ClearInvoice();
+        }
+
+        public object GetInvoiceTotalSum()
+        {
+            return invoice.TotalPrice();
         }
     }
 }
