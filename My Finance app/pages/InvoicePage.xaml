@@ -61,7 +61,6 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Binding="{Binding ProductName}" Header="Produkt" IsReadOnly="True"/>
 
-                        <!--<DataGridTextColumn Binding="{Binding Price, Mode=TwoWay}" Header="Cena jednostkowa"/>-->
                         <DataGridTemplateColumn Header="Cena jednostkowa" IsReadOnly="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -69,7 +68,6 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <!--<DataGridTextColumn Binding="{Binding Quantity, Mode=TwoWay}" Header="Ilość"/>-->
                         <DataGridTemplateColumn Header="Ilość" IsReadOnly="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -77,7 +75,6 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <!--<DataGridTextColumn Binding="{Binding Discount, Mode=TwoWay}" Header="Rabat"/>-->
                         <DataGridTemplateColumn Header="Rabat" IsReadOnly="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -85,20 +82,11 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-
                         <DataGridTextColumn Binding="{Binding TotalPrice, UpdateSourceTrigger=PropertyChanged}" Header="Cena" IsReadOnly="True"/>
                         <DataGridTextColumn Binding="{Binding Description}" Header="Opis"/>
-                        <!--<DataGridTextColumn Binding="{Binding Description}" Header="Kategoria" IsReadOnly="True" />-->
-
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
-            <!--<Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="127*"/>
-                    <ColumnDefinition Width="260*"/>
-                    <ColumnDefinition Width="0*"/>
-                    <ColumnDefinition Width="0*"/>
-                </Grid.ColumnDefinitions>-->
         </Grid>
         <Label Content="Suma:" Grid.Column="2" HorizontalAlignment="Left" Margin="10,169,0,0" VerticalAlignment="Top" Width="48"/>
         <Label x:Name="l_totalPrice" Content="{Binding TotalPrice, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" HorizontalAlignment="Left" Margin="58,169,0,0" VerticalAlignment="Top"/>

@@ -27,6 +27,22 @@ namespace MyFinanceApp.pages
             SetupAdditionalData();
         }
 
+        /// <summary>
+        /// Create or cancel new bill.
+        /// </summary>
+        /// 
+        private void InvoiceOperation(object sender, RoutedEventArgs e)
+        {
+            if (invoiceService.InvoiceExists())
+            {
+                CancelCurrentInvoice();
+            }
+            else
+            {
+                CreateNewInvoice();
+            }
+        }
+
         private void Bt_AddNewItemToInvoice(object sender, RoutedEventArgs e)
         {
             if (cb_product.SelectedValue == null)
@@ -50,7 +66,7 @@ namespace MyFinanceApp.pages
                 }
 
                 invoiceService.AddInvoiceItem(product, price, quantity, description, discount);
-
+                l_totalPrice.Content = invoiceService.GetInvoiceTotalSum();
                 ClearInvoiceItemForm();
             }
 
@@ -97,11 +113,11 @@ namespace MyFinanceApp.pages
 
             UpdateControlsState(true);
             dg_paragony.ItemsSource = null;
-            invoiceService.Clear();
 
             bt_invoiceOperation.Content = "Dodaj paragon";
-            //l_totalPrice.Content = 0.00;
+            l_totalPrice.Content = 0.00;
         }
+
         private void UpdateControlsState(bool state)
         {
             if (state)
@@ -111,10 +127,12 @@ namespace MyFinanceApp.pages
                 tb_nr_paragonu.Clear();
             }
 
+            bt_ref.IsEnabled = !state;
             gr_produkty.IsEnabled = !state;
             gr_invoice.IsEnabled = state;
             bt_invoiceOperation.IsEnabled = true;
         }
+
         private void ClearInvoiceItemForm()
         {
             tb_price.Clear();
@@ -128,6 +146,7 @@ namespace MyFinanceApp.pages
         {
             if (!string.IsNullOrEmpty(cb_shop.Text) && !string.IsNullOrEmpty(cb_bankAccount.Text))
             {
+                
                 //check if shop is on the list. If not then add new shop and reload combo.
 
                 //TODO: method check for shop in DB and automaticly add if shop not exists. 
@@ -136,13 +155,19 @@ namespace MyFinanceApp.pages
 
                 //Load list of products for selected shop
                 int shopId = (int)cb_shop.SelectedValue;
+
+                var accountId = (int)cb_bankAccount.SelectedValue;
+                var invoiceDate = (DateTime)dp_date.SelectedDate;
+                var invoiceNumber = tb_nr_paragonu.Text;
+
                 FillComboboxWithProductsForSelectedShop(shopId);
 
                 //new instance of bill
-                invoiceService.CreateNewInvoice(shopId, (int)cb_bankAccount.SelectedValue, (DateTime)dp_date.SelectedDate, tb_nr_paragonu.Text);
+                invoiceService.CreateNewInvoice(shopId, accountId, invoiceDate, invoiceNumber);
 
                 //setting ItemSource of data grid to bill details
                 dg_paragony.ItemsSource = invoiceService.GetInvoiceItems();
+                l_totalPrice.Content = invoiceService.GetInvoiceTotalSum();
                 UpdateControlsState(false);
                 bt_invoiceOperation.Content = "Anuluj paragon";
 
@@ -155,13 +180,12 @@ namespace MyFinanceApp.pages
         private void CancelCurrentInvoice()
         {
             dg_paragony.ItemsSource = null;
-            invoiceService.CancelInvoice();
+            invoiceService.ClearInvoice();
 
             UpdateControlsState(true);
             bt_invoiceOperation.Content = "Dodaj paragon";
 
         }
-
 
 
         private static decimal CalculateDiscount(string discount)
@@ -192,21 +216,7 @@ namespace MyFinanceApp.pages
             cb_product.Text = productName;
         }
 
-        /// <summary>
-        /// Create or cancel new bill.
-        /// </summary>
-        /// 
-        private void InvoiceOperation(object sender, RoutedEventArgs e)
-        {
-            if (invoiceService.InvoiceExists())
-            {
-                CancelCurrentInvoice();
-            }
-            else
-            {
-                CreateNewInvoice();
-            }
-        }
+
 
         /// <summary>
         /// Refresh bill details data grid..
