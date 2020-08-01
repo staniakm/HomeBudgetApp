@@ -69,7 +69,7 @@ namespace MyFinanceApp.pages
                 {"@kwota", accountMoneyAmount.Text.Replace(",",".")},
                 {"@opis", accountDescription.Text },
                 {"@owner", accountOwner.Text },
-                {"@oprocentowanie", konto_procent.Text},
+                {"@oprocentowanie", konto_procent.Text==""?"0":konto_procent.Text},
                 {"@id", (accountId.Text.Equals("")?null:accountId.Text)}
             };
             //save accout

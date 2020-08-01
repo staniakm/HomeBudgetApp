@@ -24,8 +24,11 @@ namespace MyFinanceApp.pages
             if (dg_asortyment.SelectedIndex > -1)
             {
                 DataRowView dr = (DataRowView)dg_asortyment.SelectedItem;
-                CategoryEditWindow cw = new CategoryEditWindow(dr, categoryService, this);
-                cw.ShowDialog();
+                if (dr != null)
+                {
+                    CategoryEditWindow cw = new CategoryEditWindow(dr, categoryService, this);
+                    cw.ShowDialog();
+                }
             }
         }
 

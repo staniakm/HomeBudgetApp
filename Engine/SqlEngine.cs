@@ -83,7 +83,7 @@ namespace Engine
 
         }
 
-        public void AddAutomaticInvoices() => SQLexecuteNonQuerry("EXEC dbo.auto_invoice");
+        public void AddAutomaticInvoices() => SQLexecuteNonQuerry("EXEC dbo.autoInvoice");
 
         public void UpdateItemCategory(int productId, string newCategoryName, int newCategoryId, string newProductName)
         {
@@ -404,7 +404,7 @@ namespace Engine
         }
         private void RecalculateInvoiceAndUpdateInvoiceCategories(int invoiceId, SqlConnection _con)
         {
-            SQLexecuteNonQuerry(string.Format("exec przeliczParagon {0}", invoiceId), _con);
+            SQLexecuteNonQuerry(string.Format("exec recalculateInvoice {0}", invoiceId), _con);
         }
 
         private void UpdateBankAccount(int invoiceId, SqlConnection _con)
