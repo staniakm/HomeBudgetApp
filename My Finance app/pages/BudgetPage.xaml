@@ -33,7 +33,13 @@
             <Label  Content="Oszczędności:" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
             <Label x:Name="lb_oszczednosci" Content="0.00" ContentStringFormat="{}{0} zł" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
         </StackPanel>
-        <DataGrid x:Name="dg_budzety" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}"/>
+        <DataGrid x:Name="dg_budzety" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Edytuj" Click="EditBudget"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
 
     </Grid>
 </Page>

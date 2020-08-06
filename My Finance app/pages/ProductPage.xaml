@@ -18,9 +18,11 @@
         <Button x:Name="bt_edit_category" Click="EditItemCategory" Content="Edytuj" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,70,10,0"/>
 
         <DataGrid x:Name="dg_asortyment" Grid.Column="1" Margin="5" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}" >
-            <!--<DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Path=nazwa}" IsReadOnly="True" />
-                </DataGrid.Columns>-->
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Edytuj" Click="EditItemCategory"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
         </DataGrid>
     </Grid>
 </Page>

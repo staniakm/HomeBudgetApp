@@ -2,6 +2,7 @@
 using Engine.service;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -99,6 +100,18 @@ namespace MyFinanceApp.pages
             }
             return settings;
 
+        }
+
+        private void ReportItemDetailsMenu(object sender, RoutedEventArgs e)
+        {
+            if (dg_reports.SelectedIndex > -1)
+            {
+                DataRowView dr = (DataRowView)dg_reports.SelectedItem;
+                if (dr != null)
+                {
+                    Console.WriteLine(dr);
+                }
+            }
         }
     }
 }

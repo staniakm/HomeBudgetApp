@@ -13,7 +13,13 @@
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="12*"/>
         </Grid.ColumnDefinitions>
-        <DataGrid x:Name="dg_reports" Grid.Column="1" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsReadOnly="True"/>
+        <DataGrid x:Name="dg_reports" Grid.Column="1" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsReadOnly="True">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Szczegóły" Click="ReportItemDetailsMenu"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
 
         <StackPanel x:Name="sp_ustawieniaRaportu_1">
             <Button x:Name="bt_generuj" Content="Generuj" HorizontalAlignment="Stretch" Margin="5,10,0,0" VerticalAlignment="Top" Click="GenerateReport"/>
