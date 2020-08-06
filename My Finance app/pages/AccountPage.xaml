@@ -39,7 +39,7 @@
             </TabPanel>
             <TabPanel Margin="5" Height="60">
                 <Label Content="Opis" Width="100"/>
-                <TextBox x:Name="accountDescription" Height="60" TextWrapping="Wrap" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Opis, Mode=OneWay}" />
+                <TextBox x:Name="accountDescription" Height="60" TextWrapping="Wrap" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Description, Mode=OneWay}" />
             </TabPanel>
             <TabPanel Margin="5">
                 <Label Content="Właściciel" Width="100"/>
@@ -47,7 +47,7 @@
             </TabPanel>
             <TabPanel Margin="5">
                 <Label Content="Oprocentowanie" Width="100"/>
-                <TextBox x:Name="konto_procent" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.Oprocentowanie, Mode=OneWay}"  PreviewTextInput="NumberValidation"/>
+                <TextBox x:Name="konto_procent" Width="150" Text="{Binding ElementName=konta_cb_konto, Path=SelectedItem.InterestRate, Mode=OneWay}"  PreviewTextInput="NumberValidation"/>
             </TabPanel>
         </StackPanel>
 

@@ -46,13 +46,13 @@ namespace MyFinanceApp
                 DataRowView dr = (DataRowView)dg_budzety.SelectedItem;
                 BudgetEditWindow cw = new BudgetEditWindow(dr, budgetService, GetCurrentlySelectedDate());
                 cw.ShowDialog();
+                ReloadBudgetData();
             }
         }
 
         private void LoadBudget(object sender, RoutedEventArgs e)
         {
             ReloadBudgetData();
-
         }
 
         private void ReloadBudgetData()

@@ -9,7 +9,7 @@ namespace Engine.service
 {
     public class ReportService
     {
-        private SqlEngine sqlEngine;
+        private readonly SqlEngine sqlEngine;
 
         public ReportService(SqlEngine sqlEngine)
         {
@@ -19,21 +19,21 @@ namespace Engine.service
         public DataView PrepareReport(ReportType.Type reportType, Dictionary<int, Tuple<string, string>> reportSettings)
         {
 
-            var sqlCommand = "";
-            switch(reportType)
+            string sqlCommand;
+            switch (reportType)
             {
                 case ReportType.Type.STANDARD:
-                    sqlCommand = "exec generuj_zestawienie_2";
+                    sqlCommand = "exec generateStandardReport";
                     break;
 
                 case ReportType.Type.CATEGORY:
-                    sqlCommand = "exec generuj_zestawienie_podzial_na_kategorie";
+                    sqlCommand = "exec generateReportByCategory";
                     break;
                 case ReportType.Type.CATEGORY_AND_ACCOUNT:
-                    sqlCommand = "exec generuj_zestawienie_podzial_na_kategorie_konto";
+                    sqlCommand = "exec generateReportByCategoryAndAccount";
                     break;
                 case ReportType.Type.INVOICE_LIST:
-                    sqlCommand = "exec show_invoice_list";
+                    sqlCommand = "exec showInvoiceList";
                     break;
                 default:
                     throw new Exception("Incorrect value");
