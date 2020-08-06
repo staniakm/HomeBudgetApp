@@ -1,5 +1,6 @@
 ﻿using Engine;
 using Engine.service;
+using My_Finance_app;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -23,7 +24,7 @@ namespace MyFinanceApp.pages
     /// </summary>
     public partial class ReportPage : Page
     {
-        private ReportService reportService;
+        private readonly ReportService reportService;
         private readonly CategoryService categoryService;
         private readonly ShopService shopService;
 
@@ -109,7 +110,20 @@ namespace MyFinanceApp.pages
                 DataRowView dr = (DataRowView)dg_reports.SelectedItem;
                 if (dr != null)
                 {
-                    Console.WriteLine(dr);
+                    if (cb_report_type.Text.ToUpper().Equals("LISTA PARAGONÓW"))
+                    {
+                        int invoiceId = (int)dr.Row.ItemArray[0];
+                        var invoiceDetails = reportService.GetInvoiceDetails(invoiceId);
+                        InvoiceView cw = new InvoiceView(invoiceDetails);
+                        cw.ShowDialog();
+                    }
+                    else
+                    {
+                        foreach (var element in dr.Row.ItemArray)
+                        {
+                            Console.WriteLine(element);
+                        }
+                    }
                 }
             }
         }

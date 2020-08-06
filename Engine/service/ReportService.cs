@@ -41,5 +41,10 @@ namespace Engine.service
             return sqlEngine.PrepareReport(sqlCommand, reportSettings).DefaultView;
 
         }
+
+        public DataView GetInvoiceDetails(int invoiceId)
+        {
+            return sqlEngine.GetInvoiceDetails(invoiceId).DefaultView;
+        }
     }
 }

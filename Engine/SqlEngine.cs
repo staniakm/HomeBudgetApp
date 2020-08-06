@@ -264,6 +264,15 @@ namespace Engine
             return kategorie;
         }
 
+        public DataTable GetInvoiceDetails(int invoiceId)
+        {
+            string command = string.Format("select a.NAZWA as name, convert(decimal(10,3) ,ilosc) as amount, " +
+                "convert(decimal(10,2),cena_za_jednostke) as unit_price, convert(decimal(10,2),rabat) as discount, " +
+                "convert(decimal(10,2),cena) as price, k.nazwa as category " +
+                "from paragony_szczegoly ps join ASORTYMENT a on a.id = ps.ID_ASO join kategoria k on k.id = a.ID_KAT where id_paragonu = {0}", invoiceId);
+            return GetData(command);
+        }
+
         public DataTable GetBudgets(DateTime date)
         {
             int month = date.Month;
@@ -274,8 +283,8 @@ namespace Engine
 
                 param.Add("@miesiac", month.ToString());
                 param.Add("@year", year.ToString());
-               var sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
-                    "where miesiac = @miesiac and rok = @year order by k.nazwa; ";
+                var sqlquery = "select b.id, b.miesiac, k.nazwa, b.planed, b.used, b.percentUsed from budzet b join kategoria k on k.id = b.category " +
+                     "where miesiac = @miesiac and rok = @year order by k.nazwa; ";
                 return GetData(sqlquery, param);
             }
             else
