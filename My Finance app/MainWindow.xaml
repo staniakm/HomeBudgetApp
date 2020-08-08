@@ -16,12 +16,12 @@
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="Menu" >
                     <MenuItem x:Name="mi_invoice" Header="Paragony" Click="SwichPage"/>
-                    <MenuItem x:Name="mi_report" Header="Zestawienia">
-                        <MenuItem x:Name="mi_standardReport" Header="Standardowe zestawienie" Click="SwichPage" />
-                    </MenuItem>
                     <MenuItem x:Name="mi_budget" Header="Budżet" Click="SwichPage"/>
                     <MenuItem x:Name="mi_product" Header="Asortyment" Click="SwichPage"/>
                     <MenuItem x:Name="mi_account" Header="Konta" Click="SwichPage"/>
+                </MenuItem>
+                <MenuItem x:Name="mi_report" Header="Zestawienia">
+                    <MenuItem x:Name="mi_standardReport" Header="Standardowe zestawienie" Click="SwichPage" />
                 </MenuItem>
             </Menu>
         </DockPanel>
