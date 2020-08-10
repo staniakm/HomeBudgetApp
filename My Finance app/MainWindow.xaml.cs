@@ -1,5 +1,6 @@
 ﻿using Engine;
 using Engine.service;
+using My_Finance_app.pages;
 using MyFinanceApp.pages;
 using System;
 using System.Windows;
@@ -56,6 +57,9 @@ namespace MyFinanceApp
                     break;
                 case "mi_invoice":
                     Main.Content = new InvoicePage(invoiceService, shopService, bankAccountService);
+                    break;
+                case "mi_auto_invoice_prodcut":
+                    Main.Content = new AutoInvoiceProdcutPage(invoiceService, bankAccountService);
                     break;
             }
         }

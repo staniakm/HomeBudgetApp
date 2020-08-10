@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -83,6 +84,7 @@ namespace Engine
 
         }
 
+
         public void AddAutomaticInvoices() => SQLexecuteNonQuerry("EXEC dbo.autoInvoice");
 
         public void UpdateItemCategory(int productId, string newCategoryName, int newCategoryId, string newProductName)
@@ -117,6 +119,15 @@ namespace Engine
                 ShopAso.Add(new Product((int)item["id"], (string)item["NAZWA"]));
             }
             return ShopAso;
+        }
+
+        internal DataTable GetAutoInvoiceItemList()
+        {
+            string query = "select a.NAZWA produkt, s.sklep, k.nazwa konto, CONVERT(decimal(9,2),p.PRICE_PER_UNIT) cena, p.QUANTITY ilość " +
+                "from AUTOMATIC_PRODUCT_LIST p join ASORTYMENT a on a.id = p.ASO_ID " +
+                "join sklepy s on s.ID = p.SHOP_ID " +
+                "join konto k on k.ID = p.ACCOUNT_ID; ";            
+            return GetData(query);
         }
 
         public DataTable PrepareReport(string sqlCommand, Dictionary<int, Tuple<string, string>> reportSettings)

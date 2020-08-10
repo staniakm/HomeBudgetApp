@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data;
 
 namespace Engine.service
 {
@@ -14,9 +11,6 @@ namespace Engine.service
         private Invoice invoice;
         private readonly SqlEngine sqlEngine;
 
-        public InvoiceService()
-        {
-        }
 
         public InvoiceService(SqlEngine sqlEngine)
         {
@@ -31,10 +25,6 @@ namespace Engine.service
         public void CreateNewInvoice(int shopId, int accountId, DateTime invoiceDate, string invoiceNumber)
         {
             invoice = new Invoice(shopId, accountId, invoiceDate, invoiceNumber);
-            //invoice.SetDate(invoiceDate);
-            //invoice.SetInvoiceNumber(invoiceNumber);
-            //invoice.SetShopId(shopId);
-            //invoice.SetAccount(accountId);
         }
 
         public ObservableCollection<InvoiceDetails> GetInvoiceItems()
@@ -57,6 +47,11 @@ namespace Engine.service
         public void AddAutomaticInvoices()
         {
             sqlEngine.AddAutomaticInvoices();
+        }
+
+        public DataTable GetAutoInvoiceItemList()
+        {
+            return sqlEngine.GetAutoInvoiceItemList();
         }
 
         public void SaveInvoice()
