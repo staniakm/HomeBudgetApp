@@ -13,7 +13,6 @@ namespace Engine
 
         public SqlEngine(string database, string user, string pass)
         {
-
             string dbString = @"localhost\SQLEXPRESS";
             conString = string.Format("Data Source={0}; Initial Catalog={1}; Integrated Security=false;" +
                     "Connection Timeout=10; user id={2}; password={3}", dbString, database, user, pass);
@@ -209,7 +208,7 @@ namespace Engine
             DataTable dt = GetTableByName("konta");
             foreach (DataRow item in dt.Rows)
             {
-                konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"], (decimal)item["kwota"], (string)item["opis"], (string)item["wlasciciel"], (decimal)item["oprocentowanie"]));
+                konta.Add(new BankAccount((int)item["id"], (string)item["nazwa"], (decimal)item["kwota"], (string)item["opis"], (int)item["wlasciciel"], (decimal)item["oprocentowanie"]));
             }
             return konta;
         }
@@ -376,6 +375,9 @@ namespace Engine
                     break;
                 case "kategorie":
                     sqlCommand = "select '' nazwa, -1 id union SELECT nazwa,id FROM kategoria order by nazwa;";
+                    break;
+                case "account_owner":
+                    sqlCommand = "SELECT owner_id as id, name ,description FROM account_owner order by name;";
                     break;
             }
             return GetData(sqlCommand);
@@ -653,13 +655,10 @@ namespace Engine
 
         private string SQLgetScalar(string querry, SqlConnection conn)
         {
-            string output = "";
             try
             {
                 SqlCommand sql = new SqlCommand(querry, conn);
-
-                output = sql.ExecuteScalar().ToString();
-
+                return sql.ExecuteScalar().ToString();
             }
             catch (Exception ex)
             {
@@ -667,7 +666,6 @@ namespace Engine
                 //Console.WriteLine("SQL scalar Value MSG: " + ex.Message);
                 throw;
             }
-            return output;
         }
     }
 

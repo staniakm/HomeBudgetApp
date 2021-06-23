@@ -55,6 +55,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="entity\Shop.cs" />
     <Compile Include="Reports.cs" />
+    <Compile Include="repository\ShopRepository.cs" />
     <Compile Include="service\BankAccountService.cs" />
     <Compile Include="service\BudgetService.cs" />
     <Compile Include="service\CategoryService.cs" />

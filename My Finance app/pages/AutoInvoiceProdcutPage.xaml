@@ -14,17 +14,16 @@
             <ColumnDefinition Width="600*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Background="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
-            <Button x:Name="bt_add_item" Content="Dodaj" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,10,10,0" />
-            <Button x:Name="bt_remove_item" Content="Usuń" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,2,10,0" />
-            <Button x:Name="bt_edit_item"  Content="Edytuj" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,2,10,0"/>
-            <Button x:Name="bt_update_month_invoice" Content="Aktualizuj paragon" ToolTip="Aktualizuje paragon dodany w tym miesiącu" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="10,2,10,0"/>
+            <Button x:Name="bt_add_item" Content="Dodaj" Click="AddAutoInvoiceItem" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,10,10,0" />
+            <Button x:Name="bt_update_month_invoice" Content="Aktualizuj paragon" ToolTip="Aktualizuje paragon dodany w tym miesiącu" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="10,2,10,0" Click="UpdateAutoinvoiceData"/>
         </StackPanel>
         <DataGrid x:Name="dg_autoInvoiceItems" Grid.Column="1" Margin="1,2,3,2" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" ItemsSource="{Binding}">
-            <!--<DataGrid.ContextMenu>
+            <DataGrid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Edytuj" Click="EditBudget"/>
+                    <MenuItem Header="Edytuj" Click="EditItem"/>
+                    <MenuItem Header="Usuń" Click="DeleteItem"/>
                 </ContextMenu>
-            </DataGrid.ContextMenu>-->
+            </DataGrid.ContextMenu>
         </DataGrid>
     </Grid>
 </Page>

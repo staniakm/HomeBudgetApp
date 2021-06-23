@@ -153,6 +153,7 @@ namespace MyFinanceApp.pages
                 //should be split to two separated methods
                 CreateShopIfNotExists();
 
+
                 //Load list of products for selected shop
                 int shopId = (int)cb_shop.SelectedValue;
 
