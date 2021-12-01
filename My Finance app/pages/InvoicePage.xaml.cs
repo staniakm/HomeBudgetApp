@@ -1,6 +1,7 @@
 ﻿using Engine;
 using Engine.service;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -14,6 +15,8 @@ namespace MyFinanceApp.pages
     /// </summary>
     public partial class InvoicePage : Page
     {
+
+        private Invoice invoice = null;
         private readonly InvoiceService invoiceService;
         private readonly ShopService shopService;
         private readonly BankAccountService bankAccountService;
@@ -33,7 +36,7 @@ namespace MyFinanceApp.pages
         /// 
         private void InvoiceOperation(object sender, RoutedEventArgs e)
         {
-            if (invoiceService.InvoiceExists())
+            if (InvoiceExists())
             {
                 CancelCurrentInvoice();
             }
@@ -65,8 +68,8 @@ namespace MyFinanceApp.pages
                     discount = CalculateDiscount(tb_discount.Text);
                 }
 
-                invoiceService.AddInvoiceItem(product, price, quantity, description, discount);
-                l_totalPrice.Content = invoiceService.GetInvoiceTotalSum();
+                AddInvoiceItem(product, price, quantity, description, discount);
+                l_totalPrice.Content = GetInvoiceTotalSum();
                 ClearInvoiceItemForm();
             }
 
@@ -109,8 +112,8 @@ namespace MyFinanceApp.pages
         /// <param name="e"></param>
         private void Bt_SaveInvoiceInDatabase(object sender, RoutedEventArgs e)
         {
-            invoiceService.SaveInvoice();
-
+            invoiceService.SaveInvoice(invoice);
+            ClearInvoice();
             UpdateControlsState(true);
             dg_paragony.ItemsSource = null;
 
@@ -164,15 +167,49 @@ namespace MyFinanceApp.pages
                 FillComboboxWithProductsForSelectedShop(shopId);
 
                 //new instance of bill
-                invoiceService.CreateNewInvoice(shopId, accountId, invoiceDate, invoiceNumber);
+                invoice = new Invoice(shopId, accountId, invoiceDate, invoiceNumber);
+                //invoiceService.CreateNewInvoice(shopId, accountId, invoiceDate, invoiceNumber);
 
                 //setting ItemSource of data grid to bill details
-                dg_paragony.ItemsSource = invoiceService.GetInvoiceItems();
-                l_totalPrice.Content = invoiceService.GetInvoiceTotalSum();
+                dg_paragony.ItemsSource = GetInvoiceItems();
+                l_totalPrice.Content = GetInvoiceTotalSum();
                 UpdateControlsState(false);
                 bt_invoiceOperation.Content = "Anuluj paragon";
 
             }
+        }
+
+
+        private decimal GetInvoiceTotalSum()
+        {
+            return invoice.TotalPrice();
+        }
+
+        public bool InvoiceExists()
+        {
+            return invoice != null;
+        }
+
+        //public void CreateNewInvoice(int shopId, int accountId, DateTime invoiceDate, string invoiceNumber)
+        //{
+        //    invoice = new Invoice(shopId, accountId, invoiceDate, invoiceNumber);
+        //}
+
+        private ObservableCollection<InvoiceDetails> GetInvoiceItems()
+        {
+            return invoice.GetInvoiceItems();
+        }
+
+        public void AddInvoiceItem(Product product, decimal price, decimal quantity, string description, decimal discount)
+        {
+            InvoiceDetails invoiceDetails = new InvoiceDetails(product, price, quantity, description, discount);
+            invoice.AddInvoiceItem(invoiceDetails);
+        }
+
+
+        public void ClearInvoice()
+        {
+            invoice = null;
         }
 
         /*
@@ -181,7 +218,7 @@ namespace MyFinanceApp.pages
         private void CancelCurrentInvoice()
         {
             dg_paragony.ItemsSource = null;
-            invoiceService.ClearInvoice();
+            ClearInvoice();
 
             UpdateControlsState(true);
             bt_invoiceOperation.Content = "Dodaj paragon";
@@ -227,7 +264,7 @@ namespace MyFinanceApp.pages
         private void RefreshDataGrid(object sender, RoutedEventArgs e)
         {
             dg_paragony.ItemsSource = null;
-            dg_paragony.ItemsSource = invoiceService.GetInvoiceItems();
+            dg_paragony.ItemsSource = GetInvoiceItems();
 
         }
 

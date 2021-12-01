@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Engine.entity;
+using Engine.reports;
+using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -15,31 +17,29 @@ namespace Engine.service
 
         public DataView PrepareReport(ReportType.Type reportType, Dictionary<int, Tuple<string, string>> reportSettings)
         {
-
-            string sqlCommand;
-            switch (reportType)
-            {
-                case ReportType.Type.STANDARD:
-                    sqlCommand = "exec generateStandardReport";
-                    break;
-
-                case ReportType.Type.CATEGORY:
-                    sqlCommand = "exec generateReportByCategory";
-                    break;
-                case ReportType.Type.CATEGORY_AND_ACCOUNT:
-                    sqlCommand = "exec generateReportByCategoryAndAccount";
-                    break;
-                case ReportType.Type.INVOICE_LIST:
-                    sqlCommand = "exec showInvoiceList";
-                    break;
-                default:
-                    throw new Exception("Incorrect value");
-            }
-            return sqlEngine.PrepareReport(sqlCommand, reportSettings).DefaultView;
+            var report = GetReportByType(reportType);
+            return sqlEngine.PrepareReport(report, reportSettings).DefaultView;
 
         }
 
-        public DataView GetInvoiceDetails(int invoiceId)
+        private IReport GetReportByType(ReportType.Type reportType)
+        {
+            switch (reportType)
+            {
+                case ReportType.Type.STANDARD:
+                    return new StandardReports();
+                case ReportType.Type.CATEGORY:
+                    return new CategoryReport();
+                case ReportType.Type.CATEGORY_AND_ACCOUNT:
+                    return new CategoryAccountReport();
+                case ReportType.Type.INVOICE_LIST:
+                    return new InvoiceReport();
+                default:
+                    throw new Exception("Incorrect report value: " + reportType);
+            }
+        }
+
+        public DataView GetInvoiceDetails(long invoiceId)
         {
             return sqlEngine.GetInvoiceDetails(invoiceId).DefaultView;
         }

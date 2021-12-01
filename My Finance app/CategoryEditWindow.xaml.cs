@@ -22,9 +22,9 @@ namespace MyFinanceApp
 
             productId = (int)id[0];
             lb_id_aso.Content = id[0];
-            lb_product_name.Text= id["Nazwa"].ToString();
-            lb_id_kat.Content = id["id_kat"];
-            lb_nazwa_kat.Content = id["Nazwa kategorii"];
+            lb_product_name.Text= id["produkt"].ToString();
+            lb_id_kat.Content = id["id_kategorii"];
+            lb_nazwa_kat.Content = id["kategoria"];
             this.categoryService = categoryService;
             this.mw = mw;
             LoadCategories();

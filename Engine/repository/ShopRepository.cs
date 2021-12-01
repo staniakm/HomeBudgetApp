@@ -24,7 +24,7 @@ namespace Engine.repository
         {
             ObservableCollection<Shop> sklepy = new ObservableCollection<Shop>();
 
-            DataTable dt = sqlEngine.GetData("select '' sklep, -1 id union SELECT sklep, id FROM sklepy order by sklep;");
+            DataTable dt = sqlEngine.GetData("select '' name, -1 id union SELECT name, id FROM shop order by name;");
             foreach (DataRow item in dt.Rows)
             {
                 sklepy.Add(new Shop(item));
@@ -39,42 +39,41 @@ namespace Engine.repository
             DataTable dt = GetAsoList(shop);
             foreach (DataRow item in dt.Rows)
             {
-                ShopAso.Add(new Product((int)item["id"], (string)item["NAZWA"]));
+                ShopAso.Add(new Product((int)item["id"], (string)item["name"]));
             }
             return ShopAso;
         }
 
-
-        /// <summary>
+                /// <summary>
         /// Jeśli procesura zwróci wartość > 0 tzn że sklep został dopisany. 
         /// </summary>
         /// <param name="shopName"></param>
         /// <returns></returns>
         public int CreateNewShopIfNotExists(string shopName)
         {
-            return sqlEngine.SQLexecuteNonQuerry(string.Format("if not exists(select 1 from sklepy where sklep = '{0}') insert into sklepy(sklep) select '{0}'", shopName));
+            return sqlEngine.SQLexecuteNonQuerry(string.Format("insert into shop(name) select '{0}'where not exists(select 1 from shop where Upper(name) = Upper('{0}'))", shopName));
         }
 
         public void AddAsoToShop(string produkt, int shopId)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>
             {
-                { "@produkt", produkt },
-                { "@idsklep", shopId.ToString() }
+                { "produkt", produkt.ToString() },
+                { "shopid", shopId.ToString() }
             };
 
-            sqlEngine.SQLexecuteNonQuerryProcedure("dbo.addAsoToStore", dic);
+            sqlEngine.SQLexecuteNonQuerry($@"call addasotoshop ('{produkt}', {shopId})");
         }
 
         private DataTable GetAsoList(int shop)
         {
             Dictionary<string, int> dict = new Dictionary<string, int>
             {
-                { "@id", shop }
+                { "id", shop }
             };
 
-            string querry = "select '' as NAZWA, 0 id union  select a.NAZWA, a.id from ASORTYMENT a join ASORTYMENT_SKLEP sk on sk.id_aso = a.id " +
-                "join sklepy s on sk.id_sklep = s.id and s.ID = @id where a.del = 0 and sk.del = 0 order by nazwa";
+            string querry = "select '' as name, 0 id union  select a.name, a.id from assortment a join shop_assortment sk on sk.aso = a.id " +
+                "join shop s on sk.shop = s.id and s.ID = @id where a.del = false and sk.del = false order by name";
             return sqlEngine.GetData(querry, dict);
         }
     }

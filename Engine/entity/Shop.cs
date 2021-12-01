@@ -17,7 +17,7 @@ namespace Engine
         public Shop(DataRow item)
         {
             ID = (int)item["id"];
-            Name = (string)item["sklep"];
+            Name = (string)item["name"];
         }
     }
 }

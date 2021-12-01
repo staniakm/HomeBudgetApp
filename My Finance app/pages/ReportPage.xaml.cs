@@ -102,7 +102,7 @@ namespace MyFinanceApp.pages
                 {
                     if (cb_report_type.Text.ToUpper().Equals("LISTA PARAGONÓW"))
                     {
-                        int invoiceId = (int)dr.Row.ItemArray[0];
+                        var invoiceId = (long)dr.Row.ItemArray[0];
                         var invoiceDetails = reportService.GetInvoiceDetails(invoiceId);
                         InvoiceView cw = new InvoiceView(invoiceDetails);
                         cw.ShowDialog();

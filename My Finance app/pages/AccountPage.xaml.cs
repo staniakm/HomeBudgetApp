@@ -65,12 +65,12 @@ namespace MyFinanceApp.pages
             string selectedAccount = konta_cb_konto.Text;
             Dictionary<string, string> tmpDic = new Dictionary<string, string>()
             {
-                {"@nazwa", accountName.Text},
-                {"@kwota", accountMoneyAmount.Text.Replace(",",".")},
-                {"@opis", accountDescription.Text },
-                {"@owner", accountOwner.Text },
-                {"@oprocentowanie", konto_procent.Text==""?"0":konto_procent.Text},
-                {"@id", (accountId.Text.Equals("")?null:accountId.Text)}
+                {"name", accountName.Text},
+                {"amount", accountMoneyAmount.Text.Replace(",",".")},
+                {"description", accountDescription.Text },
+                {"owner", accountOwner.Text },
+                {"oprocentowanie", konto_procent.Text==""?"0":konto_procent.Text},
+                {"id", (accountId.Text.Equals("")?null:accountId.Text)}
             };
             //save accout
             bankAccountService.ModifyBankAccount(tmpDic);

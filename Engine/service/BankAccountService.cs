@@ -1,30 +1,27 @@
-﻿using System;
+﻿using Engine.repository;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Engine.service
 {
-    
+
     public class BankAccountService
     {
-        private readonly SqlEngine sqlEngine;
+        private readonly BankAccountRepository repository;
 
-        public BankAccountService(SqlEngine sqlEngine)
+        public BankAccountService(BankAccountRepository repository)
         {
-            this.sqlEngine = sqlEngine;
+            this.repository = repository;
         }
 
         public ObservableCollection<BankAccount> GetBankAccounts()
         {
-            return sqlEngine.GetBankAccountsCollection();
+            return repository.GetBankAccountsCollection();
         }
 
         public void ModifyBankAccount(Dictionary<string, string> tmpDic)
         {
-            sqlEngine.ModifyBankAccount(tmpDic);
+            repository.ModifyBankAccount(tmpDic);
         }
 
     }

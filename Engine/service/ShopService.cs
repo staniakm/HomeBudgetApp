@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Engine.repository;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -9,32 +10,32 @@ namespace Engine.service
 {
     public class ShopService
     {
-        private SqlEngine sqlEngine;
+        private ShopRepository shopRepository;
 
-        public ShopService(SqlEngine sql)
+        public ShopService(ShopRepository shopRepository)
         {
-            sqlEngine = sql;
+            this.shopRepository = shopRepository;
             Console.WriteLine("Loading shop service");
         }
 
         public ObservableCollection<Shop> GetShopsCollection()
         {
-            return sqlEngine.GetShopsCollection();
+            return shopRepository.GetShopsCollection();
         }
 
         public ObservableCollection<Product> GetProductsInStore(int shopId)
         {
-            return sqlEngine.GetProductsInStore(shopId);
+            return shopRepository.GetProductsInStore(shopId);
         }
 
         public int CreateNewShopIfNotExists(string shopName)
         {
-            return sqlEngine.CreateNewShopIfNotExists(shopName);
+            return shopRepository.CreateNewShopIfNotExists(shopName);
         }
 
         public void AddAsoToShop(string productName, int shopId)
         {
-            sqlEngine.AddAsoToShop(productName, shopId);
+            shopRepository.AddAsoToShop(productName, shopId);
         }
     }
 }

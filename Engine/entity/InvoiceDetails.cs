@@ -19,6 +19,25 @@ namespace Engine
         public string Description { get; set; }
 
 
+        public string getPriceAsString()
+        {
+            return Price.ToString().Replace(",", ".");
+        }
+
+        public string getQuantityAsString()
+        {
+            return Quantity.ToString().Replace(",", ".");
+        }
+
+        public string getDiscountAsString()
+        {
+            return Discount.ToString().Replace(",", ".");
+        }
+
+        public string getTotalPriceAsString()
+        {
+            return TotalPrice.ToString().Replace(",", ".");
+        }
 
         public InvoiceDetails(Product product, decimal cena, decimal ilosc, string opis = "", decimal discount=0.0M)
         {
