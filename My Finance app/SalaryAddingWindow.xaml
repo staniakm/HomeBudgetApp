@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="SalaryAddingWindow" Height="250" Width="390">
     <Grid >
-        <ComboBox x:Name="salary_description" HorizontalAlignment="Left" ItemsSource="{Binding}" DisplayMemberPath="text" Margin="83,21,0,0" VerticalAlignment="Top" Width="284" Height="31"/>
+        <ComboBox x:Name="salary_description" HorizontalAlignment="Left" ItemsSource="{Binding}" DisplayMemberPath="name" Margin="83,21,0,0" VerticalAlignment="Top" Width="284" Height="31"/>
         <TextBox x:Name="sallary_amount" HorizontalAlignment="Left" Height="32" Margin="83,66,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="278" PreviewTextInput="NumberValidation" />
         <Label Content="Opis" HorizontalAlignment="Left" Margin="13,21,0,0" VerticalAlignment="Top" Width="53"/>
         <Label Content="Kwota" HorizontalAlignment="Left" Margin="13,66,0,0" VerticalAlignment="Top" Width="53"/>

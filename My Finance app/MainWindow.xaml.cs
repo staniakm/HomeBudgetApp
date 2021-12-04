@@ -1,4 +1,5 @@
 ﻿using Engine;
+using Engine.repository;
 using Engine.service;
 using My_Finance_app.pages;
 using MyFinanceApp.pages;
@@ -19,12 +20,12 @@ namespace MyFinanceApp
 
         public MainWindow(SqlEngine sqlEngine)
         {
-            shopService = new ShopService(sqlEngine);
-            bankAccountService = new BankAccountService(sqlEngine);
+            shopService = new ShopService(new ShopRepository());
+            bankAccountService = new BankAccountService(new BankAccountRepository());
             invoiceService = new InvoiceService(sqlEngine);
             reportService = new ReportService(sqlEngine);
             categoryService = new CategoryService(sqlEngine);
-            budgetService = new BudgetService(sqlEngine);
+            budgetService = new BudgetService(new BudgetRepository());
 
             InitializeComponent();
             Main.Content = new InvoicePage(invoiceService, shopService, bankAccountService);

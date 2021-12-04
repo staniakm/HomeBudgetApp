@@ -42,6 +42,24 @@ namespace My_Finance_app.pages
             dg_autoInvoiceItems.ItemsSource = invoiceService.GetAutoInvoiceItemList().DefaultView;
         }
 
+        private void AddAutoInvoiceItem(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Add new item dialog");
+        }
 
+        private void UpdateAutoinvoiceData(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Updating autoinvoice for current month");
+        }
+
+        private void DeleteItem(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Delete item");
+        }
+
+        private void EditItem(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Edit item");
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace Engine
         public Category(DataRow item)
         {
             ID = (int)item["id"];
-            Name = (string)item["nazwa"];
+            Name = (string)item["name"];
         }
     }
 }

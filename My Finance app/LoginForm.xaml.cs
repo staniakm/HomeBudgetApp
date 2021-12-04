@@ -15,10 +15,10 @@ namespace MyFinanceApp
         private void ConfirmLogin_Click(object sender, RoutedEventArgs e)
         {
             //create instance to SqlEngine for selected database
-            SqlEngine sql = new SqlEngine(cb_db_name.Text, login.Text, pass.Password.ToString());
+            SqlEngine sql = SqlEngine.GetInstance();
             ////check if login data are correct
             ///
-            bool isLogged = sql.TryLogin();
+            bool isLogged = sql.TryLogin(cb_db_name.Text, login.Text, pass.Password.ToString());
 
             if (isLogged)
             {
