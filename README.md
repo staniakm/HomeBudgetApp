@@ -5,4 +5,8 @@ At first SQL Server express edition was used. Now it is ported to PostgreSql dat
 Created for tracking home budget flow (expenses, income, account balance) and plan month budget
 
 Readme soon be updated with "How to run" information.     
-I plan to merge this reposoitry with other repositories that us data from postgres DB
+
+Data can be fetched through api build with kotlin and spring boot [rest api](https://github.com/staniakm/homeBudgetKotlinApi)    
+Front end application is available on this [repo](https://github.com/staniakm/homeBudgetReact). At this moment it can be outdated a little.      
+
+Also, simple android app will be available on [this placeholder](http://localhost:8080) repo
