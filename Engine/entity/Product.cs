@@ -9,10 +9,13 @@ namespace Engine
         public int ID { get;  set; }
         public string Name { get;  set; }
 
-        public Product(int id, string name)
+        public int CategoryId { get; set; }
+
+        public Product(int id, string name, int categoyId)
         {
             ID = id;
             Name = name;
+            CategoryId = categoyId;
         }
 
     }

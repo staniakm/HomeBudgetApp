@@ -34,7 +34,7 @@ namespace Engine
            // string dbString = @"localhost\SQLEXPRESS";
             // conString = string.Format("Data Source={0}; Initial Catalog={1}; Integrated Security=false;" +
                //     "Connection Timeout=10; user id={2}; password={3}", dbString, database, user, pass);
-            conString = string.Format("Host=localhost;Username={0};Password={1};Database=postgres",user, pass);
+            conString = string.Format("Host=localhost;Username={0};Password={1};Database={2}",user, pass, database);
 
             bool connected = false;
             using (NpgsqlConnection _con = new NpgsqlConnection(conString))
@@ -289,8 +289,9 @@ namespace Engine
             foreach (var item in invoice.GetInvoiceItems())
             {
                 sb.AppendLine(
-                    $@"insert into invoice_details(invoice, unit_price, amount, price, discount, assortment, description)
-                            values ({invoiceId}, {item.getPriceAsString()}, {item.getQuantityAsString()}, {item.getTotalPriceAsString()}, {item.getDiscountAsString()}, {item.GetIDAso()}, '{item.Description}');");
+                    $@"insert into invoice_details(invoice, unit_price, amount, price, discount, assortment, description, category)
+                            values ({invoiceId}, {item.getPriceAsString()}, {item.getQuantityAsString()}, {item.getTotalPriceAsString()}, 
+                                    {item.getDiscountAsString()}, {item.GetIDAso()}, '{item.Description}', {item.Product.CategoryId});");
             }
             Console.WriteLine(sb.ToString());
 
