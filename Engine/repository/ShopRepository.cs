@@ -39,7 +39,7 @@ namespace Engine.repository
             DataTable dt = GetAsoList(shop);
             foreach (DataRow item in dt.Rows)
             {
-                ShopAso.Add(new Product((int)item["id"], (string)item["name"]));
+                ShopAso.Add(new Product((int)item["id"], (string)item["name"], (int)item["category"]));
             }
             return ShopAso;
         }
@@ -72,7 +72,7 @@ namespace Engine.repository
                 { "id", shop }
             };
 
-            string querry = "select '' as name, 0 id union  select a.name, a.id from assortment a join shop_assortment sk on sk.aso = a.id " +
+            string querry = "select '' as name, 0 id, 1 category union  select a.name, a.id, a.category from assortment a join shop_assortment sk on sk.aso = a.id " +
                 "join shop s on sk.shop = s.id and s.ID = @id where a.del = false and sk.del = false order by name";
             return sqlEngine.GetData(querry, dict);
         }

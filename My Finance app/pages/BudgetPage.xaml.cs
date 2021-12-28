@@ -23,14 +23,14 @@ namespace MyFinanceApp
         private void SetPreviousMonth(object sender, RoutedEventArgs e)
         {
             selectedDate = selectedDate.AddMonths(-1);
-            lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
+            lb_selectedMonth.Content = selectedDate.ToString("yyyy-MM");
             ReloadBudgetData();
         }
 
         private void SetNextMonth(object sender, RoutedEventArgs e)
         {
             selectedDate = selectedDate.AddMonths(1);
-            lb_selectedMonth.Content = selectedDate.ToShortDateString().Substring(0, 7);
+            lb_selectedMonth.Content = selectedDate.ToString("yyyy-MM");
             ReloadBudgetData();
         }
 
